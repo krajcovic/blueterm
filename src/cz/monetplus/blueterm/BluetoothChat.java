@@ -16,7 +16,12 @@
 
 package cz.monetplus.blueterm;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -75,7 +80,7 @@ public class BluetoothChat extends Activity {
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
 	// Array adapter for the conversation thread
-	private WarmerAdapter<String> mConversationArrayAdapter;
+	private ArrayAdapter<String> mConversationArrayAdapter;
 	// String buffer for outgoing messages
 	private StringBuffer mOutStringBuffer;
 	// Local Bluetooth adapter
@@ -89,7 +94,10 @@ public class BluetoothChat extends Activity {
 	// in the arrayList we add the messaged received from server
 	private ArrayList<String> arrayList;
 
-	private WarmerAdapter<?> mAdapter;
+	private WarmerAdapter mAdapter;
+
+	private ByteArrayInputStream slipInputFraming;
+	private ByteArrayOutputStream slipOutputpFraming;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,6 +126,19 @@ public class BluetoothChat extends Activity {
 			finish();
 			return;
 		}
+
+		slipOutputpFraming = new ByteArrayOutputStream();
+		// slipInputFraming = new ByteArrayInputStream(new byte[512]);
+
+		arrayList = new ArrayList<String>();
+
+		// relate the listView from java to the one created in xml
+		// mList = (ListView)findViewById(R.id.list);
+		mAdapter = new WarmerAdapter(this, arrayList);
+		// mList.setAdapter(mAdapter);
+
+		// connect to the server
+		new TCPconnectTask().execute("");
 	}
 
 	@Override
@@ -163,7 +184,7 @@ public class BluetoothChat extends Activity {
 		Log.d(TAG, "setupChat()");
 
 		// Initialize the array adapter for the conversation thread
-		mConversationArrayAdapter = new WarmerAdapter<String>(this,
+		mConversationArrayAdapter = new ArrayAdapter<String>(this,
 				R.layout.message);
 		mConversationView = (ListView) findViewById(R.id.in);
 		mConversationView.setAdapter(mConversationArrayAdapter);
@@ -179,7 +200,7 @@ public class BluetoothChat extends Activity {
 				// Send a message using content of the edit text widget
 				TextView view = (TextView) findViewById(R.id.edit_text_out);
 				String message = view.getText().toString();
-				sendMessage(message);
+				sendMessage(message.getBytes());
 			}
 		});
 
@@ -232,7 +253,7 @@ public class BluetoothChat extends Activity {
 	 * @param message
 	 *            A string of text to send.
 	 */
-	private void sendMessage(String message) {
+	private void sendMessage(byte[] message) {
 		// Check that we're actually connected before trying anything
 		if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
 			Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT)
@@ -241,10 +262,10 @@ public class BluetoothChat extends Activity {
 		}
 
 		// Check that there's actually something to send
-		if (message.length() > 0) {
+		if (message.length > 0) {
 			// Get the message bytes and tell the BluetoothChatService to write
-			byte[] send = message.getBytes();
-			mChatService.write(send);
+			// byte[] send = message.getBytes();
+			mChatService.write(message);
 
 			// Reset out string buffer to zero and clear the edit text field
 			mOutStringBuffer.setLength(0);
@@ -261,7 +282,7 @@ public class BluetoothChat extends Activity {
 			if (actionId == EditorInfo.IME_NULL
 					&& event.getAction() == KeyEvent.ACTION_UP) {
 				String message = view.getText().toString();
-				sendMessage(message);
+				sendMessage(message.getBytes());
 			}
 			if (D)
 				Log.i(TAG, "END onEditorAction");
@@ -301,7 +322,59 @@ public class BluetoothChat extends Activity {
 			case MESSAGE_READ:
 				byte[] readBuf = (byte[]) msg.obj;
 				// construct a string from the valid bytes in the buffer
-				String readMessage = new String(readBuf, 0, msg.arg1);
+				// String readMessage = new String(readBuf, 0, msg.arg1);
+				String readMessage = MonetUtils.bytesToHex(readBuf, msg.arg1);
+				slipOutputpFraming.write(readBuf, 0, msg.arg1);
+				Log.d(TAG, "Len: " + slipOutputpFraming.size());
+				if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
+					Log.d(TAG, "Execute SLIP.getFrame");
+
+					// Ulozim si zbytek predchozich odpovedi
+					byte[] restInput = new byte[0];
+					try {
+						if (slipInputFraming != null) {
+							restInput = new byte[slipInputFraming.available()];
+							slipInputFraming.read(restInput);
+						}
+					} catch (IOException e) {
+						Log.e(TAG, e.getMessage());
+					}
+
+					// sloucim zbytek a aktulane obdrzene data
+					slipInputFraming = new ByteArrayInputStream(
+							MonetUtils.concat(restInput,
+									slipOutputpFraming.toByteArray()));
+					slipOutputpFraming.reset();
+					Log.d(TAG, "Available" + slipInputFraming.available());
+
+					// vyctu si prvni frame
+					ByteArrayOutputStream frame = new ByteArrayOutputStream();
+					byte cur;
+					while ((cur = (byte) slipInputFraming.read()) != SLIPFrame.END) {
+						frame.write(cur);
+					}
+					frame.write(cur);
+
+					// rozparsuju frame
+					byte[] obsah = SLIPFrame.parseFrame(frame.toByteArray());
+					TerminalFrame termFram = new TerminalFrame(obsah);
+
+					switch (termFram.getPort()) {
+					// TODO: udelat enum
+					case 33333:
+						break;
+					case 33334:
+						break;
+					case 33335:
+						break;
+					case 33336:
+						break;
+					}
+
+				}
+
+				Log.d(TAG, "Len: " + slipOutputpFraming.size());
+
 				mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
 						+ readMessage);
 				break;
@@ -404,6 +477,12 @@ public class BluetoothChat extends Activity {
 				public void messageReceived(String message) {
 					// this method calls the onProgressUpdate
 					publishProgress(message);
+
+					TerminalFrame termFrame = new TerminalFrame(33330, message
+							.getBytes());
+
+					// send to terminal
+					sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
 				}
 			});
 			mTcpClient.run();

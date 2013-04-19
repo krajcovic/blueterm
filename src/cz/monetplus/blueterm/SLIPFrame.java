@@ -74,4 +74,28 @@ public class SLIPFrame {
 		return bout.toByteArray();
 
 	}
+
+	public static byte[] getFirstFrame(byte[] data) {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream(data.length);
+
+		for (byte b : data) {
+			bout.write(b);
+			if (b == END) {
+				// return bout.toByteArray();
+				break;
+			}
+		}
+
+		return bout.toByteArray();
+	}
+
+	public static boolean isFrame(byte[] data) {
+
+		for (byte b : data) {
+			if (b == END)
+				return true;
+		}
+
+		return false;
+	}
 }

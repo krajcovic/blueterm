@@ -1,6 +1,8 @@
 package cz.monetplus.blueterm;
 
 public class CRCFCS {
+	public static final int PPPINITFCS = 0xffff;
+	public static final int PPPGOODFCS = 0xf0b8;
 	/*
 	 * FCS lookup table as calculated by the table generator in section 2.
 	 */
@@ -38,9 +40,6 @@ public class CRCFCS {
 			0x92b9, 0x8330, 0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a,
 			0x1ef1, 0x0f78 };
 
-	// #define PPPINITFCS 0xffff /* Initial FCS value */
-	// #define PPPGOODFCS 0xf0b8 /* Good final FCS value */
-
 	/*
 	 * Calculate a new fcs given the current fcs and the new data.
 	 */
@@ -55,8 +54,11 @@ public class CRCFCS {
 	// return (fcs);
 	// }
 
-	int pppfcs(int fcs, byte[] cp, int len) {
+	public static int pppfcs(int fcs, byte[] cp) {
+		return pppfcs(fcs, cp, cp.length);
+	}
 
+	public static int pppfcs(int fcs, byte[] cp, int len) {
 		int cp_pos = 0;
 		while (len-- > 0) {
 			fcs = (fcs >> 8) ^ fcstab[(fcs ^ cp[cp_pos++]) & 0xff];
