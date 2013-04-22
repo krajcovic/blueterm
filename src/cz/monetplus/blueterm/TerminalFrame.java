@@ -14,7 +14,7 @@ public class TerminalFrame {
 	/**
 	 * Port 2Bytes
 	 */
-	private int port;
+	private TerminalPorts port;
 
 	/**
 	 * Protokol data
@@ -42,12 +42,12 @@ public class TerminalFrame {
 		this.setCrc(CRCFCS.pppfcs(CRCFCS.PPPINITFCS, createCountedPart()));
 	}
 
-	public int getPort() {
+	public TerminalPorts getPort() {
 		return port;
 	}
 
 	public void setPort(int port) {
-		this.port = port;
+		this.port = TerminalPorts.valueOf(port & 0xFFFF);
 	}
 
 	public byte[] getData() {
@@ -70,7 +70,9 @@ public class TerminalFrame {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
 		try {
-			stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
+			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
+			stream.write((byte) (this.getPort().getPort() >> 8) & 0xFF);
+			stream.write((byte) this.getPort().getPort() & 0xFF);
 			stream.write(this.getData());
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
@@ -83,9 +85,13 @@ public class TerminalFrame {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
 		try {
-			stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
+			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
+			stream.write((byte) (this.getPort().getPort() >> 8) & 0xFF);
+			stream.write((byte) this.getPort().getPort() & 0xFF);
 			stream.write(this.getData());
-			stream.write(ByteBuffer.allocate(2).putInt(this.getCrc()).array());
+			// stream.write(ByteBuffer.allocate(2).putInt(this.getCrc()).array());
+			stream.write((byte) this.getCrc() & 0xFF);
+			stream.write((byte) (this.getCrc() >> 8) & 0xFF);
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
 		}
@@ -94,8 +100,18 @@ public class TerminalFrame {
 	}
 
 	public void parseFrame(byte[] data) {
-		this.setPort(data[0] << 8 + data[1]);
-		this.setData(Arrays.copyOfRange(data, 2, data.length - 1));
-		this.setCrc(data[data.length - 1]);
+		if (data != null && data.length > 4) {
+			this.setCrc((data[data.length - 1] << 8) + data[data.length - 2]);
+
+			if (this.getCrc() == CRCFCS.pppfcs(CRCFCS.PPPINITFCS, data,
+					data.length - 2)) {
+				this.setPort((data[0] << 8) + data[1]);
+				this.setData(Arrays.copyOfRange(data, 2, data.length - 1));
+			} else {
+				Log.d(TAG, "Corrupted terminal frame");
+			}
+		} else {
+			Log.d(TAG, "Corrupted terminal frame");
+		}
 	}
 }

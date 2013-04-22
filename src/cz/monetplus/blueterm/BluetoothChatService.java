@@ -19,7 +19,10 @@ package cz.monetplus.blueterm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.UUID;
+
+import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -132,14 +135,14 @@ public class BluetoothChatService {
 		setState(STATE_LISTEN);
 
 		// Start the thread to listen on a BluetoothServerSocket
-		if (mSecureAcceptThread == null) {
-			mSecureAcceptThread = new AcceptThread(true);
-			mSecureAcceptThread.start();
-		}
-		if (mInsecureAcceptThread == null) {
-			mInsecureAcceptThread = new AcceptThread(false);
-			mInsecureAcceptThread.start();
-		}
+		// if (mSecureAcceptThread == null) {
+		// mSecureAcceptThread = new AcceptThread(true);
+		// mSecureAcceptThread.start();
+		// }
+		// if (mInsecureAcceptThread == null) {
+		// mInsecureAcceptThread = new AcceptThread(false);
+		// mInsecureAcceptThread.start();
+		// }
 	}
 
 	/**
@@ -492,23 +495,37 @@ public class BluetoothChatService {
 
 			mmInStream = tmpIn;
 			mmOutStream = tmpOut;
+
+			// try {
+			// mmInStream.reset();
+			// } catch (IOException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
 		}
 
 		public void run() {
 			Log.i(TAG, "BEGIN mConnectedThread");
-			
+
 			int bytes;
 
 			// Keep listening to the InputStream while connected
 			while (true) {
 				try {
-					byte[] buffer = new byte[512];
+					// byte[] buffer = new byte[128];
+					// Arrays.fill(buffer, (byte) 0);
 					// Read from the InputStream
-					bytes = mmInStream.read(buffer);
+
+					// bytes = mmInStream.read(buffer);
+					// bytes = mmInStream.read(buffer, 0, buffer.length);
+					// Log.d(TAG, MonetUtils.bytesToHex(buffer));
+					// Log.d(TAG, "Read " + bytes + " bytes.");
+
+					byte[] buffer = SlipInputReader.read(mmInStream);
 
 					// Send the obtained bytes to the UI Activity
-					mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes,
-							-1, buffer).sendToTarget();
+					mHandler.obtainMessage(BluetoothChat.MESSAGE_READ,
+							buffer.length, -1, buffer).sendToTarget();
 				} catch (IOException e) {
 					Log.e(TAG, "disconnected", e);
 					connectionLost();

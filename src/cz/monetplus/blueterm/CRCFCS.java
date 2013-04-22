@@ -64,6 +64,6 @@ public class CRCFCS {
 			fcs = (fcs >> 8) ^ fcstab[(fcs ^ cp[cp_pos++]) & 0xff];
 		}
 
-		return fcs;
+		return fcs ^ 0xFFFF;
 	}
 }

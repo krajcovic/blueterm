@@ -32,7 +32,10 @@ public class SLIPFrame {
 	public static byte[] createFrame(byte[] _data) {
 		// worst case scenario is we have to sub every byte resulting in a
 		// doubled buffer
-		ByteArrayOutputStream bout = new ByteArrayOutputStream(_data.length * 2);
+		ByteArrayOutputStream bout = new ByteArrayOutputStream(
+				_data.length * 2 + 2);
+
+		bout.write((byte) END);
 
 		for (int i = 0; i < _data.length; i++) {
 			if (_data[i] == END) {
@@ -45,6 +48,8 @@ public class SLIPFrame {
 				bout.write(_data[i]);
 		}
 
+		bout.write((byte) END);
+
 		return bout.toByteArray();
 	}
 
@@ -56,9 +61,9 @@ public class SLIPFrame {
 	 */
 
 	public static byte[] parseFrame(byte[] data) {
-		ByteArrayOutputStream bout = new ByteArrayOutputStream(data.length);
+		ByteArrayOutputStream bout = new ByteArrayOutputStream(data.length - 2);
 
-		for (int i = 0; i < data.length; i++) {
+		for (int i = 1; i < data.length - 1; i++) {
 			// if we have and esc and another byte...
 			if (data[i] == ESC && i + 1 < data.length) {
 				i++;
@@ -68,7 +73,8 @@ public class SLIPFrame {
 					bout.write(ESC);
 				else
 					bout.write(data[i]);
-			}
+			} else
+				bout.write(data[i]);
 		}
 
 		return bout.toByteArray();

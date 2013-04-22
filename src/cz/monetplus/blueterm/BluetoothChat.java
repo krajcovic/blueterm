@@ -199,8 +199,11 @@ public class BluetoothChat extends Activity {
 			public void onClick(View v) {
 				// Send a message using content of the edit text widget
 				TextView view = (TextView) findViewById(R.id.edit_text_out);
-				String message = view.getText().toString();
-				sendMessage(message.getBytes());
+				// String message = view.getText().toString();
+				TerminalFrame termFrame = new TerminalFrame(33333, BProtocol
+						.getAppInfo());
+
+				sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
 			}
 		});
 
@@ -320,60 +323,35 @@ public class BluetoothChat extends Activity {
 				mConversationArrayAdapter.add("Me:  " + writeMessage);
 				break;
 			case MESSAGE_READ:
-				byte[] readBuf = (byte[]) msg.obj;
+				byte[] readSlipFrame = (byte[]) msg.obj;
 				// construct a string from the valid bytes in the buffer
 				// String readMessage = new String(readBuf, 0, msg.arg1);
-				String readMessage = MonetUtils.bytesToHex(readBuf, msg.arg1);
-				slipOutputpFraming.write(readBuf, 0, msg.arg1);
-				Log.d(TAG, "Len: " + slipOutputpFraming.size());
+				String readMessage = MonetUtils.bytesToHex(readSlipFrame,
+						msg.arg1);
+				slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
 				if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
 					Log.d(TAG, "Execute SLIP.getFrame");
 
-					// Ulozim si zbytek predchozich odpovedi
-					byte[] restInput = new byte[0];
-					try {
-						if (slipInputFraming != null) {
-							restInput = new byte[slipInputFraming.available()];
-							slipInputFraming.read(restInput);
-						}
-					} catch (IOException e) {
-						Log.e(TAG, e.getMessage());
-					}
-
-					// sloucim zbytek a aktulane obdrzene data
-					slipInputFraming = new ByteArrayInputStream(
-							MonetUtils.concat(restInput,
-									slipOutputpFraming.toByteArray()));
-					slipOutputpFraming.reset();
-					Log.d(TAG, "Available" + slipInputFraming.available());
-
-					// vyctu si prvni frame
-					ByteArrayOutputStream frame = new ByteArrayOutputStream();
-					byte cur;
-					while ((cur = (byte) slipInputFraming.read()) != SLIPFrame.END) {
-						frame.write(cur);
-					}
-					frame.write(cur);
-
-					// rozparsuju frame
-					byte[] obsah = SLIPFrame.parseFrame(frame.toByteArray());
-					TerminalFrame termFram = new TerminalFrame(obsah);
-
+					TerminalFrame termFram = new TerminalFrame(
+							SLIPFrame.parseFrame(readSlipFrame));
 					switch (termFram.getPort()) {
-					// TODO: udelat enum
-					case 33333:
+					case BANK:
 						break;
-					case 33334:
+					case FLEET:
 						break;
-					case 33335:
+					case MAINTENANCE:
 						break;
-					case 33336:
+					case MASTER:
 						break;
+					default:
+						// Nedelej nic, spatne data, format, nebo crc
+						break;
+
 					}
 
 				}
 
-				Log.d(TAG, "Len: " + slipOutputpFraming.size());
+				// Log.d(TAG, "Len: " + slipOutputpFraming.size());
 
 				mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
 						+ readMessage);
