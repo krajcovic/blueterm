@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import cz.monetplus.blueterm.util.MonetUtils;
+
 import android.util.Log;
 
 public class TerminalFrame {
@@ -71,8 +73,8 @@ public class TerminalFrame {
 
 		try {
 			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
-			stream.write((byte) (this.getPort().getPort() >> 8) & 0xFF);
-			stream.write((byte) this.getPort().getPort() & 0xFF);
+			stream.write(MonetUtils.getHigh(this.getPort().getPortNumber()));
+			stream.write(MonetUtils.getLow(this.getPort().getPortNumber()));
 			stream.write(this.getData());
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
@@ -86,8 +88,8 @@ public class TerminalFrame {
 
 		try {
 			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
-			stream.write((byte) (this.getPort().getPort() >> 8) & 0xFF);
-			stream.write((byte) this.getPort().getPort() & 0xFF);
+			stream.write(MonetUtils.getHigh(this.getPort().getPortNumber()));
+			stream.write(MonetUtils.getLow(this.getPort().getPortNumber()));
 			stream.write(this.getData());
 			// stream.write(ByteBuffer.allocate(2).putInt(this.getCrc()).array());
 			stream.write((byte) this.getCrc() & 0xFF);
@@ -101,14 +103,21 @@ public class TerminalFrame {
 
 	public void parseFrame(byte[] data) {
 		if (data != null && data.length > 4) {
-			this.setCrc((data[data.length - 1] << 8) + data[data.length - 2]);
 
-			if (this.getCrc() == CRCFCS.pppfcs(CRCFCS.PPPINITFCS, data,
-					data.length - 2)) {
+			int d = data[data.length - 1] & 0xFF;
+			d <<= 8;
+			d += data[data.length - 2] & 0xFF;
+			d &= 0xFFFF;
+			this.setCrc(d);
+
+			int countedCrc = CRCFCS.pppfcs(CRCFCS.PPPINITFCS, data,
+					data.length - 2) & 0xFFFF;
+
+			if (this.getCrc() == countedCrc) {
 				this.setPort((data[0] << 8) + data[1]);
 				this.setData(Arrays.copyOfRange(data, 2, data.length - 1));
 			} else {
-				Log.d(TAG, "Corrupted terminal frame");
+				Log.d(TAG, "Invalid CRC frame");
 			}
 		} else {
 			Log.d(TAG, "Corrupted terminal frame");

@@ -334,19 +334,22 @@ public class BluetoothChat extends Activity {
 
 					TerminalFrame termFram = new TerminalFrame(
 							SLIPFrame.parseFrame(readSlipFrame));
-					switch (termFram.getPort()) {
-					case BANK:
-						break;
-					case FLEET:
-						break;
-					case MAINTENANCE:
-						break;
-					case MASTER:
-						break;
-					default:
-						// Nedelej nic, spatne data, format, nebo crc
-						break;
 
+					if (termFram != null) {
+						switch (termFram.getPort()) {
+						case BANK:
+							break;
+						case FLEET:
+							break;
+						case MAINTENANCE:
+							break;
+						case MASTER:
+							break;
+						default:
+							// Nedelej nic, spatne data, format, nebo crc
+							break;
+
+						}
 					}
 
 				}
