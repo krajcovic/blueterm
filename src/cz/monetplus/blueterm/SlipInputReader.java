@@ -29,6 +29,7 @@ public class SlipInputReader {
 			slip.write(tempBuffer);
 		} while (tempBuffer[0] != SLIPFrame.END);
 
+		Log.d(TAG, slip.toString());
 		Log.d(TAG, MonetUtils.bytesToHex(slip.toByteArray()));
 		return slip.toByteArray();
 	}

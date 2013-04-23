@@ -21,6 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cz.monetplus.blueterm.bprotocol.BProtocol;
+import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
+import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.app.Activity;
@@ -75,7 +78,8 @@ public class BluetoothChat extends Activity {
 	private TextView mTitle;
 	private ListView mConversationView;
 	private EditText mOutEditText;
-	private Button mSendButton;
+	private Button mAppInfoButton;
+	private Button mPayButton;
 
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
@@ -193,15 +197,25 @@ public class BluetoothChat extends Activity {
 		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
 		mOutEditText.setOnEditorActionListener(mWriteListener);
 
-		// Initialize the send button with a listener that for click events
-		mSendButton = (Button) findViewById(R.id.button_send);
-		mSendButton.setOnClickListener(new OnClickListener() {
+		// Initialize the app info button with a listener that for click events
+		mAppInfoButton = (Button) findViewById(R.id.button_app_info);
+		mAppInfoButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Send a message using content of the edit text widget
-				TextView view = (TextView) findViewById(R.id.edit_text_out);
+				// TextView view = (TextView) findViewById(R.id.edit_text_out);
 				// String message = view.getText().toString();
-				TerminalFrame termFrame = new TerminalFrame(33333, BProtocol
-						.getAppInfo());
+				TerminalFrame termFrame = new TerminalFrame(33333,
+						BProtocolMessages.getAppInfo());
+
+				sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
+			}
+		});
+
+		mPayButton = (Button) findViewById(R.id.button_pay);
+		mPayButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				TerminalFrame termFrame = new TerminalFrame(33333,
+						BProtocolMessages.getSale(5000, "1234567890"));
 
 				sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
 			}
@@ -329,8 +343,9 @@ public class BluetoothChat extends Activity {
 				String readMessage = MonetUtils.bytesToHex(readSlipFrame,
 						msg.arg1);
 				slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
+
+				// Check
 				if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
-					Log.d(TAG, "Execute SLIP.getFrame");
 
 					TerminalFrame termFram = new TerminalFrame(
 							SLIPFrame.parseFrame(readSlipFrame));
@@ -338,26 +353,42 @@ public class BluetoothChat extends Activity {
 					if (termFram != null) {
 						switch (termFram.getPort()) {
 						case BANK:
+							Log.d(TAG, "bank data");
 							break;
 						case FLEET:
+							Log.d(TAG, "fleet data");
 							break;
 						case MAINTENANCE:
+							Log.d(TAG, "maintentace data");
 							break;
 						case MASTER:
+							Log.d(TAG, "master data");
+							// Tyhle zpravy zpracovavat, jsou pro tuhle aplikaci
+							BProtocolFactory factory = new BProtocolFactory();
+							BProtocol bprotocol = factory.deserialize(termFram
+									.getData());
+
+							mConversationArrayAdapter.add("Parsed: "
+									+ bprotocol.toString());
+
 							break;
 						default:
 							// Nedelej nic, spatne data, format, nebo crc
+							Log.e(TAG, "Invalid port");
 							break;
 
 						}
 					}
 
+				} else {
+					Log.e(TAG, "Corrupted data. It's not slip frame.");
 				}
-
-				// Log.d(TAG, "Len: " + slipOutputpFraming.size());
 
 				mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
 						+ readMessage);
+
+				// Log.d(TAG, "Len: " + slipOutputpFraming.size());
+
 				break;
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
