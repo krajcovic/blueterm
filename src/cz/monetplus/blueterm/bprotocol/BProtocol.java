@@ -118,7 +118,7 @@ public class BProtocol implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getProtocolType() + "\n" + this.getProtocolVersion() + "\n"
+		return this.getProtocolType() + " " + this.getProtocolVersion() + " "
 				+ this.getTransactionDateTime() + "\n" + tagMap.values();
 	}
 

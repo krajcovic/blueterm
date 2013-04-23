@@ -80,6 +80,7 @@ public class BluetoothChat extends Activity {
 	private EditText mOutEditText;
 	private Button mAppInfoButton;
 	private Button mPayButton;
+	private Button mHandShakeButton;
 
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
@@ -214,10 +215,18 @@ public class BluetoothChat extends Activity {
 		mPayButton = (Button) findViewById(R.id.button_pay);
 		mPayButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				TerminalFrame termFrame = new TerminalFrame(33333,
-						BProtocolMessages.getSale(5000, "1234567890"));
+				sendMessage(SLIPFrame.createFrame(new TerminalFrame(33333,
+						BProtocolMessages.getSale(5000, "1234567890"))
+						.createFrame()));
+			}
+		});
 
-				sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
+		mHandShakeButton = (Button) findViewById(R.id.button_handshake);
+		mHandShakeButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+
+				sendMessage(SLIPFrame.createFrame(new TerminalFrame(33333,
+						BProtocolMessages.getHanshake()).createFrame()));
 			}
 		});
 
@@ -330,18 +339,28 @@ public class BluetoothChat extends Activity {
 					break;
 				}
 				break;
-			case MESSAGE_WRITE:
+			case MESSAGE_WRITE: {
 				byte[] writeBuf = (byte[]) msg.obj;
 				// construct a string from the buffer
-				String writeMessage = new String(writeBuf);
-				mConversationArrayAdapter.add("Me:  " + writeMessage);
+				// String writeMessage = new String(writeBuf);
+
+				TerminalFrame termFram = new TerminalFrame(
+						SLIPFrame.parseFrame(writeBuf));
+				BProtocolFactory factory = new BProtocolFactory();
+				BProtocol bprotocol = factory.deserialize(termFram.getData());
+
+				mConversationArrayAdapter
+						.add("Output: " + bprotocol.toString());
+
+				// mConversationArrayAdapter.add("Me:  " + writeMessage);
 				break;
-			case MESSAGE_READ:
+			}
+			case MESSAGE_READ: {
 				byte[] readSlipFrame = (byte[]) msg.obj;
 				// construct a string from the valid bytes in the buffer
 				// String readMessage = new String(readBuf, 0, msg.arg1);
-				String readMessage = MonetUtils.bytesToHex(readSlipFrame,
-						msg.arg1);
+				// String readMessage = MonetUtils.bytesToHex(readSlipFrame,
+				// msg.arg1);
 				slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
 
 				// Check
@@ -368,7 +387,7 @@ public class BluetoothChat extends Activity {
 							BProtocol bprotocol = factory.deserialize(termFram
 									.getData());
 
-							mConversationArrayAdapter.add("Parsed: "
+							mConversationArrayAdapter.add("Input: "
 									+ bprotocol.toString());
 
 							break;
@@ -384,12 +403,13 @@ public class BluetoothChat extends Activity {
 					Log.e(TAG, "Corrupted data. It's not slip frame.");
 				}
 
-				mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
-						+ readMessage);
+				// mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
+				// + readMessage);
 
 				// Log.d(TAG, "Len: " + slipOutputpFraming.size());
 
 				break;
+			}
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
 				mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);

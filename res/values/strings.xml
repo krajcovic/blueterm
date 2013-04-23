@@ -39,4 +39,5 @@
     <string name="insecure_connect">Connect a device - Insecure</string>
     <string name="discoverable">Make discoverable</string>
     <string name="button_pay">Pay</string>
+    <string name="button_handshake">Handshake</string>
 </resources>

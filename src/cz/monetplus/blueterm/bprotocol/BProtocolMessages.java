@@ -29,4 +29,16 @@ public class BProtocolMessages {
 
 		return factory.serialize(bprotocol);
 	}
+
+	public static byte[] getHanshake() {
+
+		BProtocol bprotocol = new BProtocol("B1", "01", "12345678",
+				"120221150138", "0000", "A5A5");
+
+		bprotocol.getTagMap().put(BProtocolTag.TransactionType, "95");
+
+		BProtocolFactory factory = new BProtocolFactory();
+
+		return factory.serialize(bprotocol);
+	}
 }
