@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!--
+     Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,53 +14,78 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-    <ListView android:id="@+id/in"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <ListView
+        android:id="@+id/in"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll"
-        android:layout_weight="1"
-    />
-
-    <EditText
-        android:id="@+id/edit_text_out"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="false"
+        android:layout_gravity="top|fill_vertical"
         android:layout_weight="1"
-        android:ems="10" android:inputType="text">
-
-        <requestFocus />
-    </EditText>
+        android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll" />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        >
+        android:layout_alignParentTop="false"
+        android:layout_gravity="bottom"
+        android:layout_weight="0"
+        android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/button_handshake"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_handshake" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
-        <Button
-            android:id="@+id/button_pay"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/button_pay" />
+            <EditText
+                android:id="@+id/edit_text_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text" >
 
-        <Button android:id="@+id/button_app_info"
-            android:layout_width="wrap_content"
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button_pay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/button_pay" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_app_info"
-        />
+            android:gravity="bottom"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button_handshake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_handshake" />
+
+            <Button
+                android:id="@+id/button_app_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_app_info" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>
