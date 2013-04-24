@@ -15,7 +15,7 @@
 -->
 
 <resources>
-    <string name="app_name">Bluetooth Chat</string>
+    <string name="app_name">BlueTerm</string>
 
     <!--  BluetoothChat -->
     <string name="button_app_info">AppInfo</string>
