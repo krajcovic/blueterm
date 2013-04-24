@@ -74,7 +74,9 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:inputType="text"
+                android:maxLength="8"
                 android:text="12345678" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -118,7 +120,9 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:inputType="number"
+                android:maxLength="10"
                 android:text="1234" />
+
         </LinearLayout>
 
         <LinearLayout

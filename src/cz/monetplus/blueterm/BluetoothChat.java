@@ -84,10 +84,12 @@ public class BluetoothChat extends Activity {
 	private Button mPayButton;
 	private Button mHandShakeButton;
 	private Button mClearButton;
-	private static LinearLayout mDebugLayout;
 	private static LinearLayout mInputTerminalLayout;
 	private static LinearLayout mProgressLayout;
-	private ProgressBar mProgressBar;
+
+	private EditText mTerminalIdEditText;
+	private EditText mAmountIdEditText;
+	private EditText mInvoiceIdEditText;
 
 	// Name of the connected device
 	private static String mConnectedDeviceName = null;
@@ -192,12 +194,31 @@ public class BluetoothChat extends Activity {
 		}
 	}
 
+	/**
+	 * @param resultCode
+	 * @param serverMessage
+	 */
+	// TODO: vratit zpatky volane aplikaci.
+	private void returnResult(int resultCode, String serverMessage) {
+		// Create intent to deliver some kind of result
+		// data
+		Intent result = new Intent("cz.monetplus.blueterm.RESULT_ACTION");// ,
+																			// Uri.parse("content://result_uri"));
+		result.putExtra("ResultCode", resultCode);
+		result.putExtra("ServerMessage", serverMessage);
+		if (resultCode == 0) {
+			setResult(Activity.RESULT_OK, result);
+		} else {
+			setResult(Activity.RESULT_CANCELED, result);
+		}
+		finish();
+	}
+
 	private void setupChat() {
 		Log.d(TAG, "setupChat()");
 
 		mInputTerminalLayout = (LinearLayout) findViewById(R.id.input_layout);
 		mProgressLayout = (LinearLayout) findViewById(R.id.progres_layout);
-		mProgressBar = (ProgressBar) findViewById(R.id.progressBar1);
 
 		// Initialize the array adapter for the conversation thread
 		mConversationArrayAdapter = new ArrayAdapter<String>(this,
@@ -208,6 +229,10 @@ public class BluetoothChat extends Activity {
 		// Initialize the compose field with a listener for the return key
 		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
 		mOutEditText.setOnEditorActionListener(mWriteListener);
+
+		mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
+		mAmountIdEditText = (EditText) findViewById(R.id.editAmount);
+		mInvoiceIdEditText = (EditText) findViewById(R.id.editInvoice);
 
 		// Initialize the app info button with a listener that for click events
 		mAppInfoButton = (Button) findViewById(R.id.button_app_info);
@@ -226,10 +251,6 @@ public class BluetoothChat extends Activity {
 		mPayButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				showProgressLayout();
-
-				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
-				EditText mAmountIdEditText = (EditText) findViewById(R.id.editAmount);
-				EditText mInvoiceIdEditText = (EditText) findViewById(R.id.editInvoice);
 
 				Double value = Double.valueOf(mAmountIdEditText.getText()
 						.toString()) * 100;
@@ -262,6 +283,14 @@ public class BluetoothChat extends Activity {
 				mConversationArrayAdapter.clear();
 			}
 		});
+
+		// Get the intent that started this activity
+		Intent intent = getIntent();
+		if (intent != null) {
+			String terminalId = intent.getStringExtra("TerminalId");
+			String amount = intent.getStringExtra("Amount");
+			String invoice = intent.getStringExtra("Invoice");
+		}
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
 		mChatService = new TerminalService(this, mHandler);
@@ -552,9 +581,9 @@ public class BluetoothChat extends Activity {
 		if (mChatService.getState() == TerminalService.STATE_CONNECTED) {
 			mInputTerminalLayout.setVisibility(View.GONE);
 			mProgressLayout.setVisibility(View.VISIBLE);
-//			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-//					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-//			mProgressLayout.setLayoutParams(params);
+			// ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+			// LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+			// mProgressLayout.setLayoutParams(params);
 		}
 	}
 
