@@ -1,11 +1,9 @@
 package cz.monetplus.blueterm.bprotocol;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -130,6 +128,7 @@ public class BProtocolFactory {
 	 *            velikost vycitaneho stringu
 	 * @return z bufferu vycteny string
 	 */
+	@SuppressWarnings("unused")
 	private static String getFixedTrimedString(byte[] buffer, int pos, int size) {
 		return new String(Arrays.copyOfRange(buffer, pos, pos + size)).trim();
 	}
@@ -180,6 +179,8 @@ public class BProtocolFactory {
 	 *         nebo je vstupni retezec zarovnan na pozadovanou delku prefixem z
 	 *         nul.
 	 */
+
+	@SuppressWarnings("unused")
 	private static String fixNumber(String inputStr, int size) {
 		String str = inputStr;
 

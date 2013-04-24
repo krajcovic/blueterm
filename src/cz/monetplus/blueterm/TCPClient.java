@@ -41,6 +41,13 @@ public class TCPClient {
 			out.flush();
 		}
 	}
+	
+	public void sendMessage(byte[] message) {
+		if (out != null && !out.checkError()) {
+			out.println(message);
+			out.flush();
+		}
+	}
 
 	public void stopClient() {
 		mRun = false;

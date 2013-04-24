@@ -2,7 +2,6 @@ package cz.monetplus.blueterm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import cz.monetplus.blueterm.util.MonetUtils;

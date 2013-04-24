@@ -19,7 +19,6 @@ package cz.monetplus.blueterm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.UUID;
 
 import cz.monetplus.blueterm.util.MonetUtils;
@@ -40,9 +39,9 @@ import android.util.Log;
  * connections, a thread for connecting with a device, and a thread for
  * performing data transmissions when connected.
  */
-public class BluetoothChatService {
+public class TerminalService {
 	// Debugging
-	private static final String TAG = "BluetoothChatService";
+	private static final String TAG = "TerminalService";
 	private static final boolean D = true;
 
 	// Name for the SDP record when creating server socket
@@ -83,7 +82,7 @@ public class BluetoothChatService {
 	 * @param handler
 	 *            A Handler to send messages back to the UI Activity
 	 */
-	public BluetoothChatService(Context context, Handler handler) {
+	public TerminalService(Context context, Handler handler) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = handler;
@@ -288,7 +287,7 @@ public class BluetoothChatService {
 		mHandler.sendMessage(msg);
 
 		// Start the service over to restart listening mode
-		BluetoothChatService.this.start();
+		TerminalService.this.start();
 	}
 
 	/**
@@ -303,7 +302,7 @@ public class BluetoothChatService {
 		mHandler.sendMessage(msg);
 
 		// Start the service over to restart listening mode
-		BluetoothChatService.this.start();
+		TerminalService.this.start();
 	}
 
 	/**
@@ -311,6 +310,7 @@ public class BluetoothChatService {
 	 * like a server-side client. It runs until a connection is accepted (or
 	 * until cancelled).
 	 */
+	@SuppressWarnings("unused")
 	private class AcceptThread extends Thread {
 		// The local server socket
 		private final BluetoothServerSocket mmServerSocket;
@@ -357,7 +357,7 @@ public class BluetoothChatService {
 
 				// If a connection was accepted
 				if (socket != null) {
-					synchronized (BluetoothChatService.this) {
+					synchronized (TerminalService.this) {
 						switch (mState) {
 						case STATE_LISTEN:
 						case STATE_CONNECTING:
@@ -452,7 +452,7 @@ public class BluetoothChatService {
 			}
 
 			// Reset the ConnectThread because we're done
-			synchronized (BluetoothChatService.this) {
+			synchronized (TerminalService.this) {
 				mConnectThread = null;
 			}
 
@@ -506,8 +506,6 @@ public class BluetoothChatService {
 
 		public void run() {
 			Log.i(TAG, "BEGIN mConnectedThread");
-
-			int bytes;
 
 			// Keep listening to the InputStream while connected
 			while (true) {

@@ -1,7 +1,6 @@
 package cz.monetplus.blueterm;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,7 +13,6 @@ public class SlipInputReader {
 	private static final String TAG = "SlipInputReader";
 
 	public static byte[] read(InputStream stream) throws IOException {
-		// return super.read(buffer, offset, length);
 		ByteArrayOutputStream slip = new ByteArrayOutputStream();
 
 		byte[] tempBuffer = new byte[1];

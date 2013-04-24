@@ -16,15 +16,12 @@
 
 package cz.monetplus.blueterm;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
-import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -75,7 +72,7 @@ public class BluetoothChat extends Activity {
 	private static final int REQUEST_ENABLE_BT = 3;
 
 	// Layout Views
-	private TextView mTitle;
+	private static TextView mTitle;
 	private ListView mConversationView;
 	private EditText mOutEditText;
 	private Button mAppInfoButton;
@@ -83,26 +80,26 @@ public class BluetoothChat extends Activity {
 	private Button mHandShakeButton;
 
 	// Name of the connected device
-	private String mConnectedDeviceName = null;
+	private static String mConnectedDeviceName = null;
 	// Array adapter for the conversation thread
-	private ArrayAdapter<String> mConversationArrayAdapter;
+	private static ArrayAdapter<String> mConversationArrayAdapter;
 	// String buffer for outgoing messages
 	private StringBuffer mOutStringBuffer;
 	// Local Bluetooth adapter
 	private BluetoothAdapter mBluetoothAdapter = null;
 	// Member object for the chat services
-	private BluetoothChatService mChatService = null;
+	private TerminalService mChatService = null;
 
 	// TCP client;
-	private TCPClient mTcpClient;
+	private static TCPClient mTcpClient;
 
 	// in the arrayList we add the messaged received from server
 	private ArrayList<String> arrayList;
 
 	private WarmerAdapter mAdapter;
 
-	private ByteArrayInputStream slipInputFraming;
-	private ByteArrayOutputStream slipOutputpFraming;
+	// private ByteArrayInputStream slipInputFraming;
+	private static ByteArrayOutputStream slipOutputpFraming;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -178,7 +175,7 @@ public class BluetoothChat extends Activity {
 		if (mChatService != null) {
 			// Only if the state is STATE_NONE, do we know that we haven't
 			// started already
-			if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
+			if (mChatService.getState() == TerminalService.STATE_NONE) {
 				// Start the Bluetooth chat services
 				mChatService.start();
 			}
@@ -202,20 +199,15 @@ public class BluetoothChat extends Activity {
 		mAppInfoButton = (Button) findViewById(R.id.button_app_info);
 		mAppInfoButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				// Send a message using content of the edit text widget
-				// TextView view = (TextView) findViewById(R.id.edit_text_out);
-				// String message = view.getText().toString();
-				TerminalFrame termFrame = new TerminalFrame(33333,
-						BProtocolMessages.getAppInfo());
-
-				sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
+				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
+						BProtocolMessages.getAppInfo()).createFrame()));
 			}
 		});
 
 		mPayButton = (Button) findViewById(R.id.button_pay);
 		mPayButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				sendMessage(SLIPFrame.createFrame(new TerminalFrame(33333,
+				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
 						BProtocolMessages.getSale(5000, "1234567890"))
 						.createFrame()));
 			}
@@ -225,13 +217,13 @@ public class BluetoothChat extends Activity {
 		mHandShakeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 
-				sendMessage(SLIPFrame.createFrame(new TerminalFrame(33333,
+				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
 						BProtocolMessages.getHanshake()).createFrame()));
 			}
 		});
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
-		mChatService = new BluetoothChatService(this, mHandler);
+		mChatService = new TerminalService(this, mHandler);
 
 		// Initialize the buffer for outgoing messages
 		mOutStringBuffer = new StringBuffer("");
@@ -279,9 +271,9 @@ public class BluetoothChat extends Activity {
 	 * @param message
 	 *            A string of text to send.
 	 */
-	private void sendMessage(byte[] message) {
+	private void send2Terminal(byte[] message) {
 		// Check that we're actually connected before trying anything
-		if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+		if (mChatService.getState() != TerminalService.STATE_CONNECTED) {
 			Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT)
 					.show();
 			return;
@@ -308,7 +300,7 @@ public class BluetoothChat extends Activity {
 			if (actionId == EditorInfo.IME_NULL
 					&& event.getAction() == KeyEvent.ACTION_UP) {
 				String message = view.getText().toString();
-				sendMessage(message.getBytes());
+				send2Terminal(message.getBytes());
 			}
 			if (D)
 				Log.i(TAG, "END onEditorAction");
@@ -317,7 +309,7 @@ public class BluetoothChat extends Activity {
 	};
 
 	// The Handler that gets information back from the BluetoothChatService
-	private final Handler mHandler = new Handler() {
+	private final static Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
@@ -325,16 +317,16 @@ public class BluetoothChat extends Activity {
 				if (D)
 					Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 				switch (msg.arg1) {
-				case BluetoothChatService.STATE_CONNECTED:
+				case TerminalService.STATE_CONNECTED:
 					mTitle.setText(R.string.title_connected_to);
 					mTitle.append(mConnectedDeviceName);
 					mConversationArrayAdapter.clear();
 					break;
-				case BluetoothChatService.STATE_CONNECTING:
+				case TerminalService.STATE_CONNECTING:
 					mTitle.setText(R.string.title_connecting);
 					break;
-				case BluetoothChatService.STATE_LISTEN:
-				case BluetoothChatService.STATE_NONE:
+				case TerminalService.STATE_LISTEN:
+				case TerminalService.STATE_NONE:
 					mTitle.setText(R.string.title_not_connected);
 					break;
 				}
@@ -373,6 +365,10 @@ public class BluetoothChat extends Activity {
 						switch (termFram.getPort()) {
 						case BANK:
 							Log.d(TAG, "bank data");
+							// sends the message to the server
+							if (mTcpClient != null) {
+								mTcpClient.sendMessage(termFram.getData());
+							}
 							break;
 						case FLEET:
 							Log.d(TAG, "fleet data");
@@ -413,12 +409,13 @@ public class BluetoothChat extends Activity {
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
 				mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-				Toast.makeText(getApplicationContext(),
+				Toast.makeText(
+						BlueTermApplication.getAppContext(), // getApplicationContext()
 						"Connected to " + mConnectedDeviceName,
 						Toast.LENGTH_SHORT).show();
 				break;
 			case MESSAGE_TOAST:
-				Toast.makeText(getApplicationContext(),
+				Toast.makeText(BlueTermApplication.getAppContext(), // getApplicationContext()
 						msg.getData().getString(TOAST), Toast.LENGTH_SHORT)
 						.show();
 				break;
@@ -514,7 +511,7 @@ public class BluetoothChat extends Activity {
 							.getBytes());
 
 					// send to terminal
-					sendMessage(SLIPFrame.createFrame(termFrame.createFrame()));
+					send2Terminal(SLIPFrame.createFrame(termFrame.createFrame()));
 				}
 			});
 			mTcpClient.run();

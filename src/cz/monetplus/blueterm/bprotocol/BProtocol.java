@@ -1,7 +1,5 @@
 package cz.monetplus.blueterm.bprotocol;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -11,12 +9,6 @@ public class BProtocol implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 3442882190681419097L;
-
-	// private static final byte STX = 0x02;
-	//
-	// private static final byte ETX = 0x03;
-	//
-	// private static final byte FS = 0x1c;
 
 	private String protocolType;
 
