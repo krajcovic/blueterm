@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class BProtocolMessages {
 
-	public static byte[] getAppInfo() {
+	public static byte[] getAppInfo(String terminalId) {
 
-		BProtocol bprotocol = new BProtocol("B1", "01", "        ",
+		BProtocol bprotocol = new BProtocol("B1", "01", terminalId,
 				getCurrentDateTimeForHeader(), "    ", "A5A5");
 
 		bprotocol.getTagMap().put(BProtocolTag.TransactionType, "80");
@@ -17,9 +17,10 @@ public class BProtocolMessages {
 		return factory.serialize(bprotocol);
 	}
 
-	public static byte[] getSale(int amount, String invoiceNumber) {
+	public static byte[] getSale(String terminalId, int amount,
+			String invoiceNumber) {
 
-		BProtocol bprotocol = new BProtocol("B1", "01", "12345678",
+		BProtocol bprotocol = new BProtocol("B1", "01", terminalId,
 				getCurrentDateTimeForHeader(), "0000", "A5A5");
 
 		bprotocol.getTagMap().put(BProtocolTag.TransactionType, "00");
@@ -33,9 +34,9 @@ public class BProtocolMessages {
 		return factory.serialize(bprotocol);
 	}
 
-	public static byte[] getHanshake() {
+	public static byte[] getHanshake(String terminalId) {
 
-		BProtocol bprotocol = new BProtocol("B1", "01", "12345678",
+		BProtocol bprotocol = new BProtocol("B1", "01", terminalId,
 				getCurrentDateTimeForHeader(), "0000", "A5A5");
 
 		bprotocol.getTagMap().put(BProtocolTag.TransactionType, "95");

@@ -23,4 +23,5 @@
     <item android:id="@+id/discoverable"
           android:icon="@android:drawable/ic_menu_mylocation"
           android:title="@string/discoverable" />
+    <item android:id="@+id/log" android:title="@string/onoff_log" android:icon="@android:drawable/ic_menu_mylocation"></item>
 </menu>

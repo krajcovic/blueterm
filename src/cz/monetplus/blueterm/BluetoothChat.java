@@ -24,9 +24,11 @@ import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 
 import android.app.Activity;
+import android.app.ActionBar.LayoutParams;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,13 +39,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +83,11 @@ public class BluetoothChat extends Activity {
 	private Button mAppInfoButton;
 	private Button mPayButton;
 	private Button mHandShakeButton;
+	private Button mClearButton;
+	private static LinearLayout mDebugLayout;
+	private static LinearLayout mInputTerminalLayout;
+	private static LinearLayout mProgressLayout;
+	private ProgressBar mProgressBar;
 
 	// Name of the connected device
 	private static String mConnectedDeviceName = null;
@@ -185,6 +195,10 @@ public class BluetoothChat extends Activity {
 	private void setupChat() {
 		Log.d(TAG, "setupChat()");
 
+		mInputTerminalLayout = (LinearLayout) findViewById(R.id.input_layout);
+		mProgressLayout = (LinearLayout) findViewById(R.id.progres_layout);
+		mProgressBar = (ProgressBar) findViewById(R.id.progressBar1);
+
 		// Initialize the array adapter for the conversation thread
 		mConversationArrayAdapter = new ArrayAdapter<String>(this,
 				R.layout.message);
@@ -199,26 +213,53 @@ public class BluetoothChat extends Activity {
 		mAppInfoButton = (Button) findViewById(R.id.button_app_info);
 		mAppInfoButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				showProgressLayout();
+
+				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getAppInfo()).createFrame()));
+						BProtocolMessages.getAppInfo(mTerminalIdEditText
+								.getText().toString())).createFrame()));
 			}
 		});
 
 		mPayButton = (Button) findViewById(R.id.button_pay);
 		mPayButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				showProgressLayout();
+
+				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
+				EditText mAmountIdEditText = (EditText) findViewById(R.id.editAmount);
+				EditText mInvoiceIdEditText = (EditText) findViewById(R.id.editInvoice);
+
+				Double value = Double.valueOf(mAmountIdEditText.getText()
+						.toString()) * 100;
+
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getSale(5000, "1234567890"))
+						BProtocolMessages.getSale(mTerminalIdEditText.getText()
+								.toString(), value.intValue(),
+								mInvoiceIdEditText.getText().toString()))
 						.createFrame()));
 			}
 		});
+		mPayButton.setFocusableInTouchMode(true);
+		mPayButton.requestFocus();
 
 		mHandShakeButton = (Button) findViewById(R.id.button_handshake);
 		mHandShakeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				showProgressLayout();
 
+				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getHanshake()).createFrame()));
+						BProtocolMessages.getHanshake(mTerminalIdEditText
+								.getText().toString())).createFrame()));
+			}
+		});
+
+		mClearButton = (Button) findViewById(R.id.button_clear);
+		mClearButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				mConversationArrayAdapter.clear();
 			}
 		});
 
@@ -383,6 +424,12 @@ public class BluetoothChat extends Activity {
 							BProtocol bprotocol = factory.deserialize(termFram
 									.getData());
 
+							if (bprotocol.getProtocolType().equals("B2")) {
+								mInputTerminalLayout
+										.setVisibility(View.VISIBLE);
+								mProgressLayout.setVisibility(View.GONE);
+							}
+
 							mConversationArrayAdapter.add("Input: "
 									+ bprotocol.toString());
 
@@ -490,8 +537,25 @@ public class BluetoothChat extends Activity {
 			// Ensure this device is discoverable by others
 			ensureDiscoverable();
 			return true;
+		case R.id.log:
+			if (mConversationView.getVisibility() == View.GONE) {
+				mConversationView.setVisibility(View.VISIBLE);
+			} else {
+				mConversationView.setVisibility(View.GONE);
+			}
+			return true;
 		}
 		return false;
+	}
+
+	private void showProgressLayout() {
+		if (mChatService.getState() == TerminalService.STATE_CONNECTED) {
+			mInputTerminalLayout.setVisibility(View.GONE);
+			mProgressLayout.setVisibility(View.VISIBLE);
+//			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+//			mProgressLayout.setLayoutParams(params);
+		}
 	}
 
 	public class TCPconnectTask extends AsyncTask<String, String, TCPClient> {
