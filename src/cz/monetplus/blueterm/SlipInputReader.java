@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.R.bool;
 import android.util.Log;
 
 import cz.monetplus.blueterm.frames.SLIPFrame;
@@ -12,7 +13,7 @@ import cz.monetplus.blueterm.util.MonetUtils;
 public class SlipInputReader {
 
 	private static final String TAG = "SlipInputReader";
-
+	
 	public static byte[] read(InputStream stream) throws IOException {
 		ByteArrayOutputStream slip = new ByteArrayOutputStream();
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
+import cz.monetplus.blueterm.bprotocol.BProtocolTag;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
@@ -113,6 +114,7 @@ public class BluetoothChat extends Activity {
 	private ArrayList<String> arrayList;
 
 	private WarmerAdapter mAdapter;
+	private boolean isStandalone;
 
 	// private ByteArrayInputStream slipInputFraming;
 	private static ByteArrayOutputStream slipOutputpFraming;
@@ -200,19 +202,16 @@ public class BluetoothChat extends Activity {
 	 * @param serverMessage
 	 */
 	// TODO: vratit zpatky volane aplikaci.
-	private void returnResult(int resultCode, String serverMessage) {
-		// Create intent to deliver some kind of result
-		// data
-		Intent result = new Intent("cz.monetplus.blueterm.RESULT_ACTION");// ,
-																			// Uri.parse("content://result_uri"));
-		result.putExtra("ResultCode", resultCode);
-		result.putExtra("ServerMessage", serverMessage);
-		if (resultCode == 0) {
+	private void returnResult(String resultCode, String serverMessage) {
+		if (isStandalone == false) {
+			// Create intent to deliver some kind of result
+			// data
+			Intent result = new Intent(); // Uri.parse("content://result_uri"));
+			result.putExtra("ResultCode", resultCode);
+			result.putExtra("ServerMessage", serverMessage);
 			setResult(Activity.RESULT_OK, result);
-		} else {
-			setResult(Activity.RESULT_CANCELED, result);
+			finish();
 		}
-		finish();
 	}
 
 	private void setupChat() {
@@ -288,11 +287,13 @@ public class BluetoothChat extends Activity {
 		String terminalId = "00000000";
 		String amount = "0.00";
 		String invoice = "00000000";
+		isStandalone = true;
 
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		if (intent != null) {
 			if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
+				isStandalone = false;
 				terminalId = intent.getStringExtra("TerminalId");
 				amount = intent.getStringExtra("Amount");
 				invoice = intent.getStringExtra("Invoice");
@@ -464,14 +465,20 @@ public class BluetoothChat extends Activity {
 							BProtocol bprotocol = factory.deserialize(termFrame
 									.getData());
 
+							mConversationArrayAdapter.add("Input: "
+									+ bprotocol.toString());
+
 							if (bprotocol.getProtocolType().equals("B2")) {
 								mInputTerminalLayout
 										.setVisibility(View.VISIBLE);
 								mProgressLayout.setVisibility(View.GONE);
-							}
 
-							mConversationArrayAdapter.add("Input: "
-									+ bprotocol.toString());
+								returnResult(
+										bprotocol.getTagMap().get(
+												BProtocolTag.ResponseCode),
+										bprotocol.getTagMap().get(
+												BProtocolTag.ServerMessage));
+							}
 
 							break;
 						default:

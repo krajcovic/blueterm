@@ -510,22 +510,13 @@ public class TerminalService {
 			// Keep listening to the InputStream while connected
 			while (true) {
 				try {
-					// byte[] buffer = new byte[128];
-					// Arrays.fill(buffer, (byte) 0);
-					// Read from the InputStream
-
-					// bytes = mmInStream.read(buffer);
-					// bytes = mmInStream.read(buffer, 0, buffer.length);
-					// Log.d(TAG, MonetUtils.bytesToHex(buffer));
-					// Log.d(TAG, "Read " + bytes + " bytes.");
-
 					byte[] buffer = SlipInputReader.read(mmInStream);
 
 					// Send the obtained bytes to the UI Activity
 					mHandler.obtainMessage(BluetoothChat.MESSAGE_READ,
 							buffer.length, -1, buffer).sendToTarget();
 				} catch (IOException e) {
-					Log.e(TAG, "disconnected", e);
+					Log.d(TAG, "disconnected", e);
 					connectionLost();
 					break;
 				}
