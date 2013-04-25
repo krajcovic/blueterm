@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SET_DEBUG_APP" />
 
     <application
         android:name="cz.monetplus.blueterm.BlueTermApplication"
@@ -42,13 +43,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <intent-filter>
-                    <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
 
-                    <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
 
-                    <data android:mimeType="text/plain" />
-                </intent-filter>
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <activity

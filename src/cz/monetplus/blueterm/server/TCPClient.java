@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.server;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,9 +12,9 @@ import android.util.Log;
 
 public class TCPClient {
 	private String serverMessage;
-	public static final String SERVERIP = "193.245.34.234"; // your computer IP
-															// address
-	public static final int SERVERPORT = 37777;
+	private String serverIp; // your computer IP
+								// address
+	private int serverPort;
 	private OnMessageReceived mMessageListener = null;
 	private boolean mRun = false;
 
@@ -25,7 +25,9 @@ public class TCPClient {
 	 * Constructor of the class. OnMessagedReceived listens for the messages
 	 * received from server
 	 */
-	public TCPClient(OnMessageReceived listener) {
+	public TCPClient(String ip, int port, OnMessageReceived listener) {
+		this.serverIp = ip;
+		this.serverPort = port;
 		mMessageListener = listener;
 	}
 
@@ -41,7 +43,7 @@ public class TCPClient {
 			out.flush();
 		}
 	}
-	
+
 	public void sendMessage(byte[] message) {
 		if (out != null && !out.checkError()) {
 			out.println(message);
@@ -59,12 +61,12 @@ public class TCPClient {
 
 		try {
 			// here you must put your computer's IP address.
-			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
+			InetAddress serverAddr = InetAddress.getByName(this.serverIp);
 
 			Log.e("TCP Client", "C: Connecting...");
 
 			// create a socket to make the connection with the server
-			Socket socket = new Socket(serverAddr, SERVERPORT);
+			Socket socket = new Socket(serverAddr, this.serverPort);
 
 			try {
 

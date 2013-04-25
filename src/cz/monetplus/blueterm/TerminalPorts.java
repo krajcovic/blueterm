@@ -1,7 +1,8 @@
 package cz.monetplus.blueterm;
 
 public enum TerminalPorts {
-	UNDEFINED(0), MASTER(33333), BANK(33334), FLEET(33335), MAINTENANCE(33336);
+	UNDEFINED(-1), SERVER(0), MASTER(33333), BANK(33334), FLEET(33335), MAINTENANCE(
+			33336);
 
 	private int portNumber;
 

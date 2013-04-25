@@ -1,9 +1,11 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.frames;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import cz.monetplus.blueterm.TerminalPorts;
+import cz.monetplus.blueterm.util.CRCFCS;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.util.Log;

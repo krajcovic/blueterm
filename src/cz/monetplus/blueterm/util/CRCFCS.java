@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.util;
 
 public class CRCFCS {
 	public static final int PPPINITFCS = 0xffff;

@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import android.util.Log;
 
+import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 public class SlipInputReader {

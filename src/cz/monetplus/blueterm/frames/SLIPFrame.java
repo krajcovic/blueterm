@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.frames;
 
 /*
  * Simple SLIP utility class based on the SLIP RFC 1055

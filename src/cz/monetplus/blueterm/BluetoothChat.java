@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
+import cz.monetplus.blueterm.frames.SLIPFrame;
+import cz.monetplus.blueterm.frames.TerminalFrame;
+import cz.monetplus.blueterm.server.ServerFrame;
+import cz.monetplus.blueterm.server.TCPClient;
 
 import android.app.Activity;
 import android.app.ActionBar.LayoutParams;
@@ -150,9 +154,6 @@ public class BluetoothChat extends Activity {
 		// mList = (ListView)findViewById(R.id.list);
 		mAdapter = new WarmerAdapter(this, arrayList);
 		// mList.setAdapter(mAdapter);
-
-		// connect to the server
-		new TCPconnectTask().execute("");
 	}
 
 	@Override
@@ -284,13 +285,23 @@ public class BluetoothChat extends Activity {
 			}
 		});
 
+		String terminalId = "00000000";
+		String amount = "0.00";
+		String invoice = "00000000";
+
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		if (intent != null) {
-			String terminalId = intent.getStringExtra("TerminalId");
-			String amount = intent.getStringExtra("Amount");
-			String invoice = intent.getStringExtra("Invoice");
+			if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
+				terminalId = intent.getStringExtra("TerminalId");
+				amount = intent.getStringExtra("Amount");
+				invoice = intent.getStringExtra("Invoice");
+			}
 		}
+
+		mTerminalIdEditText.setText(terminalId);
+		mAmountIdEditText.setText(amount);
+		mInvoiceIdEditText.setText(invoice);
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
 		mChatService = new TerminalService(this, mHandler);
@@ -379,7 +390,7 @@ public class BluetoothChat extends Activity {
 	};
 
 	// The Handler that gets information back from the BluetoothChatService
-	private final static Handler mHandler = new Handler() {
+	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
@@ -428,17 +439,17 @@ public class BluetoothChat extends Activity {
 				// Check
 				if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
 
-					TerminalFrame termFram = new TerminalFrame(
+					TerminalFrame termFrame = new TerminalFrame(
 							SLIPFrame.parseFrame(readSlipFrame));
 
-					if (termFram != null) {
-						switch (termFram.getPort()) {
-						case BANK:
-							Log.d(TAG, "bank data");
-							// sends the message to the server
-							if (mTcpClient != null) {
-								mTcpClient.sendMessage(termFram.getData());
-							}
+					if (termFrame != null) {
+						switch (termFrame.getPort()) {
+						case UNDEFINED:
+							Log.d(TAG, "undefined port");
+							break;
+						case SERVER:
+							Log.d(TAG, "send data to server");
+							handeServerMessage(termFrame);
 							break;
 						case FLEET:
 							Log.d(TAG, "fleet data");
@@ -450,7 +461,7 @@ public class BluetoothChat extends Activity {
 							Log.d(TAG, "master data");
 							// Tyhle zpravy zpracovavat, jsou pro tuhle aplikaci
 							BProtocolFactory factory = new BProtocolFactory();
-							BProtocol bprotocol = factory.deserialize(termFram
+							BProtocol bprotocol = factory.deserialize(termFrame
 									.getData());
 
 							if (bprotocol.getProtocolType().equals("B2")) {
@@ -496,6 +507,62 @@ public class BluetoothChat extends Activity {
 						.show();
 				break;
 			}
+		}
+
+		private void handeServerMessage(TerminalFrame termFrame) {
+			// sends the message to the server
+			ServerFrame serverFrame = new ServerFrame(termFrame.getData());
+
+			switch (serverFrame.getCommand()) {
+			case 0x00: {
+				ServerFrame soFrame = new ServerFrame((byte) 0x80,
+						serverFrame.getId(), null);
+				TerminalFrame toFrame = new TerminalFrame(termFrame.getPort()
+						.getPortNumber(), soFrame.createFrame());
+
+				send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+				break;
+			}
+			case 0x01: {
+				String ipHost = String.format("%d.%d.%d.%d",
+						serverFrame.getData()[0], serverFrame.getData()[1],
+						serverFrame.getData()[2], serverFrame.getData()[3]);
+
+				int port = serverFrame.getData()[4] & 0xFF;
+				port <<= 8;
+				port = serverFrame.getData()[5] & 0xFF;
+				port &= 0xFFFF;
+
+				int timeout = serverFrame.getData()[6] & 0xFF;
+				timeout <<= 8;
+				timeout = serverFrame.getData()[7] & 0xFF;
+				timeout &= 0xFFFF;
+
+				// connect to the server
+				new TCPconnectTask(ipHost, port, serverFrame.getIdInt())
+						.execute("");
+
+				ServerFrame soFrame = new ServerFrame((byte) 0x81,
+						serverFrame.getId(), new byte[1]);
+				TerminalFrame toFrame = new TerminalFrame(termFrame.getPort()
+						.getPortNumber(), soFrame.createFrame());
+
+				send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+
+				break;
+			}
+			case 0x02: {
+				mTcpClient.stopClient();
+				break;
+			}
+			case 0x03: {
+				if (mTcpClient != null) {
+					mTcpClient.sendMessage(serverFrame.getData());
+				}
+				break;
+			}
+			}
+
 		}
 	};
 
@@ -589,24 +656,41 @@ public class BluetoothChat extends Activity {
 
 	public class TCPconnectTask extends AsyncTask<String, String, TCPClient> {
 
+		private String serverIp;
+		private int serverPort;
+		private int connectionId;
+
+		private TCPconnectTask(String serverIp, int serverPort, int connectionId) {
+			super();
+			this.serverIp = serverIp;
+			this.serverPort = serverPort;
+			this.connectionId = connectionId;
+		}
+
 		@Override
 		protected TCPClient doInBackground(String... message) {
 
 			// we create a TCPClient object and
-			mTcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
-				@Override
-				// here the messageReceived method is implemented
-				public void messageReceived(String message) {
-					// this method calls the onProgressUpdate
-					publishProgress(message);
+			mTcpClient = new TCPClient(serverIp, serverPort,
+					new TCPClient.OnMessageReceived() {
+						@Override
+						// here the messageReceived method is implemented
+						public void messageReceived(String message) {
+							// this method calls the onProgressUpdate
+							publishProgress(message);
 
-					TerminalFrame termFrame = new TerminalFrame(33330, message
-							.getBytes());
+							ServerFrame soFrame = new ServerFrame((byte) 0x04,
+									connectionId, message.getBytes());
 
-					// send to terminal
-					send2Terminal(SLIPFrame.createFrame(termFrame.createFrame()));
-				}
-			});
+							TerminalFrame termFrame = new TerminalFrame(
+									TerminalPorts.SERVER.getPortNumber(),
+									soFrame.createFrame());
+
+							// send to terminal
+							send2Terminal(SLIPFrame.createFrame(termFrame
+									.createFrame()));
+						}
+					});
 			mTcpClient.run();
 
 			return null;
