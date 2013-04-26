@@ -18,6 +18,8 @@ package cz.monetplus.blueterm;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
@@ -33,11 +35,13 @@ import android.app.ActionBar.LayoutParams;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -80,6 +84,7 @@ public class BluetoothChat extends Activity {
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
 	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
+	private static final int REQUEST_PREFERENCE = 4;
 
 	// Layout Views
 	private static TextView mTitle;
@@ -89,6 +94,7 @@ public class BluetoothChat extends Activity {
 	private Button mPayButton;
 	private Button mHandShakeButton;
 	private Button mClearButton;
+	private Button mStopButton;
 	private static LinearLayout mInputTerminalLayout;
 	private static LinearLayout mProgressLayout;
 
@@ -118,6 +124,10 @@ public class BluetoothChat extends Activity {
 
 	// private ByteArrayInputStream slipInputFraming;
 	private static ByteArrayOutputStream slipOutputpFraming;
+
+	SharedPreferences sharedPref;
+
+	Timer terminalTimer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -284,19 +294,45 @@ public class BluetoothChat extends Activity {
 			}
 		});
 
-		String terminalId = "00000000";
-		String amount = "0.00";
-		String invoice = "00000000";
+		mStopButton = (Button) findViewById(R.id.buttonStop);
+		mStopButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				mInputTerminalLayout.setVisibility(View.VISIBLE);
+				mProgressLayout.setVisibility(View.GONE);
+
+				returnResult("61", "Spojeni ukončeno uživatelem");
+			}
+		});
+
+		sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+		// TODO: smazat hodnoty, pouze pro debug
+		String terminalId = "12345678";
+		String amount = "10.00";
+		String invoice = "1234";
 		isStandalone = true;
+
+		// Initialize the BluetoothChatService to perform bluetooth connections
+		mChatService = new TerminalService(this, mHandler);
+
+		// Initialize the buffer for outgoing messages
+		mOutStringBuffer = new StringBuffer("");
 
 		// Get the intent that started this activity
 		Intent intent = getIntent();
 		if (intent != null) {
 			if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
 				isStandalone = false;
+
 				terminalId = intent.getStringExtra("TerminalId");
 				amount = intent.getStringExtra("Amount");
 				invoice = intent.getStringExtra("Invoice");
+
+				String address = sharedPref.getString(
+						getString(R.string.preferences_blue_addr), "");
+				if (!address.isEmpty()) {
+					connectDevice(address, false);
+				}
 			}
 		}
 
@@ -304,11 +340,7 @@ public class BluetoothChat extends Activity {
 		mAmountIdEditText.setText(amount);
 		mInvoiceIdEditText.setText(invoice);
 
-		// Initialize the BluetoothChatService to perform bluetooth connections
-		mChatService = new TerminalService(this, mHandler);
-
-		// Initialize the buffer for outgoing messages
-		mOutStringBuffer = new StringBuffer("");
+		setDebugVisibility();
 	}
 
 	@Override
@@ -601,6 +633,19 @@ public class BluetoothChat extends Activity {
 						Toast.LENGTH_SHORT).show();
 				finish();
 			}
+		case REQUEST_PREFERENCE:
+			if (resultCode == Activity.RESULT_OK) {
+				setDebugVisibility();
+			}
+		}
+	}
+
+	private void setDebugVisibility() {
+		String tmp = getString(R.string.preferences_log);
+		if (sharedPref.getBoolean(tmp, false)) {
+			mConversationView.setVisibility(View.VISIBLE);
+		} else {
+			mConversationView.setVisibility(View.GONE);
 		}
 	}
 
@@ -608,6 +653,23 @@ public class BluetoothChat extends Activity {
 		// Get the device MAC address
 		String address = data.getExtras().getString(
 				DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString(getString(R.string.preferences_blue_addr), address);
+
+		// Commit the edits!
+		editor.commit();
+
+		connectDevice(address, secure);
+	}
+
+	/**
+	 * Get the BluetoothDevice object
+	 * 
+	 * @param address
+	 * @param secure
+	 */
+	private void connectDevice(String address, boolean secure) {
 		// Get the BLuetoothDevice object
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 		// Attempt to connect to the device
@@ -640,12 +702,11 @@ public class BluetoothChat extends Activity {
 			// Ensure this device is discoverable by others
 			ensureDiscoverable();
 			return true;
-		case R.id.log:
-			if (mConversationView.getVisibility() == View.GONE) {
-				mConversationView.setVisibility(View.VISIBLE);
-			} else {
-				mConversationView.setVisibility(View.GONE);
-			}
+		case R.id.preferences:
+
+			serverIntent = new Intent(this, SettingsActivity.class);
+			startActivityForResult(serverIntent, REQUEST_PREFERENCE);
+
 			return true;
 		}
 		return false;
