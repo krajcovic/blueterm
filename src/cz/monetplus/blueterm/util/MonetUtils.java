@@ -27,6 +27,15 @@ public class MonetUtils {
 		return c;
 	}
 
+	public static int getInt(byte low, byte high) {
+		int ret = low & 0xFF;
+		ret <<= 8;
+		ret |= high & 0xFF;
+		ret &= 0xFFFF;
+		
+		return ret;
+	}
+
 	public static byte getLow(int number) {
 		return (byte) (number & 0xFF);
 	}

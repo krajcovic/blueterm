@@ -22,8 +22,8 @@ public class ServerFrame {
 	public ServerFrame(byte command, int id, byte[] data) {
 		super();
 		this.command = command;
-		this.id[0] = (byte) (id & 0xff);
-		this.id[1] = (byte) ((id >> 8) & 0xff);
+		this.id[1] = (byte) (id & 0xff);
+		this.id[0] = (byte) ((id >> 8) & 0xff);
 		this.data = data;
 	}
 
@@ -79,6 +79,7 @@ public class ServerFrame {
 			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
 			stream.write(this.getCommand());
 			stream.write(this.getId());
+			//stream.write(this.getId());
 			if (this.getData() != null) {
 				stream.write(this.getData());
 			}

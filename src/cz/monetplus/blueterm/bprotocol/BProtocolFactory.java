@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.util.Log;
+
 import cz.monetplus.blueterm.util.MonetUtils;
 
 public class BProtocolFactory {
@@ -18,6 +20,8 @@ public class BProtocolFactory {
 	private static final byte ETX = 0x03;
 
 	private static final byte FS = 0x1c;
+
+	private static final String TAG = "BProtocolFactory";
 
 	public byte[] serialize(BProtocol bprotocol) {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -75,7 +79,7 @@ public class BProtocolFactory {
 					33, 37), "UTF8"));
 
 			String dp = new String(Arrays.copyOfRange(buffer, 37,
-					buffer.length - 2), "ISO-8859-2");
+					buffer.length-1), "ISO-8859-2");
 			String regex = "[\\x1c]";
 			String[] split = dp.split(regex);
 
@@ -87,9 +91,8 @@ public class BProtocolFactory {
 				}
 			}
 
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
 		}
 
 		return bprotocol;

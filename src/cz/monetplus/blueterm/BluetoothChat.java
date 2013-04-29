@@ -17,9 +17,11 @@
 package cz.monetplus.blueterm;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
@@ -29,14 +31,13 @@ import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.server.TCPClient;
+import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.app.Activity;
-import android.app.ActionBar.LayoutParams;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,7 +49,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -57,7 +57,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,10 +70,13 @@ public class BluetoothChat extends Activity {
 
 	// Message types sent from the BluetoothChatService Handler
 	public static final int MESSAGE_STATE_CHANGE = 1;
-	public static final int MESSAGE_READ = 2;
-	public static final int MESSAGE_WRITE = 3;
+	public static final int MESSAGE_TERM_READ = 2;
+	public static final int MESSAGE_TERM_WRITE = 3;
 	public static final int MESSAGE_DEVICE_NAME = 4;
 	public static final int MESSAGE_TOAST = 5;
+	public static final int MESSAGE_CONNECTED = 6;
+	public static final int MESSAGE_SERVER_READ = 12;
+	public static final int MESSAGE_SERVER_WRITE = 13;
 
 	// Key names received from the BluetoothChatService Handler
 	public static final String DEVICE_NAME = "device_name";
@@ -424,6 +426,8 @@ public class BluetoothChat extends Activity {
 
 	// The Handler that gets information back from the BluetoothChatService
 	private final Handler mHandler = new Handler() {
+		private byte[] idConnect;
+
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
@@ -445,23 +449,45 @@ public class BluetoothChat extends Activity {
 					break;
 				}
 				break;
-			case MESSAGE_WRITE: {
-				byte[] writeBuf = (byte[]) msg.obj;
-				// construct a string from the buffer
-				// String writeMessage = new String(writeBuf);
+			case MESSAGE_SERVER_WRITE: {
+				String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
+				mConversationArrayAdapter.add("SO: "
+						+ hex.substring(0, Math.min(hex.length(), 80)));
+			}
+				break;
 
-				TerminalFrame termFram = new TerminalFrame(
-						SLIPFrame.parseFrame(writeBuf));
-				BProtocolFactory factory = new BProtocolFactory();
-				BProtocol bprotocol = factory.deserialize(termFram.getData());
+			case MESSAGE_SERVER_READ: {
+				String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
+				mConversationArrayAdapter.add("SI: "
+						+ hex.substring(0, Math.min(hex.length(), 80)));
+			}
+				break;
 
-				mConversationArrayAdapter
-						.add("Output: " + bprotocol.toString());
-
-				// mConversationArrayAdapter.add("Me:  " + writeMessage);
+			case MESSAGE_TERM_WRITE: {
+				{
+					String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
+					mConversationArrayAdapter.add("TO: "
+							+ hex.substring(0, Math.min(hex.length(), 80)));
+				}
 				break;
 			}
-			case MESSAGE_READ: {
+
+			case MESSAGE_CONNECTED: {
+				if (mTcpClient.isConnected()) {
+					byte[] status = new byte[1];
+					status[0] = (byte) msg.arg1;
+					ServerFrame soFrame = new ServerFrame((byte) 0x05,
+							idConnect, status);
+					TerminalFrame toFrame = new TerminalFrame(
+							TerminalPorts.SERVER.getPortNumber(),
+							soFrame.createFrame());
+
+					send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+				}
+				break;
+			}
+
+			case MESSAGE_TERM_READ: {
 				byte[] readSlipFrame = (byte[]) msg.obj;
 				// construct a string from the valid bytes in the buffer
 				// String readMessage = new String(readBuf, 0, msg.arg1);
@@ -481,7 +507,6 @@ public class BluetoothChat extends Activity {
 							Log.d(TAG, "undefined port");
 							break;
 						case SERVER:
-							Log.d(TAG, "send data to server");
 							handeServerMessage(termFrame);
 							break;
 						case FLEET:
@@ -491,13 +516,12 @@ public class BluetoothChat extends Activity {
 							Log.d(TAG, "maintentace data");
 							break;
 						case MASTER:
-							Log.d(TAG, "master data");
 							// Tyhle zpravy zpracovavat, jsou pro tuhle aplikaci
 							BProtocolFactory factory = new BProtocolFactory();
 							BProtocol bprotocol = factory.deserialize(termFrame
 									.getData());
 
-							mConversationArrayAdapter.add("Input: "
+							mConversationArrayAdapter.add("TI: "
 									+ bprotocol.toString());
 
 							if (bprotocol.getProtocolType().equals("B2")) {
@@ -563,23 +587,17 @@ public class BluetoothChat extends Activity {
 				break;
 			}
 			case 0x01: {
-				String ipHost = String.format("%d.%d.%d.%d",
-						serverFrame.getData()[0], serverFrame.getData()[1],
-						serverFrame.getData()[2], serverFrame.getData()[3]);
+				idConnect = serverFrame.getId();
 
-				int port = serverFrame.getData()[4] & 0xFF;
-				port <<= 8;
-				port = serverFrame.getData()[5] & 0xFF;
-				port &= 0xFFFF;
+				int port = MonetUtils.getInt(serverFrame.getData()[4],
+						serverFrame.getData()[5]);
 
-				int timeout = serverFrame.getData()[6] & 0xFF;
-				timeout <<= 8;
-				timeout = serverFrame.getData()[7] & 0xFF;
-				timeout &= 0xFFFF;
+				int timeout = MonetUtils.getInt(serverFrame.getData()[6],
+						serverFrame.getData()[7]);
 
 				// connect to the server
-				new TCPconnectTask(ipHost, port, serverFrame.getIdInt())
-						.execute("");
+				new TCPconnectTask(Arrays.copyOfRange(serverFrame.getData(), 0,
+						4), port, timeout, serverFrame.getIdInt()).execute("");
 
 				ServerFrame soFrame = new ServerFrame((byte) 0x81,
 						serverFrame.getId(), new byte[1]);
@@ -596,7 +614,11 @@ public class BluetoothChat extends Activity {
 			}
 			case 0x03: {
 				if (mTcpClient != null) {
-					mTcpClient.sendMessage(serverFrame.getData());
+					try {
+						mTcpClient.sendMessage(serverFrame.getData());
+					} catch (IOException e) {
+						Log.d(TAG, e.getMessage());
+					}
 				}
 				break;
 			}
@@ -722,33 +744,36 @@ public class BluetoothChat extends Activity {
 		}
 	}
 
-	public class TCPconnectTask extends AsyncTask<String, String, TCPClient> {
+	public class TCPconnectTask extends AsyncTask<String, byte[], TCPClient> {
 
-		private String serverIp;
+		private byte[] serverIp;
 		private int serverPort;
 		private int connectionId;
+		private int timeout;
 
-		private TCPconnectTask(String serverIp, int serverPort, int connectionId) {
+		private TCPconnectTask(byte[] serverIp, int serverPort, int timeout,
+				int connectionId) {
 			super();
 			this.serverIp = serverIp;
 			this.serverPort = serverPort;
 			this.connectionId = connectionId;
+			this.timeout = timeout;
 		}
 
 		@Override
 		protected TCPClient doInBackground(String... message) {
 
 			// we create a TCPClient object and
-			mTcpClient = new TCPClient(serverIp, serverPort,
+			mTcpClient = new TCPClient(serverIp, serverPort, timeout, mHandler,
 					new TCPClient.OnMessageReceived() {
 						@Override
 						// here the messageReceived method is implemented
-						public void messageReceived(String message) {
+						public void messageReceived(byte[] message) {
 							// this method calls the onProgressUpdate
-							publishProgress(message);
+							// publishProgress(message);
 
 							ServerFrame soFrame = new ServerFrame((byte) 0x04,
-									connectionId, message.getBytes());
+									connectionId, message);
 
 							TerminalFrame termFrame = new TerminalFrame(
 									TerminalPorts.SERVER.getPortNumber(),
@@ -765,11 +790,15 @@ public class BluetoothChat extends Activity {
 		}
 
 		@Override
-		protected void onProgressUpdate(String... values) {
+		protected void onProgressUpdate(byte[]... values) {
 			super.onProgressUpdate(values);
 
+			// Share the sent message back to the UI Activity
+			mHandler.obtainMessage(BluetoothChat.MESSAGE_SERVER_READ, -1, -1,
+					values[0]).sendToTarget();
+
 			// in the arrayList we add the messaged received from server
-			arrayList.add(values[0]);
+			arrayList.add(new String(values[0]));
 			// notify the adapter that the data set has changed. This means that
 			// new message received
 			// from server was added to the list

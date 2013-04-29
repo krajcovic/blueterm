@@ -5,7 +5,6 @@ import java.util.List;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
 // TODO: dodelat settigs http://developer.android.com/reference/android/preference/PreferenceActivity.html

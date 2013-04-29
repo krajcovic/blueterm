@@ -116,7 +116,7 @@ public class TerminalFrame {
 
 			if (this.getCrc() == countedCrc) {
 				this.setPort((data[0] << 8) + data[1]);
-				this.setData(Arrays.copyOfRange(data, 2, data.length - 1));
+				this.setData(Arrays.copyOfRange(data, 2, data.length - 2));
 			} else {
 				Log.d(TAG, "Invalid CRC frame");
 			}

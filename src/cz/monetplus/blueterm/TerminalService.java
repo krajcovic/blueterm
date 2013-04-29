@@ -495,13 +495,6 @@ public class TerminalService {
 
 			mmInStream = tmpIn;
 			mmOutStream = tmpOut;
-
-			// try {
-			// mmInStream.reset();
-			// } catch (IOException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
 		}
 
 		public void run() {
@@ -513,10 +506,10 @@ public class TerminalService {
 					byte[] buffer = SlipInputReader.read(mmInStream);
 
 					// Send the obtained bytes to the UI Activity
-					mHandler.obtainMessage(BluetoothChat.MESSAGE_READ,
+					mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_READ,
 							buffer.length, -1, buffer).sendToTarget();
 				} catch (IOException e) {
-					Log.d(TAG, "disconnected", e);
+					Log.d(TAG, e.getMessage());
 					connectionLost();
 					break;
 				}
@@ -533,11 +526,11 @@ public class TerminalService {
 			try {
 				mmOutStream.write(buffer);
 
-				Log.d(TAG, new String(buffer, "UTF-8"));
+				//Log.d(TAG, new String(buffer, "UTF-8"));
 				Log.d(TAG, MonetUtils.bytesToHex(buffer));
 
 				// Share the sent message back to the UI Activity
-				mHandler.obtainMessage(BluetoothChat.MESSAGE_WRITE, -1, -1,
+				mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_WRITE, -1, -1,
 						buffer).sendToTarget();
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
