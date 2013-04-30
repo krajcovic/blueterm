@@ -21,7 +21,7 @@ public class BProtocol implements Serializable {
 	private String flag;
 
 	/**
-	 * TODO: predelat na int.
+	 * Optional data len in hexa.
 	 */
 	private String optionalDataLen;
 

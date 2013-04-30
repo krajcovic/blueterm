@@ -2,7 +2,6 @@ package cz.monetplus.blueterm.bprotocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,8 +46,7 @@ public class BProtocolFactory {
 			bout.write(optionalData);
 			bout.write(ETX);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, "Serialize bprotocol", e);
 		}
 
 		return bout.toByteArray();
@@ -59,9 +57,6 @@ public class BProtocolFactory {
 		BProtocol bprotocol = new BProtocol();
 
 		try {
-			// ByteArrayInputStream bin = new ByteArrayInputStream(buffer);
-			// bin.read(buffer, offset, length)
-
 			bprotocol.setProtocolType(new String(Arrays.copyOfRange(buffer, 1,
 					3), "UTF8"));
 			bprotocol.setProtocolVersion(new String(Arrays.copyOfRange(buffer,
@@ -79,7 +74,7 @@ public class BProtocolFactory {
 					33, 37), "UTF8"));
 
 			String dp = new String(Arrays.copyOfRange(buffer, 37,
-					buffer.length-1), "ISO-8859-2");
+					buffer.length - 1), "ISO-8859-2");
 			String regex = "[\\x1c]";
 			String[] split = dp.split(regex);
 
@@ -106,14 +101,12 @@ public class BProtocolFactory {
 			@SuppressWarnings("unchecked")
 			Map.Entry<BProtocolTag, String> pairs = (Entry<BProtocolTag, String>) it
 					.next();
-			// BProtocolTag tag = (BProtocolTag) pairs.getKey();
 			try {
 				bout.write(FS);
 				bout.write(pairs.getKey().getTag().charValue());
 				bout.write(pairs.getValue().toString().getBytes());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e(TAG, "BProtocolFactory compileTags", e);
 			}
 		}
 

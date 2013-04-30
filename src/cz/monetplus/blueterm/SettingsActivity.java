@@ -1,7 +1,5 @@
 package cz.monetplus.blueterm;
 
-import java.util.List;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -11,9 +9,6 @@ import android.preference.PreferenceActivity;
 public class SettingsActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
 
-//	final static String KEY_PREF_LOG = "pref_log";
-//	final static String KEY_PREF_BLUE_ADDR = "blue_addr";
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -21,15 +16,8 @@ public class SettingsActivity extends PreferenceActivity implements
 	}
 
 	@Override
-	public void onBuildHeaders(List<Header> target) {
-		// super.onBuildHeaders(target);
-		// loadHeadersFromResource(R.xml.preferences, target);
-	}
-
-	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		// TODO Auto-generated method stub
 		// Preference connectionPref = findPreference(key);
 		// connectionPref.setSummary(sharedPreferences.getString(key, ""));
 

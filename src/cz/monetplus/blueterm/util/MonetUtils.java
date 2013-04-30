@@ -32,7 +32,7 @@ public class MonetUtils {
 		ret <<= 8;
 		ret |= high & 0xFF;
 		ret &= 0xFFFF;
-		
+
 		return ret;
 	}
 

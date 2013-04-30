@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
+
 import java.util.Timer;
 
 import cz.monetplus.blueterm.bprotocol.BProtocol;

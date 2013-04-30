@@ -1,8 +1,6 @@
 package cz.monetplus.blueterm;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
-
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,8 +14,6 @@ public class WarmerAdapter extends BaseAdapter {
 	private ArrayList<String> mListItems;
 	private LayoutInflater mLayoutInflater;
 
-	OutputStream forServer;
-
 	public WarmerAdapter(BluetoothChat context, ArrayList<String> arrayList) {
 		mListItems = arrayList;
 
@@ -26,24 +22,34 @@ public class WarmerAdapter extends BaseAdapter {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
+	/* (non-Javadoc)
+	 * @see android.widget.Adapter#getCount()
+	 * getCount() represents how many items are in the list
+	 */
 	@Override
 	public int getCount() {
-		// getCount() represents how many items are in the list
 		return mListItems.size();
 	}
 
+	/* (non-Javadoc)
+	 * @see android.widget.Adapter#getItem(int)
+	 */
 	@Override
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
-		return null;
+		return mListItems.get(position);
 	}
 
+	/* (non-Javadoc)
+	 * @see android.widget.Adapter#getItemId(int)
+	 */
 	@Override
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
-		return 0;
+		return position;
 	}
 
+	/* (non-Javadoc)
+	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
+	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 

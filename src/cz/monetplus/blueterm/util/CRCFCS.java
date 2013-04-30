@@ -1,8 +1,22 @@
 package cz.monetplus.blueterm.util;
 
+/**
+ * Class for counting CRC with FCS
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public class CRCFCS {
+	/**
+	 * Initialize FCS constant.
+	 */
 	public static final int PPPINITFCS = 0xffff;
+
+	/**
+	 * Control FCS constant.
+	 */
 	public static final int PPPGOODFCS = 0xf0b8;
+
 	/*
 	 * FCS lookup table as calculated by the table generator in section 2.
 	 */
