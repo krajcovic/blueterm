@@ -52,11 +52,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -100,9 +103,10 @@ public class BluetoothChat extends Activity {
 	private static LinearLayout mInputTerminalLayout;
 	private static LinearLayout mProgressLayout;
 
-	private EditText mTerminalIdEditText;
+	// private EditText mTerminalIdEditText;
 	private EditText mAmountIdEditText;
 	private EditText mInvoiceIdEditText;
+	private EditText mCurrencyEditText;
 
 	// Name of the connected device
 	private static String mConnectedDeviceName = null;
@@ -214,13 +218,18 @@ public class BluetoothChat extends Activity {
 	 * @param serverMessage
 	 */
 	// TODO: vratit zpatky volane aplikaci.
-	private void returnResult(String resultCode, String serverMessage) {
+	private void returnResult(String resultCode, String serverMessage,
+			String authCode, String seqId, String cardNumber, String cardType) {
 		if (isStandalone == false) {
 			// Create intent to deliver some kind of result
 			// data
 			Intent result = new Intent(); // Uri.parse("content://result_uri"));
 			result.putExtra("ResultCode", resultCode);
 			result.putExtra("ServerMessage", serverMessage);
+			result.putExtra("AuthCode", authCode);
+			result.putExtra("SeqId", seqId);
+			result.putExtra("CardNumber", cardNumber);
+			result.putExtra("CardType", cardType);
 			setResult(Activity.RESULT_OK, result);
 			finish();
 		}
@@ -242,9 +251,9 @@ public class BluetoothChat extends Activity {
 		mOutEditText = (EditText) findViewById(R.id.edit_text_out);
 		mOutEditText.setOnEditorActionListener(mWriteListener);
 
-		mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
 		mAmountIdEditText = (EditText) findViewById(R.id.editAmount);
 		mInvoiceIdEditText = (EditText) findViewById(R.id.editInvoice);
+		mCurrencyEditText = (EditText) findViewById(R.id.editTextCurrency);
 
 		// Initialize the app info button with a listener that for click events
 		mAppInfoButton = (Button) findViewById(R.id.button_app_info);
@@ -252,10 +261,8 @@ public class BluetoothChat extends Activity {
 			public void onClick(View v) {
 				showProgressLayout();
 
-				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getAppInfo(mTerminalIdEditText
-								.getText().toString())).createFrame()));
+						BProtocolMessages.getAppInfo()).createFrame()));
 			}
 		});
 
@@ -268,10 +275,10 @@ public class BluetoothChat extends Activity {
 						.toString()) * 100;
 
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getSale(mTerminalIdEditText.getText()
-								.toString(), value.intValue(),
-								mInvoiceIdEditText.getText().toString()))
-						.createFrame()));
+						BProtocolMessages.getSale(value.intValue(),
+								Integer.valueOf(mCurrencyEditText.getText()
+										.toString()), mInvoiceIdEditText
+										.getText().toString())).createFrame()));
 			}
 		});
 		mPayButton.setFocusableInTouchMode(true);
@@ -282,10 +289,10 @@ public class BluetoothChat extends Activity {
 			public void onClick(View v) {
 				showProgressLayout();
 
-				EditText mTerminalIdEditText = (EditText) findViewById(R.id.editTerminalId);
+				// EditText mTerminalIdEditText = (EditText)
+				// findViewById(R.id.editTerminalId);
 				send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-						BProtocolMessages.getHanshake(mTerminalIdEditText
-								.getText().toString())).createFrame()));
+						BProtocolMessages.getHanshake()).createFrame()));
 			}
 		});
 
@@ -302,16 +309,17 @@ public class BluetoothChat extends Activity {
 				mInputTerminalLayout.setVisibility(View.VISIBLE);
 				mProgressLayout.setVisibility(View.GONE);
 
-				returnResult("61", "Spojeni ukončeno uživatelem");
+				returnResult("61", "Spojeni ukončeno uživatelem", "", "", "",
+						"");
 			}
 		});
 
 		sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
 		// TODO: smazat hodnoty, pouze pro debug
-		String terminalId = "12345678";
-		String amount = "10.00";
-		String invoice = "1234";
+		// String terminalId = "12345678";
+		// String amount = "10.00";
+		// String invoice = "1234";
 		isStandalone = true;
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
@@ -326,9 +334,10 @@ public class BluetoothChat extends Activity {
 			if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
 				isStandalone = false;
 
-				terminalId = intent.getStringExtra("TerminalId");
-				amount = intent.getStringExtra("Amount");
-				invoice = intent.getStringExtra("Invoice");
+				// terminalId = intent.getStringExtra("TerminalId");
+				mAmountIdEditText.setText(intent.getStringExtra("Amount"));
+				mCurrencyEditText.setText(intent.getStringExtra("Currency"));
+				mInvoiceIdEditText.setText(intent.getStringExtra("Invoice"));
 
 				String address = sharedPref.getString(
 						getString(R.string.preferences_blue_addr), "");
@@ -338,9 +347,8 @@ public class BluetoothChat extends Activity {
 			}
 		}
 
-		mTerminalIdEditText.setText(terminalId);
-		mAmountIdEditText.setText(amount);
-		mInvoiceIdEditText.setText(invoice);
+		// mAmountIdEditText.setText(amount);
+		// mInvoiceIdEditText.setText(invoice);
 
 		setDebugVisibility();
 	}
@@ -539,7 +547,15 @@ public class BluetoothChat extends Activity {
 										bprotocol.getTagMap().get(
 												BProtocolTag.ResponseCode),
 										bprotocol.getTagMap().get(
-												BProtocolTag.ServerMessage));
+												BProtocolTag.ServerMessage),
+										bprotocol.getTagMap().get(
+												BProtocolTag.AuthCode),
+										bprotocol.getTagMap().get(
+												BProtocolTag.SequenceId),
+										bprotocol.getTagMap().get(
+												BProtocolTag.PAN),
+										bprotocol.getTagMap().get(
+												BProtocolTag.CardType));
 							}
 
 							break;
@@ -811,5 +827,4 @@ public class BluetoothChat extends Activity {
 			mAdapter.notifyDataSetChanged();
 		}
 	}
-
 }

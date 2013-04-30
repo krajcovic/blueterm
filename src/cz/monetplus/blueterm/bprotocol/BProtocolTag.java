@@ -7,7 +7,7 @@ public enum BProtocolTag {
 
 	AlternateId('D'),
 
-	ApprovalCode('F'),
+	AuthCode('F'),
 
 	CurrencyCode('I'),
 
@@ -29,7 +29,9 @@ public enum BProtocolTag {
 
 	TotalsBatch2('m'),
 
-	CustomerFid('9');
+	CustomerFid('9'),
+
+	CardType('J');
 
 	private final Character tag;
 

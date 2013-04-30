@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="currency_array">
+        <item tag="203">CZK</item>
+        <item tag="978">EUR</item>
+        <item tag="840">USD</item>
+    </string-array>
+
+</resources>

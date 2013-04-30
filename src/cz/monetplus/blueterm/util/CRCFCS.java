@@ -54,20 +54,16 @@ public class CRCFCS {
 			0x92b9, 0x8330, 0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a,
 			0x1ef1, 0x0f78 };
 
+	/**
+	 * Private constructor.
+	 */
+	private CRCFCS() {
+		super();
+	}
+
 	/*
 	 * Calculate a new fcs given the current fcs and the new data.
 	 */
-	// unsigned short pppfcs(fcs, cp, len)
-	// register unsigned short fcs;
-	// register unsigned char *cp;
-	// register int len;
-	// {
-	// while (len--)
-	// fcs = (fcs >> 8) ^ fcstab[(fcs ^ *cp++) & 0xff];
-	//
-	// return (fcs);
-	// }
-
 	public static int pppfcs(int fcs, byte[] cp) {
 		return pppfcs(fcs, cp, cp.length);
 	}

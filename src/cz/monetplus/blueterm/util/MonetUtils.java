@@ -1,6 +1,19 @@
 package cz.monetplus.blueterm.util;
 
+/**
+ * Functions for personal purposes.
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public class MonetUtils {
+
+	/**
+	 * Private constructor.
+	 */
+	private MonetUtils() {
+		super();
+	}
 
 	public static String bytesToHex(byte[] bytes) {
 		return bytesToHex(bytes, bytes.length);

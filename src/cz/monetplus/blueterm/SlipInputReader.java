@@ -12,7 +12,14 @@ import cz.monetplus.blueterm.util.MonetUtils;
 public class SlipInputReader {
 
 	private static final String TAG = "SlipInputReader";
-	
+
+	/**
+	 * Private constructor.
+	 */
+	private SlipInputReader() {
+		super();
+	}
+
 	public static byte[] read(InputStream stream) throws IOException {
 		ByteArrayOutputStream slip = new ByteArrayOutputStream();
 

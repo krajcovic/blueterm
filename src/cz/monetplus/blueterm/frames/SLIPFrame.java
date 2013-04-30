@@ -1,26 +1,41 @@
 package cz.monetplus.blueterm.frames;
 
-/*
- * Simple SLIP utility class based on the SLIP RFC 1055
- *
- * http://www.ietf.org/rfc/rfc1055.txt
- *
- * Using these (octal)values:
- #define END             0300    // indicates end of packet
- #define ESC             0333    // indicates byte stuffing
- #define ESC_END         0334    // ESC ESC_END means END data byte
- #define ESC_ESC         0335    // ESC ESC_ESC means ESC data byte
- *
- */
-
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Simple SLIP utility class based on the SLIP RFC 1055
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public class SLIPFrame {
 
+	/**
+	 * indicates end of packet
+	 */
 	public static byte END = (byte) 0xC0;
+
+	/**
+	 * indicates byte stuffing
+	 */
 	public static byte ESC = (byte) 0xDB;
+
+	/**
+	 * ESC ESC_END means END data byte
+	 */
 	public static byte ESC_END = (byte) 0xDC;
+
+	/**
+	 * ESC ESC_ESC means ESC data byte
+	 */
 	public static byte ESC_ESC = (byte) 0xDD;
+
+	/**
+	 * Private constructor.
+	 */
+	private SLIPFrame() {
+		super();
+	}
 
 	/*
 	 * utility static method that takes a byte array of data and formats it into
