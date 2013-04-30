@@ -25,10 +25,6 @@
         android:icon="@android:drawable/ic_menu_search"
         android:title="@string/insecure_connect"/>
     <item
-        android:id="@+id/discoverable"
-        android:icon="@android:drawable/ic_menu_mylocation"
-        android:title="@string/discoverable"/>
-    <item
         android:id="@+id/preferences"
         android:icon="@android:drawable/ic_menu_mylocation"
         android:title="@string/preferences">

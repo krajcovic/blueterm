@@ -126,7 +126,7 @@ public class BluetoothChat extends Activity {
 	private ArrayList<String> arrayList;
 
 	private WarmerAdapter mAdapter;
-	private boolean isStandalone;
+	private boolean isStandalone = true;
 
 	// private ByteArrayInputStream slipInputFraming;
 	private static ByteArrayOutputStream slipOutputpFraming;
@@ -316,12 +316,6 @@ public class BluetoothChat extends Activity {
 
 		sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
-		// TODO: smazat hodnoty, pouze pro debug
-		// String terminalId = "12345678";
-		// String amount = "10.00";
-		// String invoice = "1234";
-		isStandalone = true;
-
 		// Initialize the BluetoothChatService to perform bluetooth connections
 		mChatService = new TerminalService(this, mHandler);
 
@@ -336,8 +330,11 @@ public class BluetoothChat extends Activity {
 
 				// terminalId = intent.getStringExtra("TerminalId");
 				mAmountIdEditText.setText(intent.getStringExtra("Amount"));
+				mAmountIdEditText.setEnabled(false);
 				mCurrencyEditText.setText(intent.getStringExtra("Currency"));
+				mCurrencyEditText.setEnabled(false);
 				mInvoiceIdEditText.setText(intent.getStringExtra("Invoice"));
+				mInvoiceIdEditText.setEnabled(false);
 
 				String address = sharedPref.getString(
 						getString(R.string.preferences_blue_addr), "");
@@ -346,9 +343,6 @@ public class BluetoothChat extends Activity {
 				}
 			}
 		}
-
-		// mAmountIdEditText.setText(amount);
-		// mInvoiceIdEditText.setText(invoice);
 
 		setDebugVisibility();
 	}
@@ -375,18 +369,6 @@ public class BluetoothChat extends Activity {
 			mChatService.stop();
 		if (D)
 			Log.e(TAG, "--- ON DESTROY ---");
-	}
-
-	private void ensureDiscoverable() {
-		if (D)
-			Log.d(TAG, "ensure discoverable");
-		if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-			Intent discoverableIntent = new Intent(
-					BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-			discoverableIntent.putExtra(
-					BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-			startActivity(discoverableIntent);
-		}
 	}
 
 	/**
@@ -742,10 +724,10 @@ public class BluetoothChat extends Activity {
 			startActivityForResult(serverIntent,
 					REQUEST_CONNECT_DEVICE_INSECURE);
 			return true;
-		case R.id.discoverable:
-			// Ensure this device is discoverable by others
-			ensureDiscoverable();
-			return true;
+			// case R.id.discoverable:
+			// // Ensure this device is discoverable by others
+			// ensureDiscoverable();
+			// return true;
 		case R.id.preferences:
 
 			serverIntent = new Intent(this, SettingsActivity.class);
