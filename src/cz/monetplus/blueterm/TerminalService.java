@@ -296,7 +296,11 @@ public class TerminalService {
 		public ConnectThread(BluetoothDevice device, boolean secure) {
 			mmDevice = device;
 			BluetoothSocket tmp = null;
-			mSocketType = secure ? "Secure" : "Insecure";
+			if (secure) {
+				mSocketType = "Secure";
+			} else {
+				mSocketType = "Insecure";
+			}
 
 			// Get a BluetoothSocket for a connection with the
 			// given BluetoothDevice
