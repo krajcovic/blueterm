@@ -473,17 +473,23 @@ public class BluetoothChat extends Activity {
 			}
 
 			case MESSAGE_CONNECTED: {
-				if (mTcpClient.isConnected()) {
-					byte[] status = new byte[1];
-					status[0] = (byte) msg.arg1;
-					ServerFrame soFrame = new ServerFrame((byte) 0x05,
-							idConnect, status);
-					TerminalFrame toFrame = new TerminalFrame(
-							TerminalPorts.SERVER.getPortNumber(),
-							soFrame.createFrame());
+				// if (mTcpClient.isConnected()) {
+				byte[] status = new byte[1];
+				status[0] = (byte) msg.arg1;
+				ServerFrame soFrame = new ServerFrame((byte) 0x05, idConnect,
+						status);
+				TerminalFrame toFrame = new TerminalFrame(
+						TerminalPorts.SERVER.getPortNumber(),
+						soFrame.createFrame());
 
-					send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+				send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+
+				if (status[0] != 0) {
+					mInputTerminalLayout.setVisibility(View.VISIBLE);
+					mProgressLayout.setVisibility(View.GONE);
 				}
+
+				// }
 				break;
 			}
 
