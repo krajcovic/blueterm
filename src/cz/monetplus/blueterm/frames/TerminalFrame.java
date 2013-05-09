@@ -65,7 +65,7 @@ public class TerminalFrame {
 		return crc;
 	}
 
-	public void setCrc(int crc) {
+	public final void setCrc(final int crc) {
 		this.crc = crc;
 	}
 
@@ -73,7 +73,6 @@ public class TerminalFrame {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
 		try {
-			// stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
 			stream.write(MonetUtils.getHigh(this.getPort().getPortNumber()));
 			stream.write(MonetUtils.getLow(this.getPort().getPortNumber()));
 			stream.write(this.getData());
