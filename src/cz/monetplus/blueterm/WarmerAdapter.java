@@ -21,8 +21,16 @@ public class WarmerAdapter extends BaseAdapter {
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
+	
+	   public WarmerAdapter(TransactionActivity context, ArrayList<String> arrayList) {
+	        mListItems = arrayList;
 
-	/* (non-Javadoc)
+	        // get the layout inflater
+	        mLayoutInflater = (LayoutInflater) context
+	                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	    }
+
+    /* (non-Javadoc)
 	 * @see android.widget.Adapter#getCount()
 	 * getCount() represents how many items are in the list
 	 */

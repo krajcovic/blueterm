@@ -44,8 +44,8 @@ public class TerminalService {
     private static final boolean D = true;
 
     // Name for the SDP record when creating server socket
-//    private static final String NAME_SECURE = "BluetoothChatSecure";
-//    private static final String NAME_INSECURE = "BluetoothChatInsecure";
+    // private static final String NAME_SECURE = "BluetoothChatSecure";
+    // private static final String NAME_INSECURE = "BluetoothChatInsecure";
 
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =
@@ -213,6 +213,36 @@ public class TerminalService {
         mHandler.sendMessage(msg);
 
         setState(STATE_CONNECTED);
+    }
+
+    public void join() {
+        if (D)
+            Log.d(TAG, "join");
+
+        if (mConnectThread != null) {
+            try {
+                mConnectThread.join();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        if (mConnectedThread != null) {
+            try {
+                mConnectedThread.join();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

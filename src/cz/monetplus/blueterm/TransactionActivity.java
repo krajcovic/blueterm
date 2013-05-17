@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.util.Timer;
+
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
@@ -61,9 +63,9 @@ import android.widget.Toast;
 /**
  * This is the main Activity that displays the current chat session.
  */
-public class BluetoothChat extends Activity {
+public class TransactionActivity extends Activity {
     // Debugging
-    private static final String TAG = "BluetoothChat";
+    private static final String TAG = "Transaction";
     private static final boolean isDebug = true;
 
     // Message types sent from the BluetoothChatService Handler
@@ -128,7 +130,7 @@ public class BluetoothChat extends Activity {
 
     SharedPreferences sharedPref;
 
-//    Timer terminalTimer;
+    Timer terminalTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -798,7 +800,7 @@ public class BluetoothChat extends Activity {
             super.onProgressUpdate(values);
 
             // Share the sent message back to the UI Activity
-            mHandler.obtainMessage(BluetoothChat.MESSAGE_SERVER_READ, -1, -1,
+            mHandler.obtainMessage(TransactionActivity.MESSAGE_SERVER_READ, -1, -1,
                     values[0]).sendToTarget();
 
             // in the arrayList we add the messaged received from server

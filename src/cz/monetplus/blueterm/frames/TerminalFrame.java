@@ -17,17 +17,17 @@ public class TerminalFrame {
 	/**
 	 * Port 2Bytes
 	 */
-	private TerminalPorts port;
+	private TerminalPorts port = TerminalPorts.UNDEFINED;
 
 	/**
 	 * Protokol data
 	 */
-	private byte[] data;
+	private byte[] data = null;
 
 	/**
 	 * CRC - PPP-FCS (RFC 1134)
 	 */
-	private int crc;
+	private int crc = 0;
 
 	public TerminalFrame() {
 		super();
