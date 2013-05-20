@@ -86,6 +86,14 @@ public class BluetoothChat extends Activity {
     private static final int REQUEST_ENABLE_BT = 3;
     private static final int REQUEST_PREFERENCE = 4;
 
+    // Extra
+    public static final String EXTRA_RESULT_CODE = "ResultCode";
+    public static final String EXTRA_SERVER_MESS = "ServerMessage";
+    public static final String EXTRA_AUTH_CODE = "AuthCode";
+    public static final String EXTRA_SEQ_ID = "SeqId";
+    public static final String EXTRA_CARD_NUMBER = "CardNumber";
+    public static final String EXTRA_CARD_TYPE = "CardType";
+
     // Layout Views
     private static TextView mTitle;
     private ListView mConversationView;
@@ -128,7 +136,7 @@ public class BluetoothChat extends Activity {
 
     SharedPreferences sharedPref;
 
-//    Timer terminalTimer;
+    // Timer terminalTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -223,12 +231,12 @@ public class BluetoothChat extends Activity {
             // Create intent to deliver some kind of result
             // data
             Intent result = new Intent(); // Uri.parse("content://result_uri"));
-            result.putExtra("ResultCode", resultCode);
-            result.putExtra("ServerMessage", serverMessage);
-            result.putExtra("AuthCode", authCode);
-            result.putExtra("SeqId", seqId);
-            result.putExtra("CardNumber", cardNumber);
-            result.putExtra("CardType", cardType);
+            result.putExtra(EXTRA_RESULT_CODE, resultCode);
+            result.putExtra(EXTRA_SERVER_MESS, serverMessage);
+            result.putExtra(EXTRA_AUTH_CODE, authCode);
+            result.putExtra(EXTRA_SEQ_ID, seqId);
+            result.putExtra(EXTRA_CARD_NUMBER, cardNumber);
+            result.putExtra(EXTRA_CARD_TYPE, cardType);
             setResult(Activity.RESULT_OK, result);
             finish();
         }

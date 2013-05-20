@@ -49,6 +49,14 @@ public class MonetBTAPI {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
     private static final int REQUEST_PREFERENCE = 4;
+    
+//    public static final String EXTRA_RESULT_CODE = "ResultCode";
+//    public static final String EXTRA_SERVER_MESS = "ServerMessage";
+//    public static final String EXTRA_AUTH_CODE = "AuthCode";
+//    public static final String EXTRA_SEQ_ID = "SeqId";
+//    public static final String EXTRA_CARD_NUMBER = "CardNumber";
+//    public static final String EXTRA_CARD_TYPE = "CardType";
+    
 
     /**
      * Local Bluetooth adapter
@@ -100,10 +108,16 @@ public class MonetBTAPI {
     // The Handler that gets information back from the BluetoothChatService
     private Handler mHandler;
 
+    /**
+     * @return
+     */
     public Boolean isTransactionFinished() {
         return isFinish;
     }
 
+    /**
+     * @return
+     */
     public TransactionOut getTransactionResult() {
         if (isFinish) {
             return outputData;
@@ -112,12 +126,16 @@ public class MonetBTAPI {
         return null;
     }
 
-    public Boolean doTransaction(Context context, TransactionIn in,
-            TransactionOut out) {
+    /**
+     * @param context
+     * @param in
+     * @return
+     */
+    public Boolean doTransaction(Context context, TransactionIn in) {
 
         applicationContext = context;
         inputData = in;
-        outputData = out;
+        outputData = new TransactionOut();
 
         outputData.setServerMessage("Provadim komunikaci");
 
