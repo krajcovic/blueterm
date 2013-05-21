@@ -1,56 +1,128 @@
 package cz.monetplus.blueterm.bprotocol;
 
+/**
+ * @author "Dusan Krajcovic"
+ *
+ */
+/**
+ * @author "Dusan Krajcovic"
+ *
+ */
+/**
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public enum BProtocolTag {
-	Amount1('B'),
+    /**
+     * 
+     */
+    Amount1('B'),
 
-	Amount2('C'),
+    /**
+     * 
+     */
+    Amount2('C'),
 
-	AlternateId('D'),
+    /**
+     * 
+     */
+    AlternateId('D'),
 
-	AuthCode('F'),
+    /**
+     * 
+     */
+    AuthCode('F'),
 
-	CurrencyCode('I'),
+    /**
+     * 
+     */
+    CurrencyCode('I'),
 
-	CurrencyCode2('E'),
+    /**
+     * 
+     */
+    CurrencyCode2('E'),
 
-	PAN('P'),
+    /**
+     * 
+     */
+    PAN('P'),
 
-	ResponseCode('R'),
+    /**
+     * 
+     */
+    /**
+     * 
+     */
+    ResponseCode('R'),
 
-	InvoiceNumber('S'),
+    /**
+     * 
+     */
+    InvoiceNumber('S'),
 
-	TransactionType('T'),
+    /**
+     * 
+     */
+    TransactionType('T'),
 
-	SequenceId('i'),
+    /**
+     * 
+     */
+    SequenceId('i'),
 
-	ServerMessage('g'),
+    /**
+     * 
+     */
+    ServerMessage('g'),
 
-	TotalsBatch1('l'),
+    /**
+     * 
+     */
+    TotalsBatch1('l'),
 
-	TotalsBatch2('m'),
+    /**
+     * 
+     */
+    TotalsBatch2('m'),
 
-	CustomerFid('9'),
+    /**
+     * 
+     */
+    CustomerFid('9'),
 
-	CardType('J');
+    /**
+     * 
+     */
+    CardType('J');
 
-	private final Character tag;
+    /**
+     * Character tag.
+     */
+    private final Character tag;
 
-	private BProtocolTag(Character tag) {
-		this.tag = tag;
-	}
+    /**
+     * Private constructor.
+     * 
+     * @param tag
+     *            Character tag in B protocol.
+     */
+    private BProtocolTag(Character tag) {
+        this.tag = tag;
+    }
 
-	public Character getTag() {
-		return tag;
-	}
+    public Character getTag() {
+        return tag;
+    }
 
-	public static BProtocolTag tagOf(Character tag) {
-		for (BProtocolTag e : BProtocolTag.class.getEnumConstants()) {
-			if (e.getTag().equals(tag)) {
-				return e;
-			}
-		}
-		throw new IllegalArgumentException("Unknown "
-				+ BProtocolTag.class.getName() + " enum tag:" + tag);
-	}
+    public static BProtocolTag tagOf(Character tag) {
+        for (BProtocolTag e : BProtocolTag.class.getEnumConstants()) {
+            if (e.getTag().equals(tag)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown "
+                + BProtocolTag.class.getName() + " enum tag:" + tag);
+    }
 
 }

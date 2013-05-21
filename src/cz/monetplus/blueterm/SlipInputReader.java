@@ -9,34 +9,52 @@ import android.util.Log;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.util.MonetUtils;
 
-public class SlipInputReader {
+/**
+ * Read from stream a slip frames.
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
+public final class SlipInputReader {
 
-	private static final String TAG = "SlipInputReader";
+    /**
+     * TAG for logging.
+     */
+    private static final String TAG = "SlipInputReader";
 
-	/**
-	 * Private constructor.
-	 */
-	private SlipInputReader() {
-		super();
-	}
+    /**
+     * Private constructor.
+     */
+    private SlipInputReader() {
+        super();
+    }
 
-	public static byte[] read(InputStream stream) throws IOException {
-		ByteArrayOutputStream slip = new ByteArrayOutputStream();
+    /**
+     * Read complete slipframes. From Slipframe.end to slipframe.end.
+     * 
+     * @param stream
+     *            Stream from read.
+     * @return Complete slipframes... must be checked for crc.
+     * @throws IOException
+     *             Problem with stream.
+     */
+    public static byte[] read(final InputStream stream) throws IOException {
+        ByteArrayOutputStream slip = new ByteArrayOutputStream();
 
-		byte[] tempBuffer = new byte[1];
+        byte[] tempBuffer = new byte[1];
 
-		do {
-			stream.read(tempBuffer);
-		} while (tempBuffer[0] != SLIPFrame.END);
+        do {
+            stream.read(tempBuffer);
+        } while (tempBuffer[0] != SLIPFrame.END);
 
-		slip.write(tempBuffer);
-		do {
-			stream.read(tempBuffer);
-			slip.write(tempBuffer);
-		} while (tempBuffer[0] != SLIPFrame.END);
+        slip.write(tempBuffer);
+        do {
+            stream.read(tempBuffer);
+            slip.write(tempBuffer);
+        } while (tempBuffer[0] != SLIPFrame.END);
 
-		Log.d(TAG, slip.toString());
-		Log.d(TAG, MonetUtils.bytesToHex(slip.toByteArray()));
-		return slip.toByteArray();
-	}
+        Log.d(TAG, slip.toString());
+        Log.d(TAG, MonetUtils.bytesToHex(slip.toByteArray()));
+        return slip.toByteArray();
+    }
 }

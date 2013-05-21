@@ -62,6 +62,12 @@ import android.widget.Toast;
  * This is the main Activity that displays the current chat session.
  */
 public class BluetoothChat extends Activity {
+    private static final int TERM_CMD_CONNECT_RES = 0x81;
+    private static final int TERM_CMD_SEND = 0x03;
+    private static final int TERM_CMD_DISCONNECT = 0x02;
+    private static final int TERM_CMD_CONNECT = 0x01;
+    private static final int TERM_CMD_ECHO = 0x00;
+    private static final int TERM_CMD_ECHO_RES = 0x80;
     // Debugging
     private static final String TAG = "BluetoothChat";
     private static final boolean isDebug = true;
@@ -222,12 +228,22 @@ public class BluetoothChat extends Activity {
 
     /**
      * @param resultCode
+     *            Result code from terminal.
      * @param serverMessage
+     *            Server message from terminal.
+     * @param authCode
+     *            Authorization code.
+     * @param seqId
+     *            Sequence Id.
+     * @param cardNumber
+     *            Card number.
+     * @param cardType
+     *            Card type.
      */
-    // TODO: vratit zpatky volane aplikaci.
     private void returnResult(String resultCode, String serverMessage,
             String authCode, String seqId, String cardNumber, String cardType) {
-        if (isStandalone == false) {
+
+        if (!isStandalone) {
             // Create intent to deliver some kind of result
             // data
             Intent result = new Intent(); // Uri.parse("content://result_uri"));
@@ -437,46 +453,21 @@ public class BluetoothChat extends Activity {
                 if (isDebug) {
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                 }
-                switch (msg.arg1) {
-                case TerminalService.STATE_CONNECTED:
-                    mTitle.setText(R.string.title_connected_to);
-                    mTitle.append(mConnectedDeviceName);
-                    mConversationArrayAdapter.clear();
-                    break;
-                case TerminalService.STATE_CONNECTING:
-                    mTitle.setText(R.string.title_connecting);
-                    break;
-                case TerminalService.STATE_LISTEN:
-                case TerminalService.STATE_NONE:
-                    mTitle.setText(R.string.title_not_connected);
-                    break;
-                }
+                terminalServiceSwitch(msg);
                 break;
-            case MESSAGE_SERVER_WRITE: {
-                String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
-                mConversationArrayAdapter.add("SO: "
-                        + hex.substring(0, Math.min(hex.length(), 80)));
-            }
+            case MESSAGE_SERVER_WRITE:
+                add2conversation("SO:", MonetUtils.bytesToHex((byte[]) msg.obj));
                 break;
 
-            case MESSAGE_SERVER_READ: {
-                String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
-                mConversationArrayAdapter.add("SI: "
-                        + hex.substring(0, Math.min(hex.length(), 80)));
-            }
+            case MESSAGE_SERVER_READ:
+                add2conversation("SI:", MonetUtils.bytesToHex((byte[]) msg.obj));
                 break;
 
-            case MESSAGE_TERM_WRITE: {
-                {
-                    String hex = MonetUtils.bytesToHex((byte[]) msg.obj);
-                    mConversationArrayAdapter.add("TO: "
-                            + hex.substring(0, Math.min(hex.length(), 80)));
-                }
+            case MESSAGE_TERM_WRITE:
+                add2conversation("TO:", MonetUtils.bytesToHex((byte[]) msg.obj));
                 break;
-            }
 
-            case MESSAGE_CONNECTED: {
-                // if (mTcpClient.isConnected()) {
+            case MESSAGE_CONNECTED:
                 byte[] status = new byte[1];
                 status[0] = (byte) msg.arg1;
                 ServerFrame soFrame = new ServerFrame((byte) 0x05, idConnect,
@@ -492,16 +483,10 @@ public class BluetoothChat extends Activity {
                     mProgressLayout.setVisibility(View.GONE);
                 }
 
-                // }
                 break;
-            }
 
-            case MESSAGE_TERM_READ: {
+            case MESSAGE_TERM_READ:
                 byte[] readSlipFrame = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
-                // String readMessage = new String(readBuf, 0, msg.arg1);
-                // String readMessage = MonetUtils.bytesToHex(readSlipFrame,
-                // msg.arg1);
                 slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
 
                 // Check
@@ -566,13 +551,8 @@ public class BluetoothChat extends Activity {
                     Log.e(TAG, "Corrupted data. It's not slip frame.");
                 }
 
-                // mConversationArrayAdapter.add(mConnectedDeviceName + ":  "
-                // + readMessage);
-
-                // Log.d(TAG, "Len: " + slipOutputpFraming.size());
-
                 break;
-            }
+
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
                 mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
@@ -589,21 +569,43 @@ public class BluetoothChat extends Activity {
             }
         }
 
+        private void add2conversation(String from, String hex) {
+            mConversationArrayAdapter.add(from
+                    + hex.substring(0, Math.min(hex.length(), 80)));
+        }
+
+        private void terminalServiceSwitch(Message msg) {
+            switch (msg.arg1) {
+            case TerminalService.STATE_CONNECTED:
+                mTitle.setText(R.string.title_connected_to);
+                mTitle.append(mConnectedDeviceName);
+                mConversationArrayAdapter.clear();
+                break;
+            case TerminalService.STATE_CONNECTING:
+                mTitle.setText(R.string.title_connecting);
+                break;
+            case TerminalService.STATE_LISTEN:
+            case TerminalService.STATE_NONE:
+                mTitle.setText(R.string.title_not_connected);
+                break;
+            }
+        }
+
         private void handeServerMessage(TerminalFrame termFrame) {
             // sends the message to the server
             ServerFrame serverFrame = new ServerFrame(termFrame.getData());
 
             switch (serverFrame.getCommand()) {
-            case 0x00: {
-                ServerFrame soFrame = new ServerFrame((byte) 0x80,
+            case TERM_CMD_ECHO:
+                ServerFrame soFrame = new ServerFrame((byte) TERM_CMD_ECHO_RES,
                         serverFrame.getId(), null);
                 TerminalFrame toFrame = new TerminalFrame(termFrame.getPort()
                         .getPortNumber(), soFrame.createFrame());
 
                 send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
                 break;
-            }
-            case 0x01: {
+
+            case TERM_CMD_CONNECT:
                 idConnect = serverFrame.getId();
 
                 int port = MonetUtils.getInt(serverFrame.getData()[4],
@@ -616,20 +618,18 @@ public class BluetoothChat extends Activity {
                 new TCPconnectTask(Arrays.copyOfRange(serverFrame.getData(), 0,
                         4), port, timeout, serverFrame.getIdInt()).execute("");
 
-                ServerFrame soFrame = new ServerFrame((byte) 0x81,
-                        serverFrame.getId(), new byte[1]);
-                TerminalFrame toFrame = new TerminalFrame(termFrame.getPort()
-                        .getPortNumber(), soFrame.createFrame());
-
-                send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+                send2Terminal(SLIPFrame.createFrame(new TerminalFrame(termFrame
+                        .getPort().getPortNumber(), new ServerFrame(
+                        (byte) TERM_CMD_CONNECT_RES, serverFrame.getId(),
+                        new byte[1]).createFrame()).createFrame()));
 
                 break;
-            }
-            case 0x02: {
+
+            case TERM_CMD_DISCONNECT:
                 mTcpClient.stopClient();
                 break;
-            }
-            case 0x03: {
+
+            case TERM_CMD_SEND:
                 if (mTcpClient != null) {
                     try {
                         mTcpClient.sendMessage(serverFrame.getData());
@@ -638,7 +638,6 @@ public class BluetoothChat extends Activity {
                     }
                 }
                 break;
-            }
             }
 
         }
@@ -704,10 +703,12 @@ public class BluetoothChat extends Activity {
     }
 
     /**
-     * Get the BluetoothDevice object
+     * Get the BluetoothDevice object.
      * 
      * @param address
+     *            HW address of bluetooth
      * @param secure
+     *            True for secure connection, false for insecure.
      */
     private void connectDevice(String address, boolean secure) {
         // Get the BLuetoothDevice object
@@ -756,7 +757,8 @@ public class BluetoothChat extends Activity {
         }
     }
 
-    public class TCPconnectTask extends AsyncTask<String, byte[], TCPClient> {
+    public final class TCPconnectTask extends
+            AsyncTask<String, byte[], TCPClient> {
 
         private byte[] serverIp;
         private int serverPort;

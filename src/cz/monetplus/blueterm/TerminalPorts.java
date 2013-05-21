@@ -1,30 +1,66 @@
 package cz.monetplus.blueterm;
 
+/**
+ * Terminal ports, which identifieds a way of communication with terminal.
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public enum TerminalPorts {
-	UNDEFINED(-1), SERVER(0), MASTER(33333), BANK(33334), FLEET(33335), MAINTENANCE(
-			33336);
+    /**
+     * 
+     */
+    UNDEFINED(-1),
 
-	private int portNumber;
+    /**
+     * Communication for auth server.
+     */
+    SERVER(0),
 
-	TerminalPorts(int port) {
-		this.setPort(port);
-	}
+    /**
+     * 
+     */
+    MASTER(33333),
 
-	public int getPortNumber() {
-		return portNumber;
-	}
+    /**
+     * 
+     */
+    BANK(33334),
 
-	public void setPort(int port) {
-		this.portNumber = port;
-	}
+    /**
+     * 
+     */
+    FLEET(33335),
 
-	public static TerminalPorts valueOf(int i) {
-		for (TerminalPorts element : TerminalPorts.values()) {
-			if (element.getPortNumber() == i) {
-				return element;
-			}
-		}
+    /**
+     * 
+     */
+    MAINTENANCE(33336);
 
-		return UNDEFINED;
-	}
+    /**
+     * Numeric number of port number.
+     */
+    private int portNumber;
+
+    TerminalPorts(int port) {
+        this.setPort(port);
+    }
+
+    public int getPortNumber() {
+        return portNumber;
+    }
+
+    public void setPort(int port) {
+        this.portNumber = port;
+    }
+
+    public static TerminalPorts valueOf(int i) {
+        for (TerminalPorts element : TerminalPorts.values()) {
+            if (element.getPortNumber() == i) {
+                return element;
+            }
+        }
+
+        return UNDEFINED;
+    }
 }

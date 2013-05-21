@@ -135,7 +135,7 @@ public class DeviceListActivity extends Activity {
     }
 
     /**
-     * Start device discover with the BluetoothAdapter
+     * Start device discover with the BluetoothAdapter.
      */
     private void doDiscovery() {
         if (D) {

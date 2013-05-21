@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
  * @author "Dusan Krajcovic"
  * 
  */
-public class SLIPFrame {
+public final class SLIPFrame {
 
     /**
      * indicates end of packet

@@ -103,7 +103,7 @@ public class TerminalService {
     }
 
     /**
-     * Return the current connection state.
+     * @return Return the current connection state.
      */
     public synchronized int getState() {
         return mState;
@@ -185,9 +185,10 @@ public class TerminalService {
      *            The BluetoothDevice that has been connected
      */
     public synchronized void connected(BluetoothSocket socket,
-            BluetoothDevice device, final String socketType) {
-        if (D)
-            Log.d(TAG, "connected, Socket Type:" + socketType);
+            BluetoothDevice device) {
+        if (D) {
+            Log.d(TAG, "connected");
+        }
 
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
@@ -202,7 +203,7 @@ public class TerminalService {
         }
 
         // Start the thread to manage the connection and perform transmissions
-        mConnectedThread = new ConnectedThread(socket, socketType);
+        mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
@@ -216,8 +217,9 @@ public class TerminalService {
     }
 
     public void join() {
-        if (D)
+        if (D) {
             Log.d(TAG, "join");
+        }
 
         if (mConnectThread != null) {
             try {
@@ -227,7 +229,7 @@ public class TerminalService {
                 e.printStackTrace();
             }
         }
-        
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e1) {
@@ -249,8 +251,9 @@ public class TerminalService {
      * Stop all threads
      */
     public synchronized void stop() {
-        if (D)
+        if (D) {
             Log.d(TAG, "stop");
+        }
 
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -277,8 +280,9 @@ public class TerminalService {
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState != STATE_CONNECTED)
+            if (mState != STATE_CONNECTED) {
                 return;
+            }
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
@@ -323,16 +327,10 @@ public class TerminalService {
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
-        private String mSocketType;
 
         public ConnectThread(BluetoothDevice device, boolean secure) {
             mmDevice = device;
             BluetoothSocket tmp = null;
-            if (secure) {
-                mSocketType = "Secure";
-            } else {
-                mSocketType = "Insecure";
-            }
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
@@ -345,14 +343,14 @@ public class TerminalService {
                             .createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                Log.e(TAG, "create() failed", e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
-            setName("ConnectThread" + mSocketType);
+            Log.i(TAG, "BEGIN mConnectThread:");
+            setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
             mAdapter.cancelDiscovery();
@@ -367,7 +365,7 @@ public class TerminalService {
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() " + mSocketType
+                    Log.e(TAG, "unable to close() "
                             + " socket during connection failure", e2);
                 }
                 connectionFailed();
@@ -380,15 +378,14 @@ public class TerminalService {
             }
 
             // Start the connected thread
-            connected(mmSocket, mmDevice, mSocketType);
+            connected(mmSocket, mmDevice);
         }
 
         public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect " + mSocketType
-                        + " socket failed", e);
+                Log.e(TAG, "close() of connect " + " socket failed", e);
             }
         }
     }
@@ -402,8 +399,8 @@ public class TerminalService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        public ConnectedThread(BluetoothSocket socket, String socketType) {
-            Log.d(TAG, "create ConnectedThread: " + socketType);
+        public ConnectedThread(BluetoothSocket socket) {
+            Log.d(TAG, "create ConnectedThread: ");
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
