@@ -178,7 +178,7 @@ public class MonetBTAPI {
     }
 
     /**
-     * check bluetooth and start setting
+     * check bluetooth and start setting.
      * 
      * @return True for corect setup.
      */
@@ -444,7 +444,7 @@ public class MonetBTAPI {
     }
 
     /**
-     * Get the BluetoothDevice object
+     * Get the BluetoothDevice object.
      * 
      * @param address
      *            HW address of bluetooth.

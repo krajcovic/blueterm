@@ -86,10 +86,10 @@ public class TerminalService {
     }
 
     /**
-     * Set the current state of the chat connection
+     * Set the current state of the chat connection.
      * 
      * @param state
-     *            An integer defining the current connection state
+     *            An integer defining the current connection state.
      */
     private synchronized void setState(int state) {
         if (D) {
@@ -177,12 +177,12 @@ public class TerminalService {
     }
 
     /**
-     * Start the ConnectedThread to begin managing a Bluetooth connection
+     * Start the ConnectedThread to begin managing a Bluetooth connection.
      * 
      * @param socket
-     *            The BluetoothSocket on which the connection was made
+     *            The BluetoothSocket on which the connection was made.
      * @param device
-     *            The BluetoothDevice that has been connected
+     *            The BluetoothDevice that has been connected.
      */
     public synchronized void connected(BluetoothSocket socket,
             BluetoothDevice device) {
@@ -248,7 +248,7 @@ public class TerminalService {
     }
 
     /**
-     * Stop all threads
+     * Stop all threads.
      */
     public synchronized void stop() {
         if (D) {
@@ -269,7 +269,7 @@ public class TerminalService {
     }
 
     /**
-     * Write to the ConnectedThread in an unsynchronized manner
+     * Write to the ConnectedThread in an unsynchronized manner.
      * 
      * @param out
      *            The bytes to write

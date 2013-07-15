@@ -3,7 +3,7 @@ package cz.monetplus.blueterm.frames;
 import java.io.ByteArrayOutputStream;
 
 /**
- * Simple SLIP utility class based on the SLIP RFC 1055
+ * Simple SLIP utility class based on the SLIP RFC 1055.
  * 
  * @author "Dusan Krajcovic"
  * 
@@ -11,22 +11,22 @@ import java.io.ByteArrayOutputStream;
 public final class SLIPFrame {
 
     /**
-     * indicates end of packet
+     * indicates end of packet.
      */
     public static byte END = (byte) 0xC0;
 
     /**
-     * indicates byte stuffing
+     * indicates byte stuffing.
      */
     public static byte ESC = (byte) 0xDB;
 
     /**
-     * ESC ESC_END means END data byte
+     * ESC ESC_END means END data byte.
      */
     public static byte ESC_END = (byte) 0xDC;
 
     /**
-     * ESC ESC_ESC means ESC data byte
+     * ESC ESC_ESC means ESC data byte.
      */
     public static byte ESC_ESC = (byte) 0xDD;
 

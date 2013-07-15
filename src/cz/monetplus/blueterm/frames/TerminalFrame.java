@@ -24,17 +24,17 @@ public class TerminalFrame {
     private static final String TAG = "TerminalFrame";
 
     /**
-     * Port 2Bytes
+     * Port 2Bytes.
      */
     private TerminalPorts port = TerminalPorts.UNDEFINED;
 
     /**
-     * Protokol data
+     * Protokol data.
      */
     private byte[] data = null;
 
     /**
-     * CRC - PPP-FCS (RFC 1134)
+     * CRC - PPP-FCS (RFC 1134).
      */
     private int crc = 0;
 
