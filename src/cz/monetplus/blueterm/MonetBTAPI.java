@@ -112,20 +112,20 @@ public class MonetBTAPI {
     /**
      * @return True for finished transaction. Call getTransactionResult.
      */
-    public Boolean isTransactionFinished() {
-        return isFinish;
-    }
+    // public Boolean isTransactionFinished() {
+    // return isFinish;
+    // }
 
     /**
      * @return Return result of transaction. TransactionOut.
      */
-    public TransactionOut getTransactionResult() {
-        if (isFinish) {
-            return outputData;
-        }
-
-        return null;
-    }
+    // public TransactionOut getTransactionResult() {
+    // if (isFinish) {
+    // return outputData;
+    // }
+    //
+    // return null;
+    // }
 
     /**
      * @param context
@@ -134,7 +134,7 @@ public class MonetBTAPI {
      *            Transcation input parameters.
      * @return true for corect connected device. false for some error.
      */
-    public final Boolean doTransaction(final Context context,
+    public final TransactionOut doTransaction(final Context context,
             final TransactionIn in) {
 
         applicationContext = context;
@@ -160,14 +160,10 @@ public class MonetBTAPI {
                 if (mChatService.getState() == TerminalService.STATE_CONNECTED) {
                     Looper.loop();
                 }
-
-                isFinish = false;
-
-                return true;
             }
         }
 
-        return false;
+        return outputData;
 
     }
 
