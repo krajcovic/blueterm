@@ -40,6 +40,40 @@ public final class BProtocolMessages {
 
         return factory.serialize(bprotocol);
     }
+    
+    public static byte[] getReturn(int amount, int currencyCode,
+            String invoiceNumber) {
+
+        BProtocol bprotocol = new BProtocol("B1", "01", "        ",
+                getCurrentDateTimeForHeader(), "0000", "A5A5");
+
+        bprotocol.getTagMap().put(BProtocolTag.TransactionType, "04");
+        bprotocol.getTagMap().put(BProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(BProtocolTag.CurrencyCode2,
+                String.valueOf(currencyCode));
+        bprotocol.getTagMap().put(BProtocolTag.InvoiceNumber, invoiceNumber);
+
+        BProtocolFactory factory = new BProtocolFactory();
+
+        return factory.serialize(bprotocol);
+    }
+    
+    public static byte[] getReversal(int amount, int currencyCode,
+            String invoiceNumber) {
+
+        BProtocol bprotocol = new BProtocol("B1", "01", "        ",
+                getCurrentDateTimeForHeader(), "0000", "A5A5");
+
+        bprotocol.getTagMap().put(BProtocolTag.TransactionType, "10");
+        bprotocol.getTagMap().put(BProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(BProtocolTag.CurrencyCode2,
+                String.valueOf(currencyCode));
+        bprotocol.getTagMap().put(BProtocolTag.InvoiceNumber, invoiceNumber);
+
+        BProtocolFactory factory = new BProtocolFactory();
+
+        return factory.serialize(bprotocol);
+    }
 
     public static byte[] getHanshake() {
 

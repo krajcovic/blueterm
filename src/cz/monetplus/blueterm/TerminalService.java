@@ -29,6 +29,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -105,7 +106,7 @@ public class TerminalService {
     /**
      * @return Return the current connection state.
      */
-    public synchronized int getState() {
+    public /*synchronized*/ int getState() {
         return mState;
     }
 
@@ -424,8 +425,8 @@ public class TerminalService {
             while (true) {
                 try {
                     byte[] buffer = SlipInputReader.read(mmInStream);
-
-                    // Send the obtained bytes to the UI Activity
+                    
+                        // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_READ,
                             buffer.length, -1, buffer).sendToTarget();
                 } catch (IOException e) {
@@ -446,8 +447,11 @@ public class TerminalService {
             try {
                 mmOutStream.write(buffer);
 
-                // Log.d(TAG, new String(buffer, "UTF-8"));
-                Log.d(TAG, MonetUtils.bytesToHex(buffer));
+                Log.d(">>>term", new String(buffer, "UTF-8"));
+                Log.d(">>>", MonetUtils.bytesToHex(buffer));
+                
+//                Log.d("<<<term", slip.toString());
+//                Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
 
                 // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_WRITE, -1,

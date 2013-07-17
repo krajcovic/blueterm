@@ -443,6 +443,7 @@ public class BluetoothChat extends Activity {
     };
 
     // The Handler that gets information back from the BluetoothChatService
+    // private final Handler mHandler = new Handler(new Handler.Callback() {
     private final Handler mHandler = new Handler() {
         private byte[] idConnect;
 
@@ -567,6 +568,8 @@ public class BluetoothChat extends Activity {
                         .show();
                 break;
             }
+
+            // return false;
         }
 
         private void add2conversation(String from, String hex) {
@@ -639,7 +642,6 @@ public class BluetoothChat extends Activity {
                 }
                 break;
             }
-
         }
     };
 
