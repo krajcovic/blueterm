@@ -47,6 +47,7 @@ public class MonetBTAPI {
     public static final int MESSAGE_CONNECTED = 6;
     public static final int MESSAGE_SERVER_READ = 12;
     public static final int MESSAGE_SERVER_WRITE = 13;
+    // public static final int MESSAGE_QUIT = 99;
 
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
@@ -92,40 +93,15 @@ public class MonetBTAPI {
      */
     private TransactionOut outputData = null;
 
-    TCPconnectThread tcpThread = null;
+    private TCPconnectThread tcpThread = null;
 
     /**
      * TCP client.
      */
     private static TCPClient mTcpClient = null;
 
-    /**
-     * true for finished transaction.
-     */
-    private Boolean isFinish = false;
-
-    // private Boolean isConnected = false;
-
     // The Handler that gets information back from the BluetoothChatService
     private static Handler mHandler;
-
-    /**
-     * @return True for finished transaction. Call getTransactionResult.
-     */
-    // public Boolean isTransactionFinished() {
-    // return isFinish;
-    // }
-
-    /**
-     * @return Return result of transaction. TransactionOut.
-     */
-    // public TransactionOut getTransactionResult() {
-    // if (isFinish) {
-    // return outputData;
-    // }
-    //
-    // return null;
-    // }
 
     /**
      * @param context
@@ -141,7 +117,14 @@ public class MonetBTAPI {
         inputData = in;
         outputData = new TransactionOut();
 
-        Looper.prepare();
+        // if (Looper.myLooper() != null) {
+        // Looper.myLooper().quit();
+        //
+        // } else {
+        // Looper.prepare();
+        // }
+
+        // Looper.prepare();
 
         if (create()) {
             if (start()) {
@@ -158,8 +141,13 @@ public class MonetBTAPI {
                 }
                 //
                 if (mChatService.getState() == TerminalService.STATE_CONNECTED) {
-                    Looper.loop();
+                    // Zacni vykonavat smycku
+                    // Looper.loop();
+                } else {
+                    // Ukonci Looper.
+                    // Looper.myLooper().quit();
                 }
+                stop();
             }
         }
 
@@ -200,16 +188,12 @@ public class MonetBTAPI {
      * 
      * @return True for corect setup.
      */
-    public Boolean start() {
+    private Boolean start() {
         Log.e(TAG, "++ ON START ++");
 
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled()) {
-            // Intent enableIntent = new Intent(
-            // BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            // applicationContext.startActivityForResult(enableIntent,
-            // REQUEST_ENABLE_BT);
             Toast.makeText(applicationContext, "Bluetooth is not available",
                     Toast.LENGTH_LONG).show();
             // Otherwise, setup the chat session
@@ -223,10 +207,27 @@ public class MonetBTAPI {
         return false;
     }
 
+    private void stop() {
+        Log.e(TAG, "++ ON STOP ++");
+
+        if (mChatService != null) {
+            mChatService.stop();
+            mChatService = null;
+        }
+
+        if (tcpThread != null) {
+            tcpThread.interrupt();
+            tcpThread = null;
+        }
+        
+        mHandler.removeCallbacks(null);
+        mHandler = null;
+    }
+
     private void setupTerminal() {
         Log.d(TAG, "setupTerminal()");
         // mHandler = new Handler(new Handler.Callback() {
-        mHandler = new Handler() {
+        mHandler = new Handler(Looper.getMainLooper()) {
             private byte[] idConnect;
 
             @Override
@@ -353,9 +354,8 @@ public class MonetBTAPI {
                                             .getTagMap().get(
                                                     BProtocolTag.CardType));
 
-                                    isFinish = true;
                                     mChatService.stop();
-                                    Looper.myLooper().quit();
+//                                    Looper.getMainLooper().quit();
 
                                 }
 
@@ -375,7 +375,9 @@ public class MonetBTAPI {
                     break;
                 case MESSAGE_DEVICE_NAME:
                     break;
-                case MESSAGE_TOAST:
+                // case MESSAGE_QUIT:
+                // mChatService.stop();
+                // Looper.getMainLooper().quit();
                 }
 
                 // return false;
@@ -460,22 +462,21 @@ public class MonetBTAPI {
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         mChatService = new TerminalService(applicationContext, mHandler);
-
     }
 
-    public void pay() {
+    private void pay() {
         send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
                 BProtocolMessages.getSale(inputData.getAmount(),
                         inputData.getCurrency(), inputData.getInvoice()))
                 .createFrame()));
     }
 
-    public void handshake() {
+    private void handshake() {
         send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
                 BProtocolMessages.getHanshake()).createFrame()));
     }
 
-    public void appInfo() {
+    private void appInfo() {
         send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
                 BProtocolMessages.getAppInfo()).createFrame()));
     }
@@ -518,78 +519,6 @@ public class MonetBTAPI {
             // Reset out string buffer to zero and clear the edit text field
             // mOutStringBuffer.setLength(0);
             // mOutEditText.setText(mOutStringBuffer);
-        }
-    }
-
-    /**
-     * @author "Dusan Krajcovic"
-     * 
-     */
-    public final class TCPconnectTask extends
-            AsyncTask<String, byte[], TCPClient> {
-
-        private byte[] serverIp;
-        private int serverPort;
-        private int connectionId;
-        private int timeout;
-
-        private TCPconnectTask(byte[] serverIp, int serverPort, int timeout,
-                int connectionId) {
-            super();
-            this.serverIp = serverIp;
-            this.serverPort = serverPort;
-            this.connectionId = connectionId;
-            this.timeout = timeout;
-
-            Log.d(TAG, "TCPconnectTask to " + (serverIp[0] & 0xff) + "."
-                    + (serverIp[1] & 0xff) + "." + (serverIp[2] & 0xff) + "."
-                    + (serverIp[3] & 0xff) + ":" + serverPort + "["
-                    + connectionId + "]");
-        }
-
-        @Override
-        protected TCPClient doInBackground(String... message) {
-
-            // we create a TCPClient object and
-            mTcpClient = new TCPClient(serverIp, serverPort, timeout, mHandler,
-                    new TCPClient.OnMessageReceived() {
-                        @Override
-                        // here the messageReceived method is implemented
-                        public void messageReceived(byte[] message) {
-                            // this method calls the onProgressUpdate
-                            // publishProgress(message);
-
-                            ServerFrame soFrame = new ServerFrame((byte) 0x04,
-                                    connectionId, message);
-
-                            TerminalFrame termFrame = new TerminalFrame(
-                                    TerminalPorts.SERVER.getPortNumber(),
-                                    soFrame.createFrame());
-
-                            // send to terminal
-                            send2Terminal(SLIPFrame.createFrame(termFrame
-                                    .createFrame()));
-                        }
-                    });
-            mTcpClient.run();
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(byte[]... values) {
-            super.onProgressUpdate(values);
-
-            // Share the sent message back to the UI Activity
-            mHandler.obtainMessage(BluetoothChat.MESSAGE_SERVER_READ, -1, -1,
-                    values[0]).sendToTarget();
-
-            // in the arrayList we add the messaged received from server
-            arrayList.add(new String(values[0]));
-            // notify the adapter that the data set has changed. This means that
-            // new message received
-            // from server was added to the list
-            mAdapter.notifyDataSetChanged();
         }
     }
 

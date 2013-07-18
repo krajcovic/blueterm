@@ -126,7 +126,7 @@ public class TCPClient {
                         serverMessage = null;
                     } else {
                         // Log.d(TAG, "Sleeping tread");
-                        Thread.sleep(100);
+//                        Thread.sleep(100);
                     }
 
                 }

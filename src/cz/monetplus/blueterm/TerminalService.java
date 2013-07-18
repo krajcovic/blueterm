@@ -106,7 +106,7 @@ public class TerminalService {
     /**
      * @return Return the current connection state.
      */
-    public /*synchronized*/ int getState() {
+    public/* synchronized */int getState() {
         return mState;
     }
 
@@ -131,7 +131,7 @@ public class TerminalService {
             mConnectedThread = null;
         }
 
-        setState(STATE_LISTEN);
+        setState(STATE_NONE);
 
         // Start the thread to listen on a BluetoothServerSocket
         // if (mSecureAcceptThread == null) {
@@ -266,7 +266,8 @@ public class TerminalService {
             mConnectedThread = null;
         }
 
-        setState(STATE_NONE);
+        // Kdyz zastavuju, tak uz nic nikam neposilej.
+        //setState(STATE_NONE);
     }
 
     /**
@@ -299,9 +300,8 @@ public class TerminalService {
         Bundle bundle = new Bundle();
         bundle.putString(BluetoothChat.TOAST, "Unable to connect device");
         msg.setData(bundle);
-        mHandler.sendMessage(msg);
 
-        // Start the service over to restart listening mode
+        // Start the service over to restart none mode
         TerminalService.this.start();
     }
 
@@ -316,7 +316,7 @@ public class TerminalService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
-        // Start the service over to restart listening mode
+        // Start the service over to restart none mode
         TerminalService.this.start();
     }
 
@@ -425,13 +425,14 @@ public class TerminalService {
             while (true) {
                 try {
                     byte[] buffer = SlipInputReader.read(mmInStream);
-                    
-                        // Send the obtained bytes to the UI Activity
+
+                    // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_READ,
                             buffer.length, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.d(TAG, e.getMessage());
-                    connectionLost();
+                    // TODO: myslim ze vubec nepotrebuju.
+                    // connectionLost();
                     break;
                 }
             }
@@ -449,9 +450,9 @@ public class TerminalService {
 
                 Log.d(">>>term", new String(buffer, "UTF-8"));
                 Log.d(">>>", MonetUtils.bytesToHex(buffer));
-                
-//                Log.d("<<<term", slip.toString());
-//                Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
+
+                // Log.d("<<<term", slip.toString());
+                // Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
 
                 // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_WRITE, -1,
