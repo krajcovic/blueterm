@@ -69,11 +69,6 @@ public class MonetBTAPI {
     private static ByteArrayOutputStream slipOutputpFraming = null;
 
     /**
-     * in the arrayList we add the messaged received from server.
-     */
-    private ArrayList<String> arrayList = null;
-
-    /**
      * 
      */
     private static Context applicationContext = null;
@@ -163,12 +158,8 @@ public class MonetBTAPI {
 
         slipOutputpFraming = new ByteArrayOutputStream();
         slipOutputpFraming.reset();
-        arrayList = new ArrayList<String>();
 
         // relate the listView from java to the one created in xml
-        new ArrayAdapter<String>(applicationContext,
-                R.id.edit_text_out, arrayList);
-
         return true;
     }
 
