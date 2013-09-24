@@ -50,6 +50,8 @@ public class DeviceListActivity extends Activity {
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
+    public static String TCP_IP = "tcp_ip";
+    public static String TCP_PORT = "tcp_port";
 
     // Member fields
     private BluetoothAdapter mBtAdapter;

@@ -81,6 +81,7 @@ public class BluetoothChat extends Activity {
     public static final int MESSAGE_CONNECTED = 6;
     public static final int MESSAGE_SERVER_READ = 12;
     public static final int MESSAGE_SERVER_WRITE = 13;
+    public static final int MESSAGE_QUIT = 99;
 
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
@@ -126,7 +127,7 @@ public class BluetoothChat extends Activity {
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
-    private TerminalService mChatService = null;
+    private TerminalServiceBT mChatService = null;
 
     // TCP client;
     private static TCPClient mTcpClient;
@@ -219,7 +220,7 @@ public class BluetoothChat extends Activity {
         if (mChatService != null) {
             // Only if the state is STATE_NONE, do we know that we haven't
             // started already
-            if (mChatService.getState() == TerminalService.STATE_NONE) {
+            if (mChatService.getState() == TerminalServiceBT.STATE_NONE) {
                 // Start the Bluetooth chat services
                 mChatService.start();
             }
@@ -340,7 +341,7 @@ public class BluetoothChat extends Activity {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Initialize the BluetoothChatService to perform bluetooth connections
-        mChatService = new TerminalService(this, mHandler);
+        mChatService = new TerminalServiceBT(this, mHandler);
 
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
@@ -406,7 +407,7 @@ public class BluetoothChat extends Activity {
      */
     private void send2Terminal(byte[] message) {
         // Check that we're actually connected before trying anything
-        if (mChatService.getState() != TerminalService.STATE_CONNECTED) {
+        if (mChatService.getState() != TerminalServiceBT.STATE_CONNECTED) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT)
                     .show();
             return;
@@ -579,16 +580,16 @@ public class BluetoothChat extends Activity {
 
         private void terminalServiceSwitch(Message msg) {
             switch (msg.arg1) {
-            case TerminalService.STATE_CONNECTED:
+            case TerminalServiceBT.STATE_CONNECTED:
                 mTitle.setText(R.string.title_connected_to);
                 mTitle.append(mConnectedDeviceName);
                 mConversationArrayAdapter.clear();
                 break;
-            case TerminalService.STATE_CONNECTING:
+            case TerminalServiceBT.STATE_CONNECTING:
                 mTitle.setText(R.string.title_connecting);
                 break;
-            case TerminalService.STATE_LISTEN:
-            case TerminalService.STATE_NONE:
+            case TerminalServiceBT.STATE_LISTEN:
+            case TerminalServiceBT.STATE_NONE:
                 mTitle.setText(R.string.title_not_connected);
                 break;
             }
@@ -750,7 +751,7 @@ public class BluetoothChat extends Activity {
     }
 
     private void showProgressLayout() {
-        if (mChatService.getState() == TerminalService.STATE_CONNECTED) {
+        if (mChatService.getState() == TerminalServiceBT.STATE_CONNECTED) {
             mInputTerminalLayout.setVisibility(View.GONE);
             mProgressLayout.setVisibility(View.VISIBLE);
             // ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(

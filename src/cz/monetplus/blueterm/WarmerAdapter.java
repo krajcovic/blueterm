@@ -2,6 +2,7 @@ package cz.monetplus.blueterm;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,7 @@ public class WarmerAdapter extends BaseAdapter {
     private ArrayList<String> mListItems;
     private LayoutInflater mLayoutInflater;
 
-    public WarmerAdapter(BluetoothChat context, ArrayList<String> arrayList) {
+    public WarmerAdapter(Activity context, ArrayList<String> arrayList) {
         mListItems = arrayList;
 
         // get the layout inflater

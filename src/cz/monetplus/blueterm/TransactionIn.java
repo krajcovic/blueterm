@@ -2,6 +2,8 @@ package cz.monetplus.blueterm;
 
 public class TransactionIn {
     private String blueHwAddress;
+    private String hostIP;
+    private int hostPort;
     
     private TransactionCommand command;
 
@@ -47,5 +49,21 @@ public class TransactionIn {
 
     public void setCommand(TransactionCommand command) {
         this.command = command;
+    }
+
+    public String getHostIP() {
+        return hostIP;
+    }
+
+    public void setHostIP(String hostIP) {
+        this.hostIP = hostIP;
+    }
+
+    public int getHostPort() {
+        return hostPort;
+    }
+
+    public void setHostPort(int hostPort) {
+        this.hostPort = hostPort;
     }
 }

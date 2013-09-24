@@ -39,7 +39,7 @@ import android.util.Log;
  * connections, a thread for connecting with a device, and a thread for
  * performing data transmissions when connected.
  */
-public class TerminalService {
+public class TerminalServiceBT {
     // Debugging
     private static final String TAG = "TerminalService";
     private static final boolean D = true;
@@ -58,13 +58,18 @@ public class TerminalService {
 
     // Member fields
     private final BluetoothAdapter mAdapter;
-    private final Handler mHandler;
+
+    private Handler mHandler;
+
     private ConnectThread mConnectThread;
+
     private ConnectedThread mConnectedThread;
+
     private int mState;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0; // we're doing nothing
+
     public static final int STATE_LISTEN = 1; // now listening for incoming
                                               // connections
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing
@@ -80,7 +85,7 @@ public class TerminalService {
      * @param handler
      *            A Handler to send messages back to the UI Activity
      */
-    public TerminalService(Context context, Handler handler) {
+    public TerminalServiceBT(Context context, Handler handler) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
@@ -99,8 +104,10 @@ public class TerminalService {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(BluetoothChat.MESSAGE_STATE_CHANGE, state, -1)
-                .sendToTarget();
+        if (mHandler != null) {
+            mHandler.obtainMessage(BluetoothChat.MESSAGE_STATE_CHANGE, state,
+                    -1).sendToTarget();
+        }
     }
 
     /**
@@ -256,6 +263,8 @@ public class TerminalService {
             Log.d(TAG, "stop");
         }
 
+        mHandler = null;
+
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -267,7 +276,7 @@ public class TerminalService {
         }
 
         // Kdyz zastavuju, tak uz nic nikam neposilej.
-        //setState(STATE_NONE);
+        setState(STATE_NONE);
     }
 
     /**
@@ -295,29 +304,40 @@ public class TerminalService {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChat.TOAST, "Unable to connect device");
-        msg.setData(bundle);
+        if (Looper.myLooper() != null && mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(BluetoothChat.TOAST, "Unable to connect device");
+            msg.setData(bundle);
+            mHandler.obtainMessage(BluetoothChat.MESSAGE_QUIT).sendToTarget();
+        }
 
         // Start the service over to restart none mode
-        TerminalService.this.start();
+        TerminalServiceBT.this.start();
     }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
     private void connectionLost() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChat.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+
+        if (Looper.myLooper() != null && mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(BluetoothChat.TOAST, "Device connection was lost");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+            mHandler.obtainMessage(BluetoothChat.MESSAGE_QUIT).sendToTarget();
+        }
 
         // Start the service over to restart none mode
-        TerminalService.this.start();
+        TerminalServiceBT.this.start();
+    }
+
+    public BluetoothAdapter getAdapter() {
+        return mAdapter;
     }
 
     /**
@@ -354,7 +374,7 @@ public class TerminalService {
             setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
-            mAdapter.cancelDiscovery();
+            getAdapter().cancelDiscovery();
 
             // Make a connection to the BluetoothSocket
             try {
@@ -374,7 +394,7 @@ public class TerminalService {
             }
 
             // Reset the ConnectThread because we're done
-            synchronized (TerminalService.this) {
+            synchronized (TerminalServiceBT.this) {
                 mConnectThread = null;
             }
 
@@ -427,12 +447,13 @@ public class TerminalService {
                     byte[] buffer = SlipInputReader.read(mmInStream);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_READ,
-                            buffer.length, -1, buffer).sendToTarget();
+                    if (mHandler != null) {
+                        mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_READ,
+                                buffer.length, -1, buffer).sendToTarget();
+                    }
                 } catch (IOException e) {
                     Log.d(TAG, e.getMessage());
-                    // TODO: myslim ze vubec nepotrebuju.
-                    // connectionLost();
+                    connectionLost();
                     break;
                 }
             }
@@ -455,8 +476,10 @@ public class TerminalService {
                 // Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
 
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_WRITE, -1,
-                        -1, buffer).sendToTarget();
+                if (mHandler != null) {
+                    mHandler.obtainMessage(BluetoothChat.MESSAGE_TERM_WRITE,
+                            -1, -1, buffer).sendToTarget();
+                }
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }

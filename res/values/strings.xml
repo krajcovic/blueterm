@@ -48,5 +48,7 @@
     <!-- Preferences -->
     <string name="preferences_log">pref_log</string>
     <string name="preferences_blue_addr">blue_addr</string>
+    <string name="preferences_tcp_ip">tcp_ip</string>
+    <string name="preferences_tcp_port">tcp_port</string>
 
 </resources>

@@ -134,8 +134,11 @@ public class TCPClient {
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
-                mHandler.obtainMessage(BluetoothChat.MESSAGE_CONNECTED, 2, -1,
+                if(mRun) {
+                    // Uz koncime, takze nic nikam neposilej
+                    mHandler.obtainMessage(BluetoothChat.MESSAGE_CONNECTED, 2, -1,
                         null).sendToTarget();
+                }
 
             } finally {
                 // the socket must be closed. It is not possible to reconnect to
