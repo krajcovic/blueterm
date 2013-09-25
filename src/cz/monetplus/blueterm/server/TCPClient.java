@@ -7,7 +7,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import cz.monetplus.blueterm.BluetoothChat;
+import cz.monetplus.blueterm.HandleMessages;
+import cz.monetplus.blueterm.TerminalServiceBT;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.os.Handler;
@@ -61,7 +62,7 @@ public class TCPClient {
             // Log.d(TAG, new String(message, "UTF-8"));
             Log.d(TAG, MonetUtils.bytesToHex(message));
 
-            mHandler.obtainMessage(BluetoothChat.MESSAGE_SERVER_WRITE, -1, -1,
+            mHandler.obtainMessage(HandleMessages.MESSAGE_SERVER_WRITE, -1, -1,
                     message).sendToTarget();
         }
     }
@@ -104,7 +105,7 @@ public class TCPClient {
                 // socket.getInputStream()));
                 in = socket.getInputStream();
 
-                mHandler.obtainMessage(BluetoothChat.MESSAGE_CONNECTED, 0, -1,
+                mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 0, -1,
                         null).sendToTarget();
 
                 // in this while the client listens for the messages sent by the
@@ -136,7 +137,7 @@ public class TCPClient {
                 Log.e("TCP", "S: Error", e);
                 if(mRun) {
                     // Uz koncime, takze nic nikam neposilej
-                    mHandler.obtainMessage(BluetoothChat.MESSAGE_CONNECTED, 2, -1,
+                    mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 2, -1,
                         null).sendToTarget();
                 }
 
@@ -151,7 +152,7 @@ public class TCPClient {
         } catch (Exception e) {
 
             Log.e("TCP", "C: Error", e);
-            mHandler.obtainMessage(BluetoothChat.MESSAGE_CONNECTED, 1, -1, null)
+            mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1, null)
                     .sendToTarget();
 
         }
