@@ -8,25 +8,50 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import cz.monetplus.blueterm.HandleMessages;
-import cz.monetplus.blueterm.TerminalServiceBT;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 import android.os.Handler;
 import android.util.Log;
 
+/**
+ * Class executing communication with server
+ * @author "Dusan Krajcovic"
+ *
+ */
 public class TCPClient {
+    
+    /**
+     * TAG for debugging.
+     */
     private static final String TAG = "TCPClient";
+    
     private byte[] serverMessage;
 
-    private byte[] serverIp; // your computer IP
-                             // address
-    private int serverPort;
-    private OnMessageReceived mMessageListener = null;
-    private Handler mHandler;
-    private boolean mRun = false;
+    /**
+     * Server IP address.
+     */
+    private byte[] serverIp; 
 
-    OutputStream out;
-    InputStream in;
+    /**
+     * Server port.
+     */
+    private int serverPort;
+    
+    /**
+     * Listener for received messages.
+     */
+    private OnMessageReceived mMessageListener = null;
+    
+    /**
+     * Message handler.
+     */
+    private Handler mHandler;
+    
+    private boolean isRunning = false;
+
+    private OutputStream out;
+    
+    private InputStream in;
 
     private int timeout;
 
@@ -68,12 +93,12 @@ public class TCPClient {
     }
 
     public void stopClient() {
-        mRun = false;
+        isRunning = false;
     }
 
     public void run() {
 
-        mRun = true;
+        isRunning = true;
 
         try {
             // here you must put your computer's IP address.
@@ -110,7 +135,7 @@ public class TCPClient {
 
                 // in this while the client listens for the messages sent by the
                 // server
-                while (mRun) {
+                while (isRunning) {
                     int len = in.available();
                     if (len > 0) {
                         serverMessage = new byte[Math.min(len, 700)];
@@ -135,7 +160,7 @@ public class TCPClient {
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
-                if(mRun) {
+                if(isRunning) {
                     // Uz koncime, takze nic nikam neposilej
                     mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 2, -1,
                         null).sendToTarget();
@@ -167,6 +192,6 @@ public class TCPClient {
     }
 
     public boolean isConnected() {
-        return mRun;
+        return isRunning;
     }
 }

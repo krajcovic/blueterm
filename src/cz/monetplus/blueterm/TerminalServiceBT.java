@@ -67,7 +67,6 @@ public class TerminalServiceBT {
 
     private int mState;
 
-
     /**
      * Constructor. Prepares a new BluetoothChat session.
      * 
@@ -96,8 +95,8 @@ public class TerminalServiceBT {
 
         // Give the new state to the Handler so the UI Activity can update
         if (mHandler != null) {
-            mHandler.obtainMessage(HandleMessages.MESSAGE_STATE_CHANGE, state, -1)
-                    .sendToTarget();
+            mHandler.obtainMessage(HandleMessages.MESSAGE_STATE_CHANGE, state,
+                    -1).sendToTarget();
         }
     }
 
@@ -206,11 +205,11 @@ public class TerminalServiceBT {
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-//        Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
-//        Bundle bundle = new Bundle();
-//        bundle.putString(DEVICE_NAME, device.getName());
-//        msg.setData(bundle);
-//        mHandler.sendMessage(msg);
+        // Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
+        // Bundle bundle = new Bundle();
+        // bundle.putString(DEVICE_NAME, device.getName());
+        // msg.setData(bundle);
+        // mHandler.sendMessage(msg);
 
         setState(ConnectionState.STATE_CONNECTED);
     }
@@ -439,7 +438,8 @@ public class TerminalServiceBT {
 
                     // Send the obtained bytes to the UI Activity
                     if (mHandler != null) {
-                        mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_READ,
+                        mHandler.obtainMessage(
+                                HandleMessages.MESSAGE_TERM_READ,
                                 buffer.length, -1, buffer).sendToTarget();
                     }
                 } catch (IOException e) {
@@ -467,10 +467,11 @@ public class TerminalServiceBT {
                 // Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
 
                 // Share the sent message back to the UI Activity
-                if (mHandler != null) {
-                    mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE,
-                            -1, -1, buffer).sendToTarget();
-                }
+//                if (mHandler != null) {
+//                    mHandler.obtainMessage(
+//                            HandleMessages.MESSAGE_TERM_WRITE_FINISH, -1, -1,
+//                            buffer).sendToTarget();
+//                }
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }

@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 public class MonetBTAPI {
 
+    private static final int TERMINALPORT = 33333;
+
     private static final String TAG = "MonetBTAPI";
 
     // Key names received from the BluetoothChatService Handler
@@ -64,7 +66,7 @@ public class MonetBTAPI {
      */
     private static TransactionOut outputData = null;
 
-    private static TCPServerThread tcpThread = null;
+    private static TCPClientThread tcpThread = null;
 
     // The Handler that gets information back from the BluetoothChatService
     private static Handler mHandler = null;
@@ -82,14 +84,13 @@ public class MonetBTAPI {
         applicationContext = context;
         inputData = in;
         outputData = new TransactionOut();
-        
+
         if (Looper.myLooper() == null) {
             Log.d(TAG, "Looper.prepare()");
             Looper.prepare();
         } else {
             Log.d(TAG, "Nevim proc je myLooper uz alocovan");
         }
-        
 
         if (create()) {
             if (start()) {
@@ -169,7 +170,7 @@ public class MonetBTAPI {
 
     private void stop() {
         Log.e(TAG, "++ ON STOP ++");
-        
+
         if (terminalService != null) {
             terminalService.stop();
             terminalService = null;
@@ -180,12 +181,12 @@ public class MonetBTAPI {
             tcpThread = null;
         }
 
-        if(mHandler != null) {
-        mHandler.getLooper().quit();
-        mHandler.removeCallbacks(null);
-        mHandler = null;
+        if (mHandler != null) {
+            mHandler.getLooper().quit();
+            mHandler.removeCallbacks(null);
+            mHandler = null;
         }
-        
+
         Looper.myLooper().quit();
         Log.d(TAG, "Looper.myLooper().quit()");
     }
@@ -199,34 +200,7 @@ public class MonetBTAPI {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                 case HandleMessages.MESSAGE_STATE_CHANGE:
-                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    switch (msg.arg1) {
-                    case ConnectionState.STATE_CONNECTED:
-                        // isConnected = true;
-                        switch (inputData.getCommand()) {
-                        case HANDSHAKE:
-                            handshake();
-                            break;
-                        case INFO:
-                            appInfo();
-                            break;
-                        case PAY:
-                            pay();
-                            break;
-                        case UNKNOWN:
-                            break;
-                        default:
-                            break;
-
-                        }
-                        break;
-                    case ConnectionState.STATE_CONNECTING:
-                    case ConnectionState.STATE_LISTEN:
-                        break;
-                    case ConnectionState.STATE_NONE:
-                        // Looper.myLooper().quit();
-                        break;
-                    }
+                    handleStateChange(msg);
                     break;
                 case HandleMessages.MESSAGE_SERVER_WRITE:
                     break;
@@ -234,120 +208,156 @@ public class MonetBTAPI {
                     break;
 
                 case HandleMessages.MESSAGE_TERM_WRITE:
+                    // Jedine misto v aplikaci pres ktere se posila do terminalu
+                    write2Terminal((byte[]) msg.obj);
                     break;
 
-                case HandleMessages.MESSAGE_CONNECTED:
+                case HandleMessages.MESSAGE_CONNECTED: {
                     byte[] status = new byte[1];
                     status[0] = (byte) msg.arg1;
-                    ServerFrame soFrame = new ServerFrame((byte) 0x05,
+                    ServerFrame soFrame = new ServerFrame(
+                            TerminalCommands.TERM_CMD_SERVER_CONNECTED,
                             idConnect, status);
                     TerminalFrame toFrame = new TerminalFrame(
                             TerminalPorts.SERVER.getPortNumber(),
                             soFrame.createFrame());
 
-                    send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
-
+                    // send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
+                    mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE,
+                            -1, -1,
+                            SLIPFrame.createFrame(toFrame.createFrame()))
+                            .sendToTarget();
+                }
                     break;
 
                 case HandleMessages.MESSAGE_TERM_READ:
-                    byte[] readSlipFrame = (byte[]) msg.obj;
-                    slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
-
-                    // Check
-                    if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
-
-                        TerminalFrame termFrame = new TerminalFrame(
-                                SLIPFrame.parseFrame(slipOutputpFraming.toByteArray()));
-                        slipOutputpFraming.reset();
-
-                        if (termFrame != null) {
-                            switch (termFrame.getPort()) {
-                            case UNDEFINED:
-                                Log.d(TAG, "undefined port");
-                                break;
-                            case SERVER:
-                                handeServerMessage(termFrame);
-                                break;
-                            case FLEET:
-                                Log.d(TAG, "fleet data");
-                                break;
-                            case MAINTENANCE:
-                                Log.d(TAG, "maintentace data");
-                                break;
-                            case MASTER:
-                                // Tyhle zpravy zpracovavat, jsou pro tuhle
-                                // aplikaci
-                                BProtocolFactory factory = new BProtocolFactory();
-                                BProtocol bprotocol = factory
-                                        .deserialize(termFrame.getData());
-
-                                if (bprotocol.getProtocolType().equals("B2")) {
-
-                                    try {
-                                        outputData
-                                                .setResultCode(Integer
-                                                        .valueOf(bprotocol
-                                                                .getTagMap()
-                                                                .get(BProtocolTag.ResponseCode)));
-                                    } catch (Exception e) {
-                                        outputData.setResultCode(-1);
-                                    }
-                                    outputData
-                                            .setServerMessage(bprotocol
-                                                    .getTagMap()
-                                                    .get(BProtocolTag.ServerMessage));
-                                    try {
-                                        outputData
-                                                .setAuthCode(Integer
-                                                        .valueOf(bprotocol
-                                                                .getTagMap()
-                                                                .get(BProtocolTag.AuthCode)));
-                                    } catch (Exception e) {
-                                        outputData.setAuthCode(0);
-                                    }
-                                    try {
-                                        outputData
-                                                .setSeqId(Integer
-                                                        .valueOf(bprotocol
-                                                                .getTagMap()
-                                                                .get(BProtocolTag.SequenceId)));
-                                    } catch (Exception e) {
-                                        outputData.setSeqId(0);
-                                    }
-                                    outputData.setCardNumber(bprotocol
-                                            .getTagMap().get(BProtocolTag.PAN));
-                                    outputData.setCardType(bprotocol
-                                            .getTagMap().get(
-                                                    BProtocolTag.CardType));
-
-                                    stop();
-//                                    Looper.myLooper().quit();
-
-                                }
-
-                                break;
-                            default:
-                                // Nedelej nic, spatne data, format, nebo
-                                // crc
-                                Log.e(TAG, "Invalid port");
-                                break;
-
-                            }
-                        }
-
-                    } else {
-                        Log.e(TAG, "Corrupted data. It's not slip frame.");
-                    }
+                    handleTermReceived(msg);
 
                     break;
                 case HandleMessages.MESSAGE_DEVICE_NAME:
+                    // Nemam tuseni k cemu bych to vyuzil
                     break;
                 case HandleMessages.MESSAGE_QUIT:
                     stop();
                     break;
                 }
+            }
 
-                // return false;
+            private void handleTermReceived(Message msg) {
+                byte[] readSlipFrame = (byte[]) msg.obj;
+                slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
+
+                // Check
+                if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
+
+                    TerminalFrame termFrame = new TerminalFrame(
+                            SLIPFrame.parseFrame(slipOutputpFraming
+                                    .toByteArray()));
+                    slipOutputpFraming.reset();
+
+                    if (termFrame != null) {
+                        switch (termFrame.getPort()) {
+                        case UNDEFINED:
+                            Log.d(TAG, "undefined port");
+                            break;
+                        case SERVER:
+                            handeServerMessage(termFrame);
+                            break;
+                        case FLEET:
+                            Log.d(TAG, "fleet data");
+                            break;
+                        case MAINTENANCE:
+                            Log.d(TAG, "maintentace data");
+                            break;
+                        case MASTER:
+                            // Tyhle zpravy zpracovavat, jsou pro tuhle
+                            // aplikaci
+                            BProtocolFactory factory = new BProtocolFactory();
+                            BProtocol bprotocol = factory.deserialize(termFrame
+                                    .getData());
+
+                            if (bprotocol.getProtocolType().equals("B2")) {
+
+                                try {
+                                    outputData
+                                            .setResultCode(Integer
+                                                    .valueOf(bprotocol
+                                                            .getTagMap()
+                                                            .get(BProtocolTag.ResponseCode)));
+                                } catch (Exception e) {
+                                    outputData.setResultCode(-1);
+                                }
+                                outputData.setServerMessage(bprotocol
+                                        .getTagMap().get(
+                                                BProtocolTag.ServerMessage));
+                                try {
+                                    outputData.setAuthCode(Integer
+                                            .valueOf(bprotocol.getTagMap().get(
+                                                    BProtocolTag.AuthCode)));
+                                } catch (Exception e) {
+                                    outputData.setAuthCode(0);
+                                }
+                                try {
+                                    outputData.setSeqId(Integer
+                                            .valueOf(bprotocol.getTagMap().get(
+                                                    BProtocolTag.SequenceId)));
+                                } catch (Exception e) {
+                                    outputData.setSeqId(0);
+                                }
+                                outputData.setCardNumber(bprotocol.getTagMap()
+                                        .get(BProtocolTag.PAN));
+                                outputData.setCardType(bprotocol.getTagMap()
+                                        .get(BProtocolTag.CardType));
+
+                                stop();
+                                // Looper.myLooper().quit();
+
+                            }
+
+                            break;
+                        default:
+                            // Nedelej nic, spatne data, format, nebo
+                            // crc
+                            Log.e(TAG, "Invalid port");
+                            break;
+
+                        }
+                    }
+
+                } else {
+                    Log.e(TAG, "Corrupted data. It's not slip frame.");
+                }
+            }
+
+            private void handleStateChange(Message msg) {
+                Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                switch (msg.arg1) {
+                case ConnectionState.STATE_CONNECTED:
+                    // isConnected = true;
+                    switch (inputData.getCommand()) {
+                    case HANDSHAKE:
+                        handshake();
+                        break;
+                    case INFO:
+                        appInfo();
+                        break;
+                    case PAY:
+                        pay();
+                        break;
+                    case UNKNOWN:
+                        break;
+                    default:
+                        break;
+
+                    }
+                    break;
+                case ConnectionState.STATE_CONNECTING:
+                case ConnectionState.STATE_LISTEN:
+                    break;
+                case ConnectionState.STATE_NONE:
+                    // Looper.myLooper().quit();
+                    break;
+                }
             }
 
             private void handeServerMessage(TerminalFrame termFrame) {
@@ -360,13 +370,20 @@ public class MonetBTAPI {
                 Log.d(TAG, "Server command: " + serverFrame.getCommand());
                 switch (serverFrame.getCommand()) {
                 case TerminalCommands.TERM_CMD_ECHO:
-                    responseServer = new ServerFrame((byte) TerminalCommands.TERM_CMD_ECHO_RES,
+                    responseServer = new ServerFrame(
+                            (byte) TerminalCommands.TERM_CMD_ECHO_RES,
                             serverFrame.getId(), null);
                     responseTerminal = new TerminalFrame(termFrame.getPort()
                             .getPortNumber(), responseServer.createFrame());
 
-                    send2Terminal(SLIPFrame.createFrame(responseTerminal
-                            .createFrame()));
+                    // send2Terminal(SLIPFrame.createFrame(responseTerminal
+                    // .createFrame()));
+                    mHandler.obtainMessage(
+                            HandleMessages.MESSAGE_TERM_WRITE,
+                            -1,
+                            -1,
+                            SLIPFrame.createFrame(responseTerminal
+                                    .createFrame())).sendToTarget();
                     break;
 
                 case TerminalCommands.TERM_CMD_CONNECT:
@@ -379,7 +396,7 @@ public class MonetBTAPI {
                             serverFrame.getData()[7]);
 
                     // connect to the server
-                    tcpThread = new TCPServerThread(Arrays.copyOfRange(
+                    tcpThread = new TCPClientThread(Arrays.copyOfRange(
                             serverFrame.getData(), 0, 4), port, timeout,
                             serverFrame.getIdInt());
                     Log.i(TAG, "TCP thread starting.");
@@ -393,13 +410,19 @@ public class MonetBTAPI {
                     // connect.doInBackground("");
 
                     responseServer = new ServerFrame(
-                            (byte) TerminalCommands.TERM_CMD_CONNECT_RES, serverFrame.getId(),
-                            new byte[1]);
+                            (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
+                            serverFrame.getId(), new byte[1]);
                     responseTerminal = new TerminalFrame(termFrame.getPort()
                             .getPortNumber(), responseServer.createFrame());
 
-                    send2Terminal(SLIPFrame.createFrame(responseTerminal
-                            .createFrame()));
+                    // send2Terminal(SLIPFrame.createFrame(responseTerminal
+                    // .createFrame()));
+                    mHandler.obtainMessage(
+                            HandleMessages.MESSAGE_TERM_WRITE,
+                            -1,
+                            -1,
+                            SLIPFrame.createFrame(responseTerminal
+                                    .createFrame())).sendToTarget();
 
                     break;
 
@@ -412,32 +435,56 @@ public class MonetBTAPI {
                     break;
 
                 case TerminalCommands.TERM_CMD_SEND:
-                    tcpThread.send(serverFrame.getData());
+                    // Send data to server.
+                    tcpThread.sendMessage(serverFrame.getData());
                 }
 
             }
         };
-        // }
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         terminalService = new TerminalServiceBT(applicationContext, mHandler);
     }
 
+    /**
+     * Create and send pay request to terminal.
+     */
     private static void pay() {
-        send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-                BProtocolMessages.getSale(inputData.getAmount(),
-                        inputData.getCurrency(), inputData.getInvoice()))
-                .createFrame()));
+        mHandler.obtainMessage(
+                HandleMessages.MESSAGE_TERM_WRITE,
+                -1,
+                -1,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TERMINALPORT,
+                        BProtocolMessages.getSale(inputData.getAmount(),
+                                inputData.getCurrency(), inputData.getInvoice()))
+                        .createFrame())).sendToTarget();
     }
 
+    /**
+     * Create and send handshake to terminal.
+     */
     private static void handshake() {
-        send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-                BProtocolMessages.getHanshake()).createFrame()));
+        mHandler.obtainMessage(
+                HandleMessages.MESSAGE_TERM_WRITE,
+                -1,
+                -1,
+                SLIPFrame.createFrame(new TerminalFrame(TERMINALPORT,
+                        BProtocolMessages.getHanshake()).createFrame()))
+                .sendToTarget();
     }
 
+    /**
+     * Create and send app info request to terminal.
+     */
     private static void appInfo() {
-        send2Terminal(SLIPFrame.createFrame(new TerminalFrame(33333,
-                BProtocolMessages.getAppInfo()).createFrame()));
+        mHandler.obtainMessage(
+                HandleMessages.MESSAGE_TERM_WRITE,
+                -1,
+                -1,
+                SLIPFrame.createFrame(new TerminalFrame(TERMINALPORT,
+                        BProtocolMessages.getAppInfo()).createFrame()))
+                .sendToTarget();
     }
 
     /**
@@ -451,7 +498,7 @@ public class MonetBTAPI {
     private void connectDevice(String address, boolean secure) {
         // Get the BLuetoothDevice object
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-        
+
         // Attempt to connect to the device
         terminalService.connect(device, secure);
     }
@@ -462,7 +509,7 @@ public class MonetBTAPI {
      * @param message
      *            A string of text to send.
      */
-    private static void send2Terminal(byte[] message) {
+    private static void write2Terminal(byte[] message) {
         // Check that we're actually connected before trying anything
         if (terminalService.getState() != ConnectionState.STATE_CONNECTED) {
             Toast.makeText(applicationContext, R.string.not_connected,
@@ -472,30 +519,24 @@ public class MonetBTAPI {
 
         // Check that there's actually something to send
         if (message.length > 0) {
-            // Get the message bytes and tell the BluetoothChatService to write
-            // byte[] send = message.getBytes();
             terminalService.write(message);
-
-            // Reset out string buffer to zero and clear the edit text field
-            // mOutStringBuffer.setLength(0);
-            // mOutEditText.setText(mOutStringBuffer);
         }
     }
 
     /**
      * @author "Dusan Krajcovic"
-     *
+     * 
      */
-    public final class TCPServerThread extends Thread {
+    public final class TCPClientThread extends Thread {
 
         private static final String TAG = "arrayList";
 
         private byte[] serverIp;
 
         private int serverPort;
-        
+
         private int connectionId;
-        
+
         private int timeout;
 
         /**
@@ -509,7 +550,7 @@ public class MonetBTAPI {
          * @param timeout
          * @param connectionId
          */
-        public TCPServerThread(byte[] serverIp, int serverPort, int timeout,
+        public TCPClientThread(byte[] serverIp, int serverPort, int timeout,
                 int connectionId) {
             super();
             this.serverIp = serverIp;
@@ -525,9 +566,10 @@ public class MonetBTAPI {
 
         /**
          * Send data to server.
+         * 
          * @param sendData
          */
-        public void send(byte[] sendData) {
+        public void sendMessage(byte[] sendData) {
             if (mTcpClient != null) {
                 try {
                     mTcpClient.sendMessage(sendData);
@@ -551,35 +593,40 @@ public class MonetBTAPI {
                             // this method calls the onProgressUpdate
                             // publishProgress(message);
 
-                            ServerFrame soFrame = new ServerFrame((byte) 0x04,
-                                    connectionId, message);
+                            // ServerFrame soFrame = new ServerFrame(
+                            // TerminalCommands.TERM_CMD_SERVER_WRITE,
+                            // connectionId, message);
 
                             TerminalFrame termFrame = new TerminalFrame(
                                     TerminalPorts.SERVER.getPortNumber(),
-                                    soFrame.createFrame());
+                                    new ServerFrame(
+                                            TerminalCommands.TERM_CMD_SERVER_WRITE,
+                                            connectionId, message)
+                                            .createFrame());
 
                             // send to terminal
-                            // TODO: tady bych asi mel odeslat data do handleru.
-                            send2Terminal(SLIPFrame.createFrame(termFrame
-                                    .createFrame()));
-                            //mHandler.hasMessages(TERM_CMD_SEND, termFrame.createFrame());
+                            mHandler.obtainMessage(
+                                    HandleMessages.MESSAGE_TERM_WRITE,
+                                    -1,
+                                    -1,
+                                    SLIPFrame.createFrame(termFrame
+                                            .createFrame())).sendToTarget();
                         }
                     });
-            
+
             mTcpClient.run();
         }
 
-        @Override
         public void interrupt() {
 
             if (mTcpClient != null) {
                 mTcpClient.stopClient();
-//                try {
-//                    wait(500);
-//                } catch (InterruptedException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
+                // try {
+                // wait(500);
+                // } catch (InterruptedException e) {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+                // }
                 mTcpClient = null;
             }
 
