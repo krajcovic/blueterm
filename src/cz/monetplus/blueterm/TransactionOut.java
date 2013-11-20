@@ -2,7 +2,7 @@ package cz.monetplus.blueterm;
 
 public class TransactionOut {
     private Integer resultCode;
-    private String serverMessage;
+    private String message;
     private Integer authCode;
     private Integer seqId;
     private String cardNumber;
@@ -16,12 +16,12 @@ public class TransactionOut {
         this.resultCode = resultCode;
     }
 
-    public String getServerMessage() {
-        return serverMessage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setServerMessage(String serverMessage) {
-        this.serverMessage = serverMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public Integer getAuthCode() {

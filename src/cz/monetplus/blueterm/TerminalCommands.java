@@ -12,9 +12,9 @@ public class TerminalCommands {
     
     public static final byte TERM_CMD_DISCONNECT = 0x02;
     
-    public static final byte TERM_CMD_SEND = 0x03;
+    public static final byte TERM_CMD_SERVER_WRITE = 0x03;
     
-    public static final byte TERM_CMD_SERVER_WRITE = 0x04;
+    public static final byte TERM_CMD_SERVER_READ = 0x04;
     
     public static final byte TERM_CMD_SERVER_CONNECTED = 0x05;
 

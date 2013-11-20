@@ -1,8 +1,6 @@
 package cz.monetplus.blueterm;
 
 public class HandleMessages {
-    
-    // Message types sent from the BluetoothChatService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_TERM_READ = 2;
     public static final int MESSAGE_TERM_WRITE = 3;
@@ -12,6 +10,4 @@ public class HandleMessages {
     public static final int MESSAGE_SERVER_READ = 12;
     public static final int MESSAGE_SERVER_WRITE = 13;
     public static final int MESSAGE_QUIT = 99;
-    
-//    public static final int MESSAGE_TERM_WRITE_FINISH = 53;
 }

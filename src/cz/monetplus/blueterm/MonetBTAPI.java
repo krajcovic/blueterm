@@ -2,7 +2,6 @@ package cz.monetplus.blueterm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import cz.monetplus.blueterm.bprotocol.BProtocol;
@@ -18,28 +17,36 @@ import cz.monetplus.blueterm.util.MonetUtils;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-public class MonetBTAPI {
 
+/**
+ * Exported class for control from pos-system.
+ * @author krajcovic
+ *
+ */
+public class MonetBTAPI {
+    
+    /**
+     * Socket port 
+     */
     private static final int TERMINALPORT = 33333;
 
+    /**
+     * String tag for logging.
+     */
     private static final String TAG = "MonetBTAPI";
-
-    // Key names received from the BluetoothChatService Handler
-    public static final String DEVICE_NAME = "device_name";
-    public static final String TOAST = "toast";
+   
+    public static final String TOAST = "Messagebox";
 
     /**
      * Local Bluetooth adapter.
      */
-    private BluetoothAdapter bluetoothAdapter = null;
+    private static BluetoothAdapter bluetoothAdapter = null;
 
     /**
      * Member object for the chat services.
@@ -78,19 +85,21 @@ public class MonetBTAPI {
      *            Transcation input parameters.
      * @return true for corect connected device. false for some error.
      */
-    public final TransactionOut doTransaction(final Context context,
+    public final static TransactionOut doTransaction(final Context context,
             final TransactionIn in) {
 
         applicationContext = context;
         inputData = in;
         outputData = new TransactionOut();
 
-        if (Looper.myLooper() == null) {
-            Log.d(TAG, "Looper.prepare()");
-            Looper.prepare();
-        } else {
-            Log.d(TAG, "Nevim proc je myLooper uz alocovan");
-        }
+//        if (Looper.myLooper() == null) {
+//            Log.d(TAG, "Looper.prepare()");
+//            Looper.prepare();
+//        } else {
+//            Log.d(TAG, "Nevim proc je myLooper uz alocovan");
+//        }
+        
+        Looper.prepare();
 
         if (create()) {
             if (start()) {
@@ -104,16 +113,19 @@ public class MonetBTAPI {
                         Log.e(TAG, e.getMessage());
                     }
                 }
-                //
+
                 if (terminalService.getState() == ConnectionState.STATE_CONNECTED) {
                     // Zacni vykonavat smycku
                     Looper.loop();
-                } else {
-                    // nepodarilo se spojit, tak vsechno uklidime
-                    stop();
-                }
+                } 
+//                else {
+//                    // nepodarilo se spojit, tak vsechno uklidime
+//                    stop();
+//                }
             }
         }
+        
+        stop();
 
         return outputData;
 
@@ -124,18 +136,11 @@ public class MonetBTAPI {
      * 
      * @return true for corect creating.
      */
-    private Boolean create() {
+    private static Boolean create() {
         Log.e(TAG, "+++ ON CREATE +++");
 
         // Get local Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // If the adapter is null, then Bluetooth is not supported
-        if (bluetoothAdapter == null) {
-            Toast.makeText(applicationContext, "Bluetooth is not available",
-                    Toast.LENGTH_LONG).show();
-            return false;
-        }
 
         slipOutputpFraming = new ByteArrayOutputStream();
         slipOutputpFraming.reset();
@@ -149,14 +154,15 @@ public class MonetBTAPI {
      * 
      * @return True for corect setup.
      */
-    private Boolean start() {
+    private static Boolean start() {
         Log.e(TAG, "++ ON START ++");
 
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
-        if (!bluetoothAdapter.isEnabled()) {
-            Toast.makeText(applicationContext, "Bluetooth is not available",
-                    Toast.LENGTH_LONG).show();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+//            Toast.makeText(applicationContext, "Bluetooth is not available",
+//                    Toast.LENGTH_LONG).show();
+            outputData.setMessage("Bluetooth is not available");
             // Otherwise, setup the chat session
         } else {
             if (terminalService == null) {
@@ -168,7 +174,7 @@ public class MonetBTAPI {
         return false;
     }
 
-    private void stop() {
+    private static void stop() {
         Log.e(TAG, "++ ON STOP ++");
 
         if (terminalService != null) {
@@ -182,19 +188,21 @@ public class MonetBTAPI {
         }
 
         if (mHandler != null) {
-            mHandler.getLooper().quit();
-            mHandler.removeCallbacks(null);
+            //mHandler.getLooper().quit();
+            //mHandler.removeCallbacks(null);
             mHandler = null;
         }
 
+        //Looper.getMainLooper().quit();
         Looper.myLooper().quit();
         Log.d(TAG, "Looper.myLooper().quit()");
     }
 
-    private void setupTerminal() {
-        Log.d(TAG, "setupTerminal()");
+    private static void setupTerminal() {
+        Log.d(TAG, "setupTerminal() creating handler");
+               
         mHandler = new Handler() {
-            private byte[] idConnect;
+            private byte[] serverConnectionID;
 
             @Override
             public void handleMessage(Message msg) {
@@ -212,30 +220,20 @@ public class MonetBTAPI {
                     write2Terminal((byte[]) msg.obj);
                     break;
 
-                case HandleMessages.MESSAGE_CONNECTED: {
-                    byte[] status = new byte[1];
-                    status[0] = (byte) msg.arg1;
-                    ServerFrame soFrame = new ServerFrame(
-                            TerminalCommands.TERM_CMD_SERVER_CONNECTED,
-                            idConnect, status);
-                    TerminalFrame toFrame = new TerminalFrame(
-                            TerminalPorts.SERVER.getPortNumber(),
-                            soFrame.createFrame());
-
-                    // send2Terminal(SLIPFrame.createFrame(toFrame.createFrame()));
-                    mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE,
-                            -1, -1,
-                            SLIPFrame.createFrame(toFrame.createFrame()))
-                            .sendToTarget();
-                }
+                case HandleMessages.MESSAGE_CONNECTED:
+                    // Send to terminal information about connection at server.
+                    connectionRequest(msg);
                     break;
 
                 case HandleMessages.MESSAGE_TERM_READ:
                     handleTermReceived(msg);
-
                     break;
                 case HandleMessages.MESSAGE_DEVICE_NAME:
                     // Nemam tuseni k cemu bych to vyuzil
+                    break;
+                case HandleMessages.MESSAGE_TOAST:
+                    Toast.makeText(applicationContext, msg.obj.toString(),
+                            Toast.LENGTH_SHORT).show();
                     break;
                 case HandleMessages.MESSAGE_QUIT:
                     stop();
@@ -243,6 +241,31 @@ public class MonetBTAPI {
                 }
             }
 
+            /**
+             * Send to terminal information about connection at server.
+             * 
+             * @param msg
+             * */
+            private void connectionRequest(Message msg) {
+                byte[] status = new byte[1];
+                status[0] = (byte) msg.arg1;
+                ServerFrame soFrame = new ServerFrame(
+                        TerminalCommands.TERM_CMD_SERVER_CONNECTED,
+                        serverConnectionID, status);
+                TerminalFrame toFrame = new TerminalFrame(
+                        TerminalPorts.SERVER.getPortNumber(),
+                        soFrame.createFrame());
+
+                mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1,
+                        -1, SLIPFrame.createFrame(toFrame.createFrame()))
+                        .sendToTarget();
+            }
+
+            /**
+             * Received message from terminal
+             * 
+             * @param msg
+             */
             private void handleTermReceived(Message msg) {
                 byte[] readSlipFrame = (byte[]) msg.obj;
                 slipOutputpFraming.write(readSlipFrame, 0, msg.arg1);
@@ -261,7 +284,8 @@ public class MonetBTAPI {
                             Log.d(TAG, "undefined port");
                             break;
                         case SERVER:
-                            handeServerMessage(termFrame);
+                            // messages for server
+                            handleServerMessage(termFrame);
                             break;
                         case FLEET:
                             Log.d(TAG, "fleet data");
@@ -272,9 +296,8 @@ public class MonetBTAPI {
                         case MASTER:
                             // Tyhle zpravy zpracovavat, jsou pro tuhle
                             // aplikaci
-                            BProtocolFactory factory = new BProtocolFactory();
-                            BProtocol bprotocol = factory.deserialize(termFrame
-                                    .getData());
+                            BProtocol bprotocol = new BProtocolFactory()
+                                    .deserialize(termFrame.getData());
 
                             if (bprotocol.getProtocolType().equals("B2")) {
 
@@ -287,7 +310,7 @@ public class MonetBTAPI {
                                 } catch (Exception e) {
                                     outputData.setResultCode(-1);
                                 }
-                                outputData.setServerMessage(bprotocol
+                                outputData.setMessage(bprotocol
                                         .getTagMap().get(
                                                 BProtocolTag.ServerMessage));
                                 try {
@@ -360,34 +383,21 @@ public class MonetBTAPI {
                 }
             }
 
-            private void handeServerMessage(TerminalFrame termFrame) {
+            private void handleServerMessage(TerminalFrame termFrame) {
                 // sends the message to the server
                 final ServerFrame serverFrame = new ServerFrame(
                         termFrame.getData());
-                ServerFrame responseServer = null;
-                TerminalFrame responseTerminal = null;
+
+                // TerminalFrame responseTerminal = null;
 
                 Log.d(TAG, "Server command: " + serverFrame.getCommand());
                 switch (serverFrame.getCommand()) {
                 case TerminalCommands.TERM_CMD_ECHO:
-                    responseServer = new ServerFrame(
-                            (byte) TerminalCommands.TERM_CMD_ECHO_RES,
-                            serverFrame.getId(), null);
-                    responseTerminal = new TerminalFrame(termFrame.getPort()
-                            .getPortNumber(), responseServer.createFrame());
-
-                    // send2Terminal(SLIPFrame.createFrame(responseTerminal
-                    // .createFrame()));
-                    mHandler.obtainMessage(
-                            HandleMessages.MESSAGE_TERM_WRITE,
-                            -1,
-                            -1,
-                            SLIPFrame.createFrame(responseTerminal
-                                    .createFrame())).sendToTarget();
+                    echoResponse(termFrame, serverFrame);
                     break;
 
                 case TerminalCommands.TERM_CMD_CONNECT:
-                    idConnect = serverFrame.getId();
+                    serverConnectionID = serverFrame.getId();
 
                     int port = MonetUtils.getInt(serverFrame.getData()[4],
                             serverFrame.getData()[5]);
@@ -396,27 +406,20 @@ public class MonetBTAPI {
                             serverFrame.getData()[7]);
 
                     // connect to the server
-                    tcpThread = new TCPClientThread(Arrays.copyOfRange(
+                    tcpThread = new TCPClientThread();
+                    tcpThread.setConnection(Arrays.copyOfRange(
                             serverFrame.getData(), 0, 4), port, timeout,
                             serverFrame.getIdInt());
                     Log.i(TAG, "TCP thread starting.");
                     tcpThread.start();
 
-                    // TCPconnect connect = new
-                    // TCPconnect(Arrays.copyOfRange(serverFrame.getData(),
-                    // 0,
-                    // 4),
-                    // port, timeout, serverFrame.getIdInt());
-                    // connect.doInBackground("");
+                    TerminalFrame responseTerminal = new TerminalFrame(
+                            termFrame.getPort().getPortNumber(),
+                            new ServerFrame(
+                                    (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
+                                    serverFrame.getId(), new byte[1])
+                                    .createFrame());
 
-                    responseServer = new ServerFrame(
-                            (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
-                            serverFrame.getId(), new byte[1]);
-                    responseTerminal = new TerminalFrame(termFrame.getPort()
-                            .getPortNumber(), responseServer.createFrame());
-
-                    // send2Terminal(SLIPFrame.createFrame(responseTerminal
-                    // .createFrame()));
                     mHandler.obtainMessage(
                             HandleMessages.MESSAGE_TERM_WRITE,
                             -1,
@@ -434,11 +437,30 @@ public class MonetBTAPI {
                     }
                     break;
 
-                case TerminalCommands.TERM_CMD_SEND:
+                case TerminalCommands.TERM_CMD_SERVER_WRITE:
                     // Send data to server.
                     tcpThread.sendMessage(serverFrame.getData());
                 }
 
+            }
+
+            /**
+             * Terminal check this application.
+             * 
+             * @param termFrame
+             * @param serverFrame
+             */
+            private void echoResponse(TerminalFrame termFrame,
+                    final ServerFrame serverFrame) {
+                TerminalFrame responseTerminal = new TerminalFrame(termFrame
+                        .getPort().getPortNumber(), new ServerFrame(
+                        TerminalCommands.TERM_CMD_ECHO_RES,
+                        serverFrame.getId(), null).createFrame());
+
+                mHandler.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1,
+                        -1,
+                        SLIPFrame.createFrame(responseTerminal.createFrame()))
+                        .sendToTarget();
             }
         };
 
@@ -495,7 +517,7 @@ public class MonetBTAPI {
      * @param secure
      *            True for secure connection, false for insecure.
      */
-    private void connectDevice(String address, boolean secure) {
+    private static void connectDevice(String address, boolean secure) {
         // Get the BLuetoothDevice object
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
 
@@ -527,9 +549,9 @@ public class MonetBTAPI {
      * @author "Dusan Krajcovic"
      * 
      */
-    public final class TCPClientThread extends Thread {
+    public static final class TCPClientThread extends Thread {
 
-        private static final String TAG = "arrayList";
+        private static final String TAG = "TCPClientThread";
 
         private byte[] serverIp;
 
@@ -543,6 +565,10 @@ public class MonetBTAPI {
          * TCP client.
          */
         private TCPClient mTcpClient = null;
+        
+        public TCPClientThread() {
+            super();
+        }
 
         /**
          * @param serverIp
@@ -550,9 +576,9 @@ public class MonetBTAPI {
          * @param timeout
          * @param connectionId
          */
-        public TCPClientThread(byte[] serverIp, int serverPort, int timeout,
+        public void setConnection(byte[] serverIp, int serverPort, int timeout,
                 int connectionId) {
-            super();
+            
             this.serverIp = serverIp;
             this.serverPort = serverPort;
             this.connectionId = connectionId;
@@ -590,17 +616,10 @@ public class MonetBTAPI {
                         @Override
                         // here the messageReceived method is implemented
                         public void messageReceived(byte[] message) {
-                            // this method calls the onProgressUpdate
-                            // publishProgress(message);
-
-                            // ServerFrame soFrame = new ServerFrame(
-                            // TerminalCommands.TERM_CMD_SERVER_WRITE,
-                            // connectionId, message);
-
                             TerminalFrame termFrame = new TerminalFrame(
                                     TerminalPorts.SERVER.getPortNumber(),
                                     new ServerFrame(
-                                            TerminalCommands.TERM_CMD_SERVER_WRITE,
+                                            TerminalCommands.TERM_CMD_SERVER_READ,
                                             connectionId, message)
                                             .createFrame());
 
