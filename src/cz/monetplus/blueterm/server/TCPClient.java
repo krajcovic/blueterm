@@ -8,49 +8,50 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import cz.monetplus.blueterm.HandleMessages;
+import cz.monetplus.blueterm.MessageThread;
 import cz.monetplus.blueterm.util.MonetUtils;
 
-import android.os.Handler;
 import android.util.Log;
 
 /**
  * Class executing communication with server
+ * 
  * @author "Dusan Krajcovic"
- *
+ * 
  */
 public class TCPClient {
-    
+
     /**
      * TAG for debugging.
      */
     private static final String TAG = "TCPClient";
-    
+
     private byte[] serverMessage;
 
     /**
      * Server IP address.
      */
-    private byte[] serverIp; 
+    private byte[] serverIp;
 
     /**
      * Server port.
      */
     private int serverPort;
-    
+
     /**
      * Listener for received messages.
      */
     private OnMessageReceived mMessageListener = null;
-    
+
     /**
      * Message handler.
      */
-    private Handler mHandler;
-    
+    private MessageThread mHandler;
+
     private boolean isRunning = false;
 
     private OutputStream out;
-    
+
     private InputStream in;
 
     private int timeout;
@@ -70,7 +71,7 @@ public class TCPClient {
      * @param listener
      *            Receive message listener.
      */
-    public TCPClient(byte[] ip, int port, int timeout, Handler handler,
+    public TCPClient(byte[] ip, int port, int timeout, MessageThread handler,
             OnMessageReceived listener) {
         this.serverIp = ip;
         this.serverPort = port;
@@ -88,7 +89,7 @@ public class TCPClient {
             Log.d(TAG, MonetUtils.bytesToHex(message));
 
             mHandler.obtainMessage(HandleMessages.MESSAGE_SERVER_WRITE, -1, -1,
-                    message).sendToTarget();
+                    message);
         }
     }
 
@@ -131,7 +132,7 @@ public class TCPClient {
                 in = socket.getInputStream();
 
                 mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 0, -1,
-                        null).sendToTarget();
+                        null);
 
                 // in this while the client listens for the messages sent by the
                 // server
@@ -152,7 +153,7 @@ public class TCPClient {
                         serverMessage = null;
                     } else {
                         // Log.d(TAG, "Sleeping tread");
-//                        Thread.sleep(100);
+                        // Thread.sleep(100);
                     }
 
                 }
@@ -160,10 +161,10 @@ public class TCPClient {
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
-                if(isRunning) {
+                if (isRunning) {
                     // Uz koncime, takze nic nikam neposilej
-                    mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 2, -1,
-                        null).sendToTarget();
+                    mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 2,
+                            -1, null);
                 }
 
             } finally {
@@ -177,8 +178,8 @@ public class TCPClient {
         } catch (Exception e) {
 
             Log.e("TCP", "C: Error", e);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1, null)
-                    .sendToTarget();
+            mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1,
+                    null);
 
         }
 

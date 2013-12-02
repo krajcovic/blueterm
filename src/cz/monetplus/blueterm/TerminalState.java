@@ -1,6 +1,6 @@
 package cz.monetplus.blueterm;
 
-public class ConnectionState {
+public class TerminalState {
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0; // we're doing nothing
 

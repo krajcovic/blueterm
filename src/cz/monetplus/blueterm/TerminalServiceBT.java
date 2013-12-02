@@ -27,10 +27,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
 /**
@@ -59,7 +56,7 @@ public class TerminalServiceBT {
     // Member fields
     private final BluetoothAdapter mAdapter;
 
-    private Handler mHandler;
+    private MessageThread mHandler;
 
     private ConnectThread mConnectThread;
 
@@ -75,9 +72,9 @@ public class TerminalServiceBT {
      * @param handler
      *            A Handler to send messages back to the UI Activity
      */
-    public TerminalServiceBT(Context context, Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = ConnectionState.STATE_NONE;
+    public TerminalServiceBT(Context context, MessageThread handler, BluetoothAdapter adapter) {
+        mAdapter = adapter;
+        mState = TerminalState.STATE_NONE;
         mHandler = handler;
     }
 
@@ -96,7 +93,7 @@ public class TerminalServiceBT {
         // Give the new state to the Handler so the UI Activity can update
         if (mHandler != null) {
             mHandler.obtainMessage(HandleMessages.MESSAGE_STATE_CHANGE, state,
-                    -1).sendToTarget();
+                    -1);
         }
     }
 
@@ -128,7 +125,7 @@ public class TerminalServiceBT {
             mConnectedThread = null;
         }
 
-        setState(ConnectionState.STATE_NONE);
+        setState(TerminalState.STATE_NONE);
 
         // Start the thread to listen on a BluetoothServerSocket
         // if (mSecureAcceptThread == null) {
@@ -155,7 +152,7 @@ public class TerminalServiceBT {
         }
 
         // Cancel any thread attempting to make a connection
-        if (mState == ConnectionState.STATE_CONNECTING) {
+        if (mState == TerminalState.STATE_CONNECTING) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
                 mConnectThread = null;
@@ -171,7 +168,7 @@ public class TerminalServiceBT {
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
-        setState(ConnectionState.STATE_CONNECTING);
+        setState(TerminalState.STATE_CONNECTING);
     }
 
     /**
@@ -211,7 +208,7 @@ public class TerminalServiceBT {
         // msg.setData(bundle);
         // mHandler.sendMessage(msg);
 
-        setState(ConnectionState.STATE_CONNECTED);
+        setState(TerminalState.STATE_CONNECTED);
     }
 
     public void join() {
@@ -266,7 +263,7 @@ public class TerminalServiceBT {
         }
 
         // Kdyz zastavuju, tak uz nic nikam neposilej.
-        setState(ConnectionState.STATE_NONE);
+        setState(TerminalState.STATE_NONE);
     }
 
     /**
@@ -281,7 +278,7 @@ public class TerminalServiceBT {
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState != ConnectionState.STATE_CONNECTED) {
+            if (mState != TerminalState.STATE_CONNECTED) {
                 return;
             }
             r = mConnectedThread;
@@ -294,13 +291,15 @@ public class TerminalServiceBT {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
-        if (Looper.myLooper() != null && mHandler != null) {
+        //if (Looper.myLooper() != null && mHandler != null) {
+        if (mHandler != null) {
             // Send a failure message back to the Activity
-            Message msg = mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
-            Bundle bundle = new Bundle();
-            bundle.putString("Toast", "Unable to connect device");
-            msg.setData(bundle);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT).sendToTarget();
+            //Message msg = mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
+            //Bundle bundle = new Bundle();
+            //bundle.putString("Toast", "Unable to connect device");
+            //msg.setData(bundle);
+            mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
+            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT);
         }
 
         // Start the service over to restart none mode
@@ -312,14 +311,11 @@ public class TerminalServiceBT {
      */
     private void connectionLost() {
 
-        if (Looper.myLooper() != null && mHandler != null) {
+        //if (Looper.myLooper() != null && mHandler != null) {
+        if (mHandler != null) {
             // Send a failure message back to the Activity
-            Message msg = mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
-            Bundle bundle = new Bundle();
-            bundle.putString("Toast", "Device connection was lost");
-            msg.setData(bundle);
-            mHandler.sendMessage(msg);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT).sendToTarget();
+            mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
+            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT);
         }
 
         // Start the service over to restart none mode
@@ -440,7 +436,7 @@ public class TerminalServiceBT {
                     if (mHandler != null) {
                         mHandler.obtainMessage(
                                 HandleMessages.MESSAGE_TERM_READ,
-                                buffer.length, -1, buffer).sendToTarget();
+                                buffer.length, -1, buffer);
                     }
                 } catch (IOException e) {
                     Log.d(TAG, e.getMessage());
@@ -462,16 +458,6 @@ public class TerminalServiceBT {
 
                 Log.d(">>>term", new String(buffer, "UTF-8"));
                 Log.d(">>>", MonetUtils.bytesToHex(buffer));
-
-                // Log.d("<<<term", slip.toString());
-                // Log.d("<<<    ", MonetUtils.bytesToHex(slip.toByteArray()));
-
-                // Share the sent message back to the UI Activity
-//                if (mHandler != null) {
-//                    mHandler.obtainMessage(
-//                            HandleMessages.MESSAGE_TERM_WRITE_FINISH, -1, -1,
-//                            buffer).sendToTarget();
-//                }
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
