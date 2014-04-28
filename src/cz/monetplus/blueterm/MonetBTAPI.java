@@ -3,7 +3,6 @@ package cz.monetplus.blueterm;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.os.Looper;
 import android.util.Log;
 
 /**
@@ -24,7 +23,10 @@ public class MonetBTAPI {
      */
     private static final String TAG = "MonetBTAPI";
 
-    public static final String TOAST = "Messagebox";
+    /**
+     * 
+     */
+    //public static final String TOAST = "Messagebox";
 
     /**
      * Local Bluetooth adapter.
@@ -51,10 +53,8 @@ public class MonetBTAPI {
      */
     private static TransactionOut outputData = null;
 
-    // private static TCPClientThread tcpThread = null;
-
     // The Handler that gets information back from the BluetoothChatService
-    private static MessageThread mHandler = null;
+    private static MessageThread messageThread = null;
 
     /**
      * @param context
@@ -63,21 +63,12 @@ public class MonetBTAPI {
      *            Transcation input parameters.
      * @return true for corect connected device. false for some error.
      */
-    public final static TransactionOut doTransaction(final Context context,
+    public static final TransactionOut doTransaction(final Context context,
             final TransactionIn in) {
 
         applicationContext = context;
         inputData = in;
         outputData = new TransactionOut();
-
-        // if (Looper.myLooper() == null) {
-        // Log.d(TAG, "Looper.prepare()");
-        // Looper.prepare();
-        // } else {
-        // Log.d(TAG, "Nevim proc je myLooper uz alocovan");
-        //
-
-        // Looper.prepare();
 
         if (create()) {
             if (start()) {
@@ -94,13 +85,13 @@ public class MonetBTAPI {
 
                 if (terminalService.getState() == TerminalState.STATE_CONNECTED) {
 
-                    mHandler.obtainMessage(HandleMessages.MESSAGE_STATE_CHANGE,
+                    messageThread.addMessage(
+                            HandleMessages.MESSAGE_STATE_CHANGE,
                             TerminalState.STATE_CONNECTED, in.getCommand()
                                     .ordinal());
                 }
                 while (terminalService.getState() == TerminalState.STATE_CONNECTED) {
                     // Zacni vykonavat smycku
-                    // Looper.loop();
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -109,11 +100,7 @@ public class MonetBTAPI {
 
                 }
 
-                outputData = mHandler.getValue();
-                // else {
-                // // nepodarilo se spojit, tak vsechno uklidime
-                // stop();
-                // }
+                outputData = messageThread.getValue();
             }
         }
 
@@ -133,9 +120,6 @@ public class MonetBTAPI {
         // Get local Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // slipOutputpFraming = new ByteArrayOutputStream();
-        // slipOutputpFraming.reset();
-
         // relate the listView from java to the one created in xml
         return true;
     }
@@ -151,8 +135,6 @@ public class MonetBTAPI {
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            // Toast.makeText(applicationContext, "Bluetooth is not available",
-            // Toast.LENGTH_LONG).show();
             outputData.setMessage("Bluetooth is not available");
             // Otherwise, setup the chat session
         } else {
@@ -173,33 +155,22 @@ public class MonetBTAPI {
             terminalService = null;
         }
 
-        // if (tcpThread != null) {
-        // tcpThread.interrupt();
-        // tcpThread = null;
-        // }
-
-        if (mHandler != null) {
-            // mHandler.getLooper().quit();
-            // mHandler.removeCallbacks(null);
-            mHandler = null;
+        if (messageThread != null) {
+            messageThread = null;
         }
-
-        // Looper.getMainLooper().quit();
-        // Looper.myLooper().quit();
-        // Log.d(TAG, "Looper.myLooper().quit()");
     }
 
     private static void setupTerminal() {
         Log.d(TAG, "setupTerminal() creating handler");
 
-        mHandler = new MessageThread(applicationContext, TERMINALPORT,
+        messageThread = new MessageThread(applicationContext, TERMINALPORT,
                 inputData);
 
         // Initialize the BluetoothChatService to perform bluetooth connections
-        terminalService = new TerminalServiceBT(applicationContext, mHandler,
-                bluetoothAdapter);
-        mHandler.setTerminalService(terminalService);
-        mHandler.start();
+        terminalService = new TerminalServiceBT(applicationContext,
+                messageThread, bluetoothAdapter);
+        messageThread.setTerminalService(terminalService);
+        messageThread.start();
     }
 
     /**

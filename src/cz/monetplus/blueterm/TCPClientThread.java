@@ -12,7 +12,7 @@ import cz.monetplus.blueterm.server.TCPClient;
  * @author "Dusan Krajcovic"
  * 
  */
-public final class TCPClientThread extends Thread implements ObjectThreads{
+public final class TCPClientThread extends Thread implements ObjectThreads {
 
     private static final String TAG = "TCPClientThread";
 
@@ -23,7 +23,7 @@ public final class TCPClientThread extends Thread implements ObjectThreads{
     private int connectionId;
 
     private int timeout;
-    
+
     private MessageThread mHandler;
 
     /**
@@ -38,9 +38,13 @@ public final class TCPClientThread extends Thread implements ObjectThreads{
 
     /**
      * @param serverIp
+     *            Server IP address.
      * @param serverPort
+     *            Server port.
      * @param timeout
+     *            TODO: dodelat timeout.
      * @param connectionId
+     *            current connection ID.
      */
     public void setConnection(byte[] serverIp, int serverPort, int timeout,
             int connectionId) {
@@ -52,14 +56,15 @@ public final class TCPClientThread extends Thread implements ObjectThreads{
 
         Log.d(TAG, "TCPconnectTask to " + (serverIp[0] & 0xff) + "."
                 + (serverIp[1] & 0xff) + "." + (serverIp[2] & 0xff) + "."
-                + (serverIp[3] & 0xff) + ":" + serverPort + "["
-                + connectionId + "]");
+                + (serverIp[3] & 0xff) + ":" + serverPort + "[" + connectionId
+                + "]");
     }
 
     /**
      * Send data to server.
      * 
      * @param sendData
+     *            Buffer for sending data to server.
      */
     public void sendMessage(byte[] sendData) {
         if (mTcpClient != null) {
@@ -86,16 +91,12 @@ public final class TCPClientThread extends Thread implements ObjectThreads{
                                 TerminalPorts.SERVER.getPortNumber(),
                                 new ServerFrame(
                                         TerminalCommands.TERM_CMD_SERVER_READ,
-                                        connectionId, message)
-                                        .createFrame());
+                                        connectionId, message).createFrame());
 
                         // send to terminal
-                        mHandler.obtainMessage(
-                                HandleMessages.MESSAGE_TERM_WRITE,
-                                -1,
-                                -1,
-                                SLIPFrame.createFrame(termFrame
-                                        .createFrame()));
+                        mHandler.addMessage(
+                                HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
+                                SLIPFrame.createFrame(termFrame.createFrame()));
                     }
                 });
 

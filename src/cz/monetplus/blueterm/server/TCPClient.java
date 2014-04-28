@@ -84,12 +84,12 @@ public class TCPClient {
         if (out != null) {
             out.write(message);
             out.flush();
-
+            
             // Log.d(TAG, new String(message, "UTF-8"));
             Log.d(TAG, MonetUtils.bytesToHex(message));
 
-            mHandler.obtainMessage(HandleMessages.MESSAGE_SERVER_WRITE, -1, -1,
-                    message);
+//            mHandler.addMessage(HandleMessages.MESSAGE_SERVER_WRITE, -1, -1,
+//                    message);
         }
     }
 
@@ -131,7 +131,7 @@ public class TCPClient {
                 // socket.getInputStream()));
                 in = socket.getInputStream();
 
-                mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 0, -1,
+                mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 0, -1,
                         null);
 
                 // in this while the client listens for the messages sent by the
@@ -163,7 +163,7 @@ public class TCPClient {
                 Log.e("TCP", "S: Error", e);
                 if (isRunning) {
                     // Uz koncime, takze nic nikam neposilej
-                    mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 2,
+                    mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 2,
                             -1, null);
                 }
 
@@ -178,7 +178,7 @@ public class TCPClient {
         } catch (Exception e) {
 
             Log.e("TCP", "C: Error", e);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1,
+            mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1,
                     null);
 
         }

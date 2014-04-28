@@ -27,7 +27,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Looper;
 import android.util.Log;
 
 /**
@@ -54,15 +53,15 @@ public class TerminalServiceBT {
     UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Member fields
-    private final BluetoothAdapter mAdapter;
+    private final BluetoothAdapter bluetoothAdapter;
 
-    private MessageThread mHandler;
+    private MessageThread messageThread;
 
     private ConnectThread mConnectThread;
 
     private ConnectedThread mConnectedThread;
 
-    private int mState;
+    private int currentTerminalState;
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -72,10 +71,19 @@ public class TerminalServiceBT {
      * @param handler
      *            A Handler to send messages back to the UI Activity
      */
-    public TerminalServiceBT(Context context, MessageThread handler, BluetoothAdapter adapter) {
-        mAdapter = adapter;
-        mState = TerminalState.STATE_NONE;
-        mHandler = handler;
+    /**
+     * @param context
+     *            Application context.
+     * @param messageThread
+     *            Message thread with queue.
+     * @param adapter
+     *            Bluetooth adapter (only one for application).
+     */
+    public TerminalServiceBT(Context context, MessageThread messageThread,
+            BluetoothAdapter adapter) {
+        bluetoothAdapter = adapter;
+        currentTerminalState = TerminalState.STATE_NONE;
+        this.messageThread = messageThread;
     }
 
     /**
@@ -86,13 +94,13 @@ public class TerminalServiceBT {
      */
     private synchronized void setState(int state) {
         if (D) {
-            Log.d(TAG, "setState() " + mState + " -> " + state);
+            Log.d(TAG, "setState() " + currentTerminalState + " -> " + state);
         }
-        mState = state;
+        currentTerminalState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        if (mHandler != null) {
-            mHandler.obtainMessage(HandleMessages.MESSAGE_STATE_CHANGE, state,
+        if (messageThread != null) {
+            messageThread.addMessage(HandleMessages.MESSAGE_STATE_CHANGE, state,
                     -1);
         }
     }
@@ -101,7 +109,7 @@ public class TerminalServiceBT {
      * @return Return the current connection state.
      */
     public/* synchronized */int getState() {
-        return mState;
+        return currentTerminalState;
     }
 
     /**
@@ -152,7 +160,7 @@ public class TerminalServiceBT {
         }
 
         // Cancel any thread attempting to make a connection
-        if (mState == TerminalState.STATE_CONNECTING) {
+        if (currentTerminalState == TerminalState.STATE_CONNECTING) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
                 mConnectThread = null;
@@ -250,7 +258,7 @@ public class TerminalServiceBT {
             Log.d(TAG, "stop");
         }
 
-        mHandler = null;
+        messageThread = null;
 
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -278,7 +286,7 @@ public class TerminalServiceBT {
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState != TerminalState.STATE_CONNECTED) {
+            if (currentTerminalState != TerminalState.STATE_CONNECTED) {
                 return;
             }
             r = mConnectedThread;
@@ -291,15 +299,16 @@ public class TerminalServiceBT {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
-        //if (Looper.myLooper() != null && mHandler != null) {
-        if (mHandler != null) {
+        // if (Looper.myLooper() != null && mHandler != null) {
+        if (messageThread != null) {
             // Send a failure message back to the Activity
-            //Message msg = mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
-            //Bundle bundle = new Bundle();
-            //bundle.putString("Toast", "Unable to connect device");
-            //msg.setData(bundle);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT);
+            // Message msg =
+            // mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
+            // Bundle bundle = new Bundle();
+            // bundle.putString("Toast", "Unable to connect device");
+            // msg.setData(bundle);
+            messageThread.addMessage(HandleMessages.MESSAGE_TOAST);
+            messageThread.addMessage(HandleMessages.MESSAGE_QUIT);
         }
 
         // Start the service over to restart none mode
@@ -311,11 +320,11 @@ public class TerminalServiceBT {
      */
     private void connectionLost() {
 
-        //if (Looper.myLooper() != null && mHandler != null) {
-        if (mHandler != null) {
+        // if (Looper.myLooper() != null && mHandler != null) {
+        if (messageThread != null) {
             // Send a failure message back to the Activity
-            mHandler.obtainMessage(HandleMessages.MESSAGE_TOAST);
-            mHandler.obtainMessage(HandleMessages.MESSAGE_QUIT);
+            messageThread.addMessage(HandleMessages.MESSAGE_TOAST);
+            messageThread.addMessage(HandleMessages.MESSAGE_QUIT);
         }
 
         // Start the service over to restart none mode
@@ -323,7 +332,7 @@ public class TerminalServiceBT {
     }
 
     public BluetoothAdapter getAdapter() {
-        return mAdapter;
+        return bluetoothAdapter;
     }
 
     /**
@@ -433,8 +442,8 @@ public class TerminalServiceBT {
                     byte[] buffer = SlipInputReader.read(mmInStream);
 
                     // Send the obtained bytes to the UI Activity
-                    if (mHandler != null) {
-                        mHandler.obtainMessage(
+                    if (messageThread != null) {
+                        messageThread.addMessage(
                                 HandleMessages.MESSAGE_TERM_READ,
                                 buffer.length, -1, buffer);
                     }

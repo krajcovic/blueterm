@@ -19,6 +19,12 @@ import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.util.MonetUtils;
 
+/**
+ * Thread for handling all messages.
+ * 
+ * @author "Dusan Krajcovic"
+ * 
+ */
 public class MessageThread extends Thread {
 
     /**
@@ -26,20 +32,44 @@ public class MessageThread extends Thread {
      */
     private static final String TAG = "MessageThread";
 
+    /**
+     * Server connection ID. Only one serverconnection.
+     */
     private byte[] serverConnectionID = null;
 
+    /**
+     * TCP client thread for read and write.
+     */
     private static TCPClientThread tcpThread = null;
 
+    /**
+     * Message queue for handling messages from threads.
+     */
     private Queue<Message> queue = new LinkedList<Message>();
 
+    /**
+     * Application context.
+     */
     private Context applicationContext;
 
+    /**
+     * Terminal port (example 33333).
+     */
     private int terminalPort;
 
+    /**
+     * Transaction input params.
+     */
     private TransactionIn transactionInputData;
 
+    /**
+     * Transaction output params.
+     */
     private TransactionOut transactionOutputData;
 
+    /**
+     * Stop this thread.
+     */
     private boolean stopThread = false;
 
     /**
@@ -48,10 +78,15 @@ public class MessageThread extends Thread {
     private TerminalServiceBT terminalService = null;
 
     /**
-     * Terminal to muze posilat po castech
+     * Terminal to muze posilat po castech.
      */
     private static ByteArrayOutputStream slipOutputpFraming = null;
 
+    /**
+     * @param context
+     * @param terminalPort
+     * @param transactionInputData
+     */
     public MessageThread(final Context context, int terminalPort,
             TransactionIn transactionInputData) {
         super();
@@ -66,10 +101,8 @@ public class MessageThread extends Thread {
 
     @Override
     public void run() {
-        // super.run();
-
-        while (stopThread == false) {
-            if (queue.peek() != null && stopThread == false) {
+        while (!stopThread) {
+            if (queue.peek() != null) {
                 handleMessage(queue.poll());
             }
         }
@@ -80,6 +113,11 @@ public class MessageThread extends Thread {
         }
     }
 
+    /**
+     * Get result from current thread.
+     * 
+     * @return TransactionOut result Data.
+     */
     public TransactionOut getValue() {
         return transactionOutputData;
     }
@@ -88,7 +126,7 @@ public class MessageThread extends Thread {
      * Create and send pay request to terminal.
      */
     private void pay() {
-        this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
                 .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
                         .getSale(transactionInputData.getAmount(),
                                 transactionInputData.getCurrency(),
@@ -100,7 +138,7 @@ public class MessageThread extends Thread {
      * Create and send handshake to terminal.
      */
     private void handshake() {
-        this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
                 .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
                         .getHanshake()).createFrame()));
     }
@@ -109,27 +147,57 @@ public class MessageThread extends Thread {
      * Create and send app info request to terminal.
      */
     private void appInfo() {
-        this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
                 .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
                         .getAppInfo()).createFrame()));
     }
 
-    public void obtainMessage(int what, int arg1, int arg2, Object obj) {
+    /**
+     * @param what
+     *            HandleMessages.
+     * @param arg1
+     *            TerminalState.
+     * @param arg2
+     *            TransactionCommand
+     * @param obj
+     *            Data for executing messages.
+     */
+    public void addMessage(int what, int arg1, int arg2, Object obj) {
         addMessage(Message.obtain(null, what, arg1, arg2, obj));
     }
 
-    public void obtainMessage(int what, int arg1, int arg2) {
+    /**
+     * @param what
+     *            HandleMessages.
+     * @param arg1
+     *            TerminalState.
+     * @param arg2
+     *            TransactionCommand
+     */
+    public void addMessage(int what, int arg1, int arg2) {
         addMessage(Message.obtain(null, what, arg1, arg2));
     }
 
-    public void obtainMessage(int what) {
+    /**
+     * @param what
+     *            HandleMessages.
+     */
+    public void addMessage(int what) {
         addMessage(Message.obtain(null, what));
     }
 
+    /**
+     * @param msg
+     *            Message for addding to queue.
+     */
     public void addMessage(Message msg) {
         queue.add(msg);
     }
 
+    /**
+     * @param service
+     *            Terminal service serving bluetooth.
+     */
     public void setTerminalService(TerminalServiceBT service) {
         this.terminalService = service;
     }
@@ -140,10 +208,10 @@ public class MessageThread extends Thread {
         case HandleMessages.MESSAGE_STATE_CHANGE:
             handleStateChange(msg);
             break;
-        case HandleMessages.MESSAGE_SERVER_WRITE:
-            break;
-        case HandleMessages.MESSAGE_SERVER_READ:
-            break;
+        // case HandleMessages.MESSAGE_SERVER_WRITE:
+        // break;
+        // case HandleMessages.MESSAGE_SERVER_READ:
+        // break;
 
         case HandleMessages.MESSAGE_TERM_WRITE:
             // Jedine misto v aplikaci pres ktere se posila do terminalu
@@ -166,8 +234,7 @@ public class MessageThread extends Thread {
                     Toast.LENGTH_SHORT).show();
             break;
         case HandleMessages.MESSAGE_QUIT:
-            terminalService.stop();
-            stopThread = true;
+            this.stopThread();
             break;
         }
     }
@@ -184,7 +251,7 @@ public class MessageThread extends Thread {
 
             // Toast.makeText(applicationContext, R.string.not_connected,
             // Toast.LENGTH_SHORT).show();
-            this.obtainMessage(HandleMessages.MESSAGE_TOAST, -1, -1,
+            this.addMessage(HandleMessages.MESSAGE_TOAST, -1, -1,
                     R.string.not_connected);
             return;
         }
@@ -199,6 +266,7 @@ public class MessageThread extends Thread {
      * Send to terminal information about connection at server.
      * 
      * @param msg
+     *            Contains status(arg1) about current connection to server.
      * */
     private void connectionRequest(Message msg) {
         byte[] status = new byte[1];
@@ -209,7 +277,7 @@ public class MessageThread extends Thread {
         TerminalFrame toFrame = new TerminalFrame(
                 TerminalPorts.SERVER.getPortNumber(), soFrame.createFrame());
 
-        this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
                 SLIPFrame.createFrame(toFrame.createFrame()));
     }
 
@@ -217,9 +285,9 @@ public class MessageThread extends Thread {
      * Received message from terminal
      * 
      * @param msg
+     *            Messaget contains information read from terminal.
      */
     private void handleTermReceived(Message msg) {
-        // byte[] readSlipFrame = (byte[]) msg.obj;
         slipOutputpFraming.write((byte[]) msg.obj, 0, msg.arg1);
 
         // Check
@@ -280,9 +348,7 @@ public class MessageThread extends Thread {
                         transactionOutputData.setCardType(bprotocol.getTagMap()
                                 .get(BProtocolTag.CardType));
 
-                        // TODO: dodelat ukonceni na jednom miste.
-                        terminalService.stop();
-                        stopThread = true;
+                        this.stopThread();
                     }
 
                     break;
@@ -300,11 +366,15 @@ public class MessageThread extends Thread {
         }
     }
 
+    private void stopThread() {
+        terminalService.stop();
+        stopThread = true;
+    }
+
     private void handleStateChange(Message msg) {
         Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
         switch (msg.arg1) {
         case TerminalState.STATE_CONNECTED:
-            // switch (inputData.getCommand()) {
             if (msg.arg2 >= 0) {
                 switch (TransactionCommand.values()[msg.arg2]) {
                 case HANDSHAKE:
@@ -364,7 +434,7 @@ public class MessageThread extends Thread {
                     (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
                     serverFrame.getId(), new byte[1]).createFrame());
 
-            this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
+            this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
                     SLIPFrame.createFrame(responseTerminal.createFrame()));
 
             break;
@@ -387,7 +457,9 @@ public class MessageThread extends Thread {
      * Terminal check this application.
      * 
      * @param termFrame
+     *            Terminal frame.
      * @param serverFrame
+     *            Server frame.
      */
     private void echoResponse(TerminalFrame termFrame,
             final ServerFrame serverFrame) {
@@ -396,7 +468,7 @@ public class MessageThread extends Thread {
                 new ServerFrame(TerminalCommands.TERM_CMD_ECHO_RES, serverFrame
                         .getId(), null).createFrame());
 
-        this.obtainMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
                 SLIPFrame.createFrame(responseTerminal.createFrame()));
     }
 }
