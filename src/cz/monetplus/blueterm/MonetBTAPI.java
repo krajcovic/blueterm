@@ -26,7 +26,7 @@ public class MonetBTAPI {
     /**
      * 
      */
-    //public static final String TOAST = "Messagebox";
+    // public static final String TOAST = "Messagebox";
 
     /**
      * Local Bluetooth adapter.
@@ -107,6 +107,10 @@ public class MonetBTAPI {
         stop();
 
         return outputData;
+    }
+
+    public static final void doCancel() {
+        stop();
     }
 
     /**
