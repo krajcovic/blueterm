@@ -50,12 +50,12 @@ public final class SLIPFrame {
         ByteArrayOutputStream bout = new ByteArrayOutputStream(
                 _data.length * 2 + 2);
 
-        bout.write((byte) END);
+        bout.write(END);
 
         for (int i = 0; i < _data.length; i++) {
             if (_data[i] == END) {
-                bout.write((byte) ESC);
-                bout.write((byte) ESC_END);
+                bout.write(ESC);
+                bout.write(ESC_END);
             } else if (_data[i] == ESC) {
                 bout.write(ESC);
                 bout.write(ESC_ESC);
@@ -64,7 +64,7 @@ public final class SLIPFrame {
             }
         }
 
-        bout.write((byte) END);
+        bout.write(END);
 
         return bout.toByteArray();
     }
