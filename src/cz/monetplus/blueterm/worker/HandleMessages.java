@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.worker;
 
 /**
  * Identificators for Handle message thread.

@@ -1,21 +1,53 @@
 package cz.monetplus.blueterm;
 
+import cz.monetplus.blueterm.vprotocol.RechargingType;
+
+
 public class TransactionIn {
     private String blueHwAddress;
+    
     private String hostIP;
-    private int hostPort;
+    
+//    private int hostPort;
     
     private TransactionCommand command;
 
-    private Integer amount;
+    private Long amount;
+    
     private String invoice;
+    
     private Integer currency;
+    
+    private Long tranId;
 
-    public Integer getAmount() {
+    private RechargingType rechargintType;
+
+    public TransactionIn() {
+        super();
+        this.amount = (long) 0;
+        this.currency = 203;
+        this.tranId = (long) 0;
+        this.rechargintType = RechargingType.Cash;
+    }
+
+    public TransactionIn(String blueHwAddress, String hostIP,
+            TransactionCommand command, Long amount, String invoice,
+            Integer currency, Long tranId) {
+        super();
+        this.blueHwAddress = blueHwAddress;
+        this.hostIP = hostIP;
+        this.command = command;
+        this.amount = amount;
+        this.invoice = invoice;
+        this.currency = currency;
+        this.tranId = tranId;
+    }
+
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 
@@ -59,11 +91,27 @@ public class TransactionIn {
         this.hostIP = hostIP;
     }
 
-    public int getHostPort() {
-        return hostPort;
+//    public int getHostPort() {
+//        return hostPort;
+//    }
+//
+//    public void setHostPort(int hostPort) {
+//        this.hostPort = hostPort;
+//    }
+
+    public Long getTranId() {
+        return this.tranId;
+    }
+    
+    public void setTranId(Long tranId) {
+        this.tranId = tranId;
     }
 
-    public void setHostPort(int hostPort) {
-        this.hostPort = hostPort;
+    public RechargingType getRechargingType() {
+        return rechargintType;
+    }
+    
+    public void setRechargingType(RechargingType type) {
+        this.rechargintType = type;
     }
 }

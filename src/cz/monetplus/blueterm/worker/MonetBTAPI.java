@@ -1,5 +1,9 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.worker;
 
+import cz.monetplus.blueterm.TransactionIn;
+import cz.monetplus.blueterm.TransactionOut;
+import cz.monetplus.blueterm.terminals.TerminalServiceBT;
+import cz.monetplus.blueterm.terminals.TerminalState;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -12,11 +16,6 @@ import android.util.Log;
  * 
  */
 public class MonetBTAPI {
-
-    /**
-     * Socket port
-     */
-    private static final int TERMINALPORT = 33333;
 
     /**
      * String tag for logging.
@@ -167,8 +166,7 @@ public class MonetBTAPI {
     private static void setupTerminal() {
         Log.d(TAG, "setupTerminal() creating handler");
 
-        messageThread = new MessageThread(applicationContext, TERMINALPORT,
-                inputData);
+        messageThread = new MessageThread(applicationContext, inputData);
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         terminalService = new TerminalServiceBT(applicationContext,

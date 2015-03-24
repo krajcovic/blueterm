@@ -1,12 +1,15 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.worker;
 
 import java.io.IOException;
 
 import android.util.Log;
+import cz.monetplus.blueterm.common.ObjectThreads;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.server.TCPClient;
+import cz.monetplus.blueterm.terminals.TerminalCommands;
+import cz.monetplus.blueterm.terminals.TerminalPorts;
 
 /**
  * @author "Dusan Krajcovic"

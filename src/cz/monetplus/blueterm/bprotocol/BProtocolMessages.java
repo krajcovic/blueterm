@@ -24,7 +24,7 @@ public final class BProtocolMessages {
         return factory.serialize(bprotocol);
     }
 
-    public static byte[] getSale(int amount, int currencyCode,
+    public static byte[] getSale(long amount, int currencyCode,
             String invoiceNumber) {
 
         BProtocol bprotocol = new BProtocol("B1", "01", "        ",

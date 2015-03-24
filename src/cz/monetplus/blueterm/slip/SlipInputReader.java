@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.slip;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

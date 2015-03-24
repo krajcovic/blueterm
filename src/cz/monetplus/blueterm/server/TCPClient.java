@@ -7,10 +7,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import cz.monetplus.blueterm.HandleMessages;
-import cz.monetplus.blueterm.MessageThread;
 import cz.monetplus.blueterm.util.MonetUtils;
-
+import cz.monetplus.blueterm.worker.HandleMessages;
+import cz.monetplus.blueterm.worker.MessageThread;
 import android.util.Log;
 
 /**

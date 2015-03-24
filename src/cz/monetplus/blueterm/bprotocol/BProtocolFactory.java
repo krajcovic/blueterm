@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.util.Log;
-
 import cz.monetplus.blueterm.util.MonetUtils;
 
 public class BProtocolFactory {

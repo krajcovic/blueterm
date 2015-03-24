@@ -42,6 +42,11 @@ public enum BProtocolTag {
      * 
      */
     CurrencyCode2('E'),
+    
+    /**
+     * Identifikator pokladniho uctu
+     */
+    SaleTicketId('N'),
 
     /**
      * 
@@ -94,7 +99,14 @@ public enum BProtocolTag {
     /**
      * 
      */
-    CardType('J');
+    CardType('J'),
+    
+    /**
+     * pole nese informaci o způsobu dobití karty:
+         0 dobití provedeno hotovostí 
+         1 dobití provedeno platební kartou
+     */
+    RechargingType('4');
 
     /**
      * Character tag.

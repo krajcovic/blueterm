@@ -75,7 +75,7 @@ public class BProtocol implements Serializable {
      * @param standardCRC16
      *            Control sum.
      */
-    BProtocol(String protocolType, String protocolVersion, String posId,
+    public BProtocol(String protocolType, String protocolVersion, String posId,
             String transactionDateTime, String flag, String standardCRC16) {
         super();
         this.protocolType = protocolType;

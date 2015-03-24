@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.worker;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -10,6 +10,11 @@ import android.content.Context;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+import cz.monetplus.blueterm.R;
+import cz.monetplus.blueterm.TransactionCommand;
+import cz.monetplus.blueterm.TransactionIn;
+import cz.monetplus.blueterm.TransactionOut;
+import cz.monetplus.blueterm.R.string;
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
@@ -17,7 +22,12 @@ import cz.monetplus.blueterm.bprotocol.BProtocolTag;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
+import cz.monetplus.blueterm.terminals.TerminalCommands;
+import cz.monetplus.blueterm.terminals.TerminalPorts;
+import cz.monetplus.blueterm.terminals.TerminalServiceBT;
+import cz.monetplus.blueterm.terminals.TerminalState;
 import cz.monetplus.blueterm.util.MonetUtils;
+import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 
 /**
  * Thread for handling all messages.
@@ -53,11 +63,6 @@ public class MessageThread extends Thread {
     private Context applicationContext;
 
     /**
-     * Terminal port (example 33333).
-     */
-    private int terminalPort;
-
-    /**
      * Transaction input params.
      */
     private TransactionIn transactionInputData;
@@ -87,7 +92,7 @@ public class MessageThread extends Thread {
      * @param terminalPort
      * @param transactionInputData
      */
-    public MessageThread(final Context context, int terminalPort,
+    public MessageThread(final Context context,
             TransactionIn transactionInputData) {
         super();
 
@@ -95,7 +100,7 @@ public class MessageThread extends Thread {
         slipOutputpFraming.reset();
 
         applicationContext = context;
-        this.terminalPort = terminalPort;
+        // this.terminalPort = terminalPort;
         this.transactionInputData = transactionInputData;
     }
 
@@ -127,29 +132,65 @@ public class MessageThread extends Thread {
      */
     private void pay() {
         this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
-                        .getSale(transactionInputData.getAmount(),
-                                transactionInputData.getCurrency(),
-                                transactionInputData.getInvoice()))
+                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+                        .getPortNumber(), BProtocolMessages.getSale(
+                        transactionInputData.getAmount(),
+                        transactionInputData.getCurrency(),
+                        transactionInputData.getInvoice())).createFrame()));
+    }
+
+    /**
+     * Create and send handshake to terminal.
+     */
+    private void handshakeMbca() {
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+                        .getPortNumber(), BProtocolMessages.getHanshake())
+                        .createFrame()));
+    }
+
+    /**
+     * Create and send pay request to terminal.
+     */
+    private void recharge() {
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+                        .getPortNumber(), VProtocolMessages.getEmvRecharge(
+                        transactionInputData.getAmount(),
+                        transactionInputData.getCurrency(),
+                        transactionInputData.getInvoice(),
+                        transactionInputData.getTranId(),
+                        transactionInputData.getRechargingType().getTag())).createFrame()));
+    }
+
+    /**
+     * Create and send app info request to terminal.
+     */
+    private void appInfoMbca() {
+        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
+                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+                        .getPortNumber(), BProtocolMessages.getAppInfo())
                         .createFrame()));
     }
 
     /**
      * Create and send handshake to terminal.
      */
-    private void handshake() {
+    private void handshakeMvta() {
         this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
-                        .getHanshake()).createFrame()));
+                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+                        .getPortNumber(), VProtocolMessages.getHanshake())
+                        .createFrame()));
     }
 
     /**
      * Create and send app info request to terminal.
      */
-    private void appInfo() {
+    private void appInfoMvta() {
         this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(terminalPort, BProtocolMessages
-                        .getAppInfo()).createFrame()));
+                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+                        .getPortNumber(), VProtocolMessages.getAppInfo())
+                        .createFrame()));
     }
 
     /**
@@ -302,60 +343,47 @@ public class MessageThread extends Thread {
                 case UNDEFINED:
                     Log.d(TAG, "undefined port");
                     break;
+                    
                 case SERVER:
                     // messages for server
                     handleServerMessage(termFrame);
                     break;
+                    
                 case FLEET:
                     Log.d(TAG, "fleet data");
                     break;
+                    
                 case MAINTENANCE:
                     Log.d(TAG, "maintentace data");
                     break;
-                case MASTER:
-                    // Tyhle zpravy zpracovavat, jsou pro tuhle
-                    // aplikaci
+                    
+                case MBCA: {
                     BProtocol bprotocol = new BProtocolFactory()
                             .deserialize(termFrame.getData());
 
                     if (bprotocol.getProtocolType().equals("B2")) {
-                        transactionOutputData = new TransactionOut();
-                        try {
-                            transactionOutputData.setResultCode(Integer
-                                    .valueOf(bprotocol.getTagMap().get(
-                                            BProtocolTag.ResponseCode)));
-                        } catch (Exception e) {
-                            transactionOutputData.setResultCode(-1);
-                        }
-                        transactionOutputData.setMessage(bprotocol.getTagMap()
-                                .get(BProtocolTag.ServerMessage));
-                        try {
-                            transactionOutputData.setAuthCode(Integer
-                                    .valueOf(bprotocol.getTagMap().get(
-                                            BProtocolTag.AuthCode)));
-                        } catch (Exception e) {
-                            transactionOutputData.setAuthCode(0);
-                        }
-                        try {
-                            transactionOutputData.setSeqId(Integer
-                                    .valueOf(bprotocol.getTagMap().get(
-                                            BProtocolTag.SequenceId)));
-                        } catch (Exception e) {
-                            transactionOutputData.setSeqId(0);
-                        }
-                        transactionOutputData.setCardNumber(bprotocol
-                                .getTagMap().get(BProtocolTag.PAN));
-                        transactionOutputData.setCardType(bprotocol.getTagMap()
-                                .get(BProtocolTag.CardType));
-
-                        this.stopThread();
+                        ParseB2(bprotocol);
                     }
+                }
+                break;
 
-                    break;
+                case MVTA: {
+                    BProtocol bprotocol = new BProtocolFactory()
+                            .deserialize(termFrame.getData());
+
+                    if (bprotocol.getProtocolType().equals("V2")) {
+                        ParseB2(bprotocol);
+                    }
+                }
+
+                break;
+
                 default:
                     // Nedelej nic, spatne data, format, nebo
                     // crc
-                    Log.e(TAG, "Invalid port");
+                    Log.e(TAG,
+                            String.format("Invalid port {}",
+                                    termFrame.getPort()));
                     break;
 
                 }
@@ -364,6 +392,36 @@ public class MessageThread extends Thread {
         } else {
             Log.e(TAG, "Corrupted data. It's not slip frame.");
         }
+    }
+
+    private void ParseB2(BProtocol bprotocol) {
+        transactionOutputData = new TransactionOut();
+        try {
+            transactionOutputData.setResultCode(Integer.valueOf(bprotocol
+                    .getTagMap().get(BProtocolTag.ResponseCode)));
+        } catch (Exception e) {
+            transactionOutputData.setResultCode(-1);
+        }
+        transactionOutputData.setMessage(bprotocol.getTagMap().get(
+                BProtocolTag.ServerMessage));
+        try {
+            transactionOutputData.setAuthCode(Integer.valueOf(bprotocol
+                    .getTagMap().get(BProtocolTag.AuthCode)));
+        } catch (Exception e) {
+            transactionOutputData.setAuthCode(0);
+        }
+        try {
+            transactionOutputData.setSeqId(Integer.valueOf(bprotocol
+                    .getTagMap().get(BProtocolTag.SequenceId)));
+        } catch (Exception e) {
+            transactionOutputData.setSeqId(0);
+        }
+        transactionOutputData.setCardNumber(bprotocol.getTagMap().get(
+                BProtocolTag.PAN));
+        transactionOutputData.setCardType(bprotocol.getTagMap().get(
+                BProtocolTag.CardType));
+
+        this.stopThread();
     }
 
     private void stopThread() {
@@ -377,14 +435,23 @@ public class MessageThread extends Thread {
         case TerminalState.STATE_CONNECTED:
             if (msg.arg2 >= 0) {
                 switch (TransactionCommand.values()[msg.arg2]) {
-                case HANDSHAKE:
-                    handshake();
+                case MBCA_HANDSHAKE:
+                    handshakeMbca();
                     break;
-                case INFO:
-                    appInfo();
+                case MBCA_INFO:
+                    appInfoMbca();
                     break;
-                case PAY:
+                case MBCA_PAY:
                     pay();
+                    break;
+                case MVTA_HANDSHAKE:
+                    handshakeMvta();
+                    break;
+                case MVTA_INFO:
+                    appInfoMvta();
+                    break;
+                case MVTA_RECHARGE:
+                    recharge();
                     break;
                 case UNKNOWN:
                     break;

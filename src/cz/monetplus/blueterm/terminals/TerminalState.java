@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.terminals;
 
 public class TerminalState {
     // Constants that indicate the current connection state

@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.terminals;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import cz.monetplus.blueterm.slip.SlipInputReader;
 import cz.monetplus.blueterm.util.MonetUtils;
-
+import cz.monetplus.blueterm.worker.HandleMessages;
+import cz.monetplus.blueterm.worker.MessageThread;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;

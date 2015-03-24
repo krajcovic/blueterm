@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.terminals;
 
 /**
  * Terminal ports, which identifieds a way of communication with terminal.
@@ -20,12 +20,12 @@ public enum TerminalPorts {
     /**
      * 
      */
-    MASTER(33333),
+    MBCA(33333),
 
     /**
      * 
      */
-    BANK(33334),
+    MVTA(33334),
 
     /**
      * 
