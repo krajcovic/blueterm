@@ -23,7 +23,8 @@ import java.util.UUID;
 
 import cz.monetplus.blueterm.slip.SlipInputReader;
 import cz.monetplus.blueterm.util.MonetUtils;
-import cz.monetplus.blueterm.worker.HandleMessages;
+import cz.monetplus.blueterm.worker.HandleMessage;
+import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.worker.MessageThread;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -94,18 +95,18 @@ public class TerminalServiceBT {
      * @param state
      *            An integer defining the current connection state.
      */
-    private synchronized void setState(int state) {
-        if (D) {
-            Log.d(TAG, "setState() " + currentTerminalState + " -> " + state);
-        }
-        currentTerminalState = state;
-
-        // Give the new state to the Handler so the UI Activity can update
-        if (messageThread != null) {
-            messageThread.addMessage(HandleMessages.MESSAGE_STATE_CHANGE, state,
-                    -1);
-        }
-    }
+//    private synchronized void setState(int state) {
+//        if (D) {
+//            Log.d(TAG, "setState() " + currentTerminalState + " -> " + state);
+//        }
+//        currentTerminalState = state;
+//
+//        // Give the new state to the Handler so the UI Activity can update
+//        if (messageThread != null) {
+//            messageThread.addMessage(HandleMessage.MESSAGE_STATE_CHANGE, state,
+//                    -1);
+//        }
+//    }
 
     /**
      * @return Return the current connection state.
@@ -135,7 +136,7 @@ public class TerminalServiceBT {
             mConnectedThread = null;
         }
 
-        setState(TerminalState.STATE_NONE);
+        //setState(TerminalState.STATE_NONE);
 
         // Start the thread to listen on a BluetoothServerSocket
         // if (mSecureAcceptThread == null) {
@@ -178,7 +179,9 @@ public class TerminalServiceBT {
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
-        setState(TerminalState.STATE_CONNECTING);
+        
+        //setState(TerminalState.STATE_CONNECTING);
+        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnecting));
     }
 
     /**
@@ -218,7 +221,8 @@ public class TerminalServiceBT {
         // msg.setData(bundle);
         // mHandler.sendMessage(msg);
 
-        setState(TerminalState.STATE_CONNECTED);
+//        setState(TerminalState.STATE_CONNECTED);
+        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnected));
     }
 
     public void join() {
@@ -273,7 +277,9 @@ public class TerminalServiceBT {
         }
 
         // Kdyz zastavuju, tak uz nic nikam neposilej.
-        setState(TerminalState.STATE_NONE);
+        //setState(TerminalState.STATE_NONE);
+        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalDisconnected));
+        
     }
 
     /**
@@ -309,8 +315,8 @@ public class TerminalServiceBT {
             // Bundle bundle = new Bundle();
             // bundle.putString("Toast", "Unable to connect device");
             // msg.setData(bundle);
-            messageThread.addMessage(HandleMessages.MESSAGE_TOAST);
-            messageThread.addMessage(HandleMessages.MESSAGE_QUIT);
+            //messageThread.addMessage(HandleMessage.MESSAGE_TOAST);
+            messageThread.addMessage(HandleOperations.Exit);
         }
 
         // Start the service over to restart none mode
@@ -325,8 +331,8 @@ public class TerminalServiceBT {
         // if (Looper.myLooper() != null && mHandler != null) {
         if (messageThread != null) {
             // Send a failure message back to the Activity
-            messageThread.addMessage(HandleMessages.MESSAGE_TOAST);
-            messageThread.addMessage(HandleMessages.MESSAGE_QUIT);
+//            messageThread.addMessage(HandleMessage.MESSAGE_TOAST);
+            messageThread.addMessage(HandleOperations.Exit);
         }
 
         // Start the service over to restart none mode
@@ -445,9 +451,10 @@ public class TerminalServiceBT {
 
                     // Send the obtained bytes to the UI Activity
                     if (messageThread != null) {
-                        messageThread.addMessage(
-                                HandleMessages.MESSAGE_TERM_READ,
-                                buffer.length, -1, buffer);
+                        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalRead, buffer));
+//                        messageThread.addMessage(
+//                                HandleMessage.MESSAGE_TERM_READ,
+//                                buffer.length, -1, buffer);
                     }
                 } catch (IOException e) {
                     Log.d(TAG, e.getMessage());

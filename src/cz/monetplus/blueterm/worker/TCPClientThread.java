@@ -97,9 +97,10 @@ public final class TCPClientThread extends Thread implements ObjectThreads {
                                         connectionId, message).createFrame());
 
                         // send to terminal
-                        mHandler.addMessage(
-                                HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
-                                SLIPFrame.createFrame(termFrame.createFrame()));
+//                        mHandler.addMessage(
+//                                HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+                        mHandler.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                                SLIPFrame.createFrame(termFrame.createFrame())));
                     }
                 });
 

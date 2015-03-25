@@ -1,21 +1,37 @@
 package cz.monetplus.blueterm;
 
-public enum TransactionCommand {
-    UNKNOWN,
+import cz.monetplus.blueterm.worker.HandleOperations;
+
+public enum TransactionCommand {   
+    ONLY_CONNECT(HandleOperations.CallConnect),
+
+    MBCA_HANDSHAKE(HandleOperations.CallMbcaHandshake),
+
+    MBCA_PAY(HandleOperations.CallMbcaPay),
+
+    MBCA_INFO(HandleOperations.CallMbcaInfo),
+
+    MVTA_HANDSHAKE(HandleOperations.CallMvtaHandshake),
     
-    ONLY_CONNECT,
-
-    MBCA_HANDSHAKE,
-
-    MBCA_PAY,
-
-    MBCA_INFO,
-
-    MVTA_HANDSHAKE,
+    MVTA_INFO(HandleOperations.CallMvtaInfo),
     
-    MVTA_INFO,
-    
-    MVTA_RECHARGE,
-
+    MVTA_RECHARGE(HandleOperations.CallMvtaRecharging),
     ;
+    
+    
+    private HandleOperations operation;
+
+    private TransactionCommand(HandleOperations operation) {
+        this.setOperation(operation);
+    }
+
+    public HandleOperations getOperation() {
+        return operation;
+    }
+
+    public void setOperation(HandleOperations operation) {
+        this.operation = operation;
+    }
+    
+    
 }

@@ -84,10 +84,11 @@ public class MonetBTAPI {
 
                 if (terminalService.getState() == TerminalState.STATE_CONNECTED) {
 
-                    messageThread.addMessage(
-                            HandleMessages.MESSAGE_STATE_CHANGE,
-                            TerminalState.STATE_CONNECTED, in.getCommand()
-                                    .ordinal());
+                    messageThread.addMessage(in.getCommand().getOperation());
+                            
+//                            HandleMessage.MESSAGE_STATE_CHANGE,
+//                            TerminalState.STATE_CONNECTED, in.getCommand()
+//                                    .ordinal());
                 }
                 while (terminalService.getState() == TerminalState.STATE_CONNECTED) {
                     // Zacni vykonavat smycku

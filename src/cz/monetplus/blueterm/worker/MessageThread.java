@@ -1,6 +1,7 @@
 package cz.monetplus.blueterm.worker;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -55,7 +56,7 @@ public class MessageThread extends Thread {
     /**
      * Message queue for handling messages from threads.
      */
-    private Queue<Message> queue = new LinkedList<Message>();
+    private Queue<HandleMessage> queue = new LinkedList<HandleMessage>();
 
     /**
      * Application context.
@@ -131,108 +132,89 @@ public class MessageThread extends Thread {
      * Create and send pay request to terminal.
      */
     private void pay() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
                         .getPortNumber(), BProtocolMessages.getSale(
                         transactionInputData.getAmount(),
                         transactionInputData.getCurrency(),
-                        transactionInputData.getInvoice())).createFrame()));
+                        transactionInputData.getInvoice())).createFrame())));
     }
 
     /**
      * Create and send handshake to terminal.
      */
     private void handshakeMbca() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
                         .getPortNumber(), BProtocolMessages.getHanshake())
-                        .createFrame()));
+                        .createFrame())));
     }
 
     /**
      * Create and send pay request to terminal.
      */
     private void recharge() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
                         .getPortNumber(), VProtocolMessages.getEmvRecharge(
-                        transactionInputData.getAmount(),
-                        transactionInputData.getCurrency(),
-                        transactionInputData.getInvoice(),
-                        transactionInputData.getTranId(),
-                        transactionInputData.getRechargingType().getTag())).createFrame()));
+                        transactionInputData.getAmount(), transactionInputData
+                                .getCurrency(), transactionInputData
+                                .getInvoice(),
+                        transactionInputData.getTranId(), transactionInputData
+                                .getRechargingType().getTag())).createFrame())));
     }
 
     /**
      * Create and send app info request to terminal.
      */
     private void appInfoMbca() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MBCA
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
                         .getPortNumber(), BProtocolMessages.getAppInfo())
-                        .createFrame()));
+                        .createFrame())));
     }
 
     /**
      * Create and send handshake to terminal.
      */
     private void handshakeMvta() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
                         .getPortNumber(), VProtocolMessages.getHanshake())
-                        .createFrame()));
+                        .createFrame())));
     }
 
     /**
      * Create and send app info request to terminal.
      */
     private void appInfoMvta() {
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1, SLIPFrame
-                .createFrame(new TerminalFrame(TerminalPorts.MVTA
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
                         .getPortNumber(), VProtocolMessages.getAppInfo())
-                        .createFrame()));
-    }
-
-    /**
-     * @param what
-     *            HandleMessages.
-     * @param arg1
-     *            TerminalState.
-     * @param arg2
-     *            TransactionCommand
-     * @param obj
-     *            Data for executing messages.
-     */
-    public void addMessage(int what, int arg1, int arg2, Object obj) {
-        addMessage(Message.obtain(null, what, arg1, arg2, obj));
-    }
-
-    /**
-     * @param what
-     *            HandleMessages.
-     * @param arg1
-     *            TerminalState.
-     * @param arg2
-     *            TransactionCommand
-     */
-    public void addMessage(int what, int arg1, int arg2) {
-        addMessage(Message.obtain(null, what, arg1, arg2));
-    }
-
-    /**
-     * @param what
-     *            HandleMessages.
-     */
-    public void addMessage(int what) {
-        addMessage(Message.obtain(null, what));
+                        .createFrame())));
     }
 
     /**
      * @param msg
      *            Message for addding to queue.
      */
-    public void addMessage(Message msg) {
+    public void addMessage(HandleMessage msg) {
         queue.add(msg);
+    }
+
+    /**
+     * @param operation
+     */
+    public void addMessage(HandleOperations operation) {
+        addMessage(new HandleMessage(operation));
+
     }
 
     /**
@@ -244,39 +226,54 @@ public class MessageThread extends Thread {
     }
 
     // @Override
-    public void handleMessage(Message msg) {
-        switch (msg.what) {
-        case HandleMessages.MESSAGE_STATE_CHANGE:
-            handleStateChange(msg);
-            break;
-        // case HandleMessages.MESSAGE_SERVER_WRITE:
-        // break;
-        // case HandleMessages.MESSAGE_SERVER_READ:
-        // break;
+    public void handleMessage(HandleMessage msg) {
 
-        case HandleMessages.MESSAGE_TERM_WRITE:
-            // Jedine misto v aplikaci pres ktere se posila do terminalu
-            write2Terminal((byte[]) msg.obj);
+        switch (msg.getOperation()) {
+        case CallMbcaHandshake:
+            handshakeMbca();
+            break;
+        case CallMbcaInfo:
+            appInfoMbca();
+            break;
+        case CallMbcaPay:
+            pay();
+            break;
+        case CallMvtaHandshake:
+            handshakeMvta();
+            break;
+        case CallMvtaInfo:
+            appInfoMvta();
+            break;
+        case CallMvtaRecharging:
+            recharge();
             break;
 
-        case HandleMessages.MESSAGE_CONNECTED:
-            // Send to terminal information about connection at server.
+        case TerminalWrite:
+            write2Terminal(msg.getBuffer().buffer());
+            break;
+        case TerminalRead:
+            parseSlipPackets(msg);
+            break;
+
+        case ServerConnected:
             connectionRequest(msg);
             break;
 
-        case HandleMessages.MESSAGE_TERM_READ:
-            handleTermReceived(msg);
+        case ShowMessage:
+            Toast.makeText(applicationContext,
+                    new String(msg.getBuffer().buffer()), Toast.LENGTH_SHORT)
+                    .show();
             break;
-        case HandleMessages.MESSAGE_DEVICE_NAME:
-            // Nemam tuseni k cemu bych to vyuzil
-            break;
-        case HandleMessages.MESSAGE_TOAST:
-            Toast.makeText(applicationContext, msg.obj.toString(),
-                    Toast.LENGTH_SHORT).show();
-            break;
-        case HandleMessages.MESSAGE_QUIT:
+
+        case Exit:
             this.stopThread();
             break;
+        case Connected:
+            break;
+
+        default:
+            break;
+
         }
     }
 
@@ -292,8 +289,9 @@ public class MessageThread extends Thread {
 
             // Toast.makeText(applicationContext, R.string.not_connected,
             // Toast.LENGTH_SHORT).show();
-            this.addMessage(HandleMessages.MESSAGE_TOAST, -1, -1,
-                    R.string.not_connected);
+//            this.addMessage(HandleMessage.MESSAGE_TOAST, -1, -1,
+//                    R.string.not_connected);
+            this.addMessage(new HandleMessage(HandleOperations.ShowMessage, "Termina isn't connected."));
             return;
         }
 
@@ -309,17 +307,20 @@ public class MessageThread extends Thread {
      * @param msg
      *            Contains status(arg1) about current connection to server.
      * */
-    private void connectionRequest(Message msg) {
-        byte[] status = new byte[1];
-        status[0] = (byte) msg.arg1;
+    private void connectionRequest(HandleMessage msg) {
+        // byte[] status = new byte[1];
+        // status[0] = (byte) msg.arg1;
+        // msg.getBuffer().buffer()
         ServerFrame soFrame = new ServerFrame(
                 TerminalCommands.TERM_CMD_SERVER_CONNECTED, serverConnectionID,
-                status);
+                msg.getBuffer().buffer());
         TerminalFrame toFrame = new TerminalFrame(
                 TerminalPorts.SERVER.getPortNumber(), soFrame.createFrame());
 
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
-                SLIPFrame.createFrame(toFrame.createFrame()));
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(toFrame.createFrame())));
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        // SLIPFrame.createFrame(toFrame.createFrame()));
     }
 
     /**
@@ -328,69 +329,75 @@ public class MessageThread extends Thread {
      * @param msg
      *            Messaget contains information read from terminal.
      */
-    private void handleTermReceived(Message msg) {
-        slipOutputpFraming.write((byte[]) msg.obj, 0, msg.arg1);
+    private void parseSlipPackets(HandleMessage msg) {
+        // slipOutputpFraming.write((byte[]) msg.obj, 0, msg.arg1);
+        try {
+            slipOutputpFraming.write(msg.getBuffer().buffer());
 
-        // Check
-        if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
+            // Check
+            if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
 
-            TerminalFrame termFrame = new TerminalFrame(
-                    SLIPFrame.parseFrame(slipOutputpFraming.toByteArray()));
-            slipOutputpFraming.reset();
+                TerminalFrame termFrame = new TerminalFrame(
+                        SLIPFrame.parseFrame(slipOutputpFraming.toByteArray()));
+                slipOutputpFraming.reset();
 
-            if (termFrame != null) {
-                switch (termFrame.getPort()) {
-                case UNDEFINED:
-                    Log.d(TAG, "undefined port");
-                    break;
-                    
-                case SERVER:
-                    // messages for server
-                    handleServerMessage(termFrame);
-                    break;
-                    
-                case FLEET:
-                    Log.d(TAG, "fleet data");
-                    break;
-                    
-                case MAINTENANCE:
-                    Log.d(TAG, "maintentace data");
-                    break;
-                    
-                case MBCA: {
-                    BProtocol bprotocol = new BProtocolFactory()
-                            .deserialize(termFrame.getData());
+                if (termFrame != null) {
+                    switch (termFrame.getPort()) {
+                    case UNDEFINED:
+                        Log.d(TAG, "undefined port");
+                        break;
 
-                    if (bprotocol.getProtocolType().equals("B2")) {
-                        ParseB2(bprotocol);
+                    case SERVER:
+                        // messages for server
+                        handleServerMessage(termFrame);
+                        break;
+
+                    case FLEET:
+                        Log.d(TAG, "fleet data");
+                        break;
+
+                    case MAINTENANCE:
+                        Log.d(TAG, "maintentace data");
+                        break;
+
+                    case MBCA: {
+                        BProtocol bprotocol = new BProtocolFactory()
+                                .deserialize(termFrame.getData());
+
+                        if (bprotocol.getProtocolType().equals("B2")) {
+                            ParseB2(bprotocol);
+                        }
+                    }
+                        break;
+
+                    case MVTA: {
+                        BProtocol bprotocol = new BProtocolFactory()
+                                .deserialize(termFrame.getData());
+
+                        if (bprotocol.getProtocolType().equals("V2")) {
+                            ParseB2(bprotocol);
+                        }
+                    }
+
+                        break;
+
+                    default:
+                        // Nedelej nic, spatne data, format, nebo
+                        // crc
+                        Log.e(TAG,
+                                String.format("Invalid port {}",
+                                        termFrame.getPort()));
+                        break;
+
                     }
                 }
-                break;
 
-                case MVTA: {
-                    BProtocol bprotocol = new BProtocolFactory()
-                            .deserialize(termFrame.getData());
-
-                    if (bprotocol.getProtocolType().equals("V2")) {
-                        ParseB2(bprotocol);
-                    }
-                }
-
-                break;
-
-                default:
-                    // Nedelej nic, spatne data, format, nebo
-                    // crc
-                    Log.e(TAG,
-                            String.format("Invalid port {}",
-                                    termFrame.getPort()));
-                    break;
-
-                }
+            } else {
+                Log.e(TAG, "Corrupted data. It's not slip frame.");
             }
 
-        } else {
-            Log.e(TAG, "Corrupted data. It's not slip frame.");
+        } catch (IOException e) {
+            Log.e(TAG, "Exception by parsing slip packets.");
         }
     }
 
@@ -429,45 +436,46 @@ public class MessageThread extends Thread {
         stopThread = true;
     }
 
-    private void handleStateChange(Message msg) {
-        Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-        switch (msg.arg1) {
-        case TerminalState.STATE_CONNECTED:
-            if (msg.arg2 >= 0) {
-                switch (TransactionCommand.values()[msg.arg2]) {
-                case MBCA_HANDSHAKE:
-                    handshakeMbca();
-                    break;
-                case MBCA_INFO:
-                    appInfoMbca();
-                    break;
-                case MBCA_PAY:
-                    pay();
-                    break;
-                case MVTA_HANDSHAKE:
-                    handshakeMvta();
-                    break;
-                case MVTA_INFO:
-                    appInfoMvta();
-                    break;
-                case MVTA_RECHARGE:
-                    recharge();
-                    break;
-                case UNKNOWN:
-                    break;
-                default:
-                    break;
-
-                }
-            }
-            break;
-        case TerminalState.STATE_CONNECTING:
-        case TerminalState.STATE_LISTEN:
-            break;
-        case TerminalState.STATE_NONE:
-            break;
-        }
-    }
+    // @Deprecated
+    // private void handleStateChange(HandleMessage msg) {
+    // Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+    // switch (msg.arg1) {
+    // case TerminalState.STATE_CONNECTED:
+    // if (msg.arg2 >= 0) {
+    // switch (TransactionCommand.values()[msg.arg2]) {
+    // case MBCA_HANDSHAKE:
+    // handshakeMbca();
+    // break;
+    // case MBCA_INFO:
+    // appInfoMbca();
+    // break;
+    // case MBCA_PAY:
+    // pay();
+    // break;
+    // case MVTA_HANDSHAKE:
+    // handshakeMvta();
+    // break;
+    // case MVTA_INFO:
+    // appInfoMvta();
+    // break;
+    // case MVTA_RECHARGE:
+    // recharge();
+    // break;
+    // case UNKNOWN:
+    // break;
+    // default:
+    // break;
+    //
+    // }
+    // }
+    // break;
+    // case TerminalState.STATE_CONNECTING:
+    // case TerminalState.STATE_LISTEN:
+    // break;
+    // case TerminalState.STATE_NONE:
+    // break;
+    // }
+    // }
 
     private void handleServerMessage(TerminalFrame termFrame) {
         // sends the message to the server
@@ -501,8 +509,9 @@ public class MessageThread extends Thread {
                     (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
                     serverFrame.getId(), new byte[1]).createFrame());
 
-            this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
-                    SLIPFrame.createFrame(responseTerminal.createFrame()));
+//            this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+            this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                    SLIPFrame.createFrame(responseTerminal.createFrame())));
 
             break;
 
@@ -535,7 +544,8 @@ public class MessageThread extends Thread {
                 new ServerFrame(TerminalCommands.TERM_CMD_ECHO_RES, serverFrame
                         .getId(), null).createFrame());
 
-        this.addMessage(HandleMessages.MESSAGE_TERM_WRITE, -1, -1,
-                SLIPFrame.createFrame(responseTerminal.createFrame()));
+//        this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(responseTerminal.createFrame())));
     }
 }

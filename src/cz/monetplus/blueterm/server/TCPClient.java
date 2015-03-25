@@ -8,7 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import cz.monetplus.blueterm.util.MonetUtils;
-import cz.monetplus.blueterm.worker.HandleMessages;
+import cz.monetplus.blueterm.worker.HandleMessage;
+import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.worker.MessageThread;
 import android.util.Log;
 
@@ -130,8 +131,10 @@ public class TCPClient {
                 // socket.getInputStream()));
                 in = socket.getInputStream();
 
-                mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 0, -1,
-                        null);
+//                mHandler.addMessage(HandleMessage.MESSAGE_CONNECTED, 0, -1,
+//                        null);
+                mHandler.addMessage(new HandleMessage(HandleOperations.ServerConnected, (byte)0));
+                
 
                 // in this while the client listens for the messages sent by the
                 // server
@@ -162,8 +165,9 @@ public class TCPClient {
                 Log.e("TCP", "S: Error", e);
                 if (isRunning) {
                     // Uz koncime, takze nic nikam neposilej
-                    mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 2,
-                            -1, null);
+//                    mHandler.addMessage(HandleMessage.MESSAGE_CONNECTED, 2,
+//                            -1, null);
+                    mHandler.addMessage(new HandleMessage(HandleOperations.ServerConnected, (byte)2));
                 }
 
             } finally {
@@ -177,8 +181,9 @@ public class TCPClient {
         } catch (Exception e) {
 
             Log.e("TCP", "C: Error", e);
-            mHandler.addMessage(HandleMessages.MESSAGE_CONNECTED, 1, -1,
-                    null);
+//            mHandler.addMessage(HandleMessage.MESSAGE_CONNECTED, 1, -1,
+//                    null);
+            mHandler.addMessage(new HandleMessage(HandleOperations.ServerConnected, (byte)1));
 
         }
 
