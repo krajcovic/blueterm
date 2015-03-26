@@ -8,16 +8,11 @@ import java.util.Queue;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-//import android.R.bool;
 import android.content.Context;
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
-import cz.monetplus.blueterm.R;
-import cz.monetplus.blueterm.TransactionCommand;
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
-import cz.monetplus.blueterm.R.string;
 import cz.monetplus.blueterm.bprotocol.BProtocol;
 import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
@@ -28,7 +23,6 @@ import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.terminals.TerminalServiceBT;
-import cz.monetplus.blueterm.terminals.TerminalState;
 import cz.monetplus.blueterm.util.MonetUtils;
 import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 
@@ -431,6 +425,9 @@ public class MessageThread extends Thread {
                         }
                         break;
                     }
+                    default:
+                        Log.w(TAG, "Unsupported application port number: " + termFrame.getPortApplication());
+                        break;
                     }
 
                 } else {

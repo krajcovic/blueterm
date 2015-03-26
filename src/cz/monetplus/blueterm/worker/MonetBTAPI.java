@@ -2,10 +2,6 @@ package cz.monetplus.blueterm.worker;
 
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
-import cz.monetplus.blueterm.terminals.TerminalServiceBT;
-import cz.monetplus.blueterm.terminals.TerminalState;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
