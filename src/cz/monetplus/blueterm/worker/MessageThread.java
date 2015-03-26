@@ -26,7 +26,7 @@ import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
-import cz.monetplus.blueterm.terminals.TerminalPorts;
+import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.terminals.TerminalServiceBT;
 import cz.monetplus.blueterm.terminals.TerminalState;
 import cz.monetplus.blueterm.util.MonetUtils;
@@ -108,8 +108,10 @@ public class MessageThread extends Thread {
         slipOutputpFraming.reset();
 
         applicationContext = context;
-        // this.terminalPort = terminalPort;
         this.transactionInputData = transactionInputData;
+        this.transactionOutputData = new TransactionOut();
+
+        addMessage(HandleOperations.GetBluetoothAddress);
     }
 
     @Override
@@ -134,73 +136,75 @@ public class MessageThread extends Thread {
      * Create and send pay request to terminal.
      */
     private void pay() {
-
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
-                        .getPortNumber(), BProtocolMessages.getSale(
-                        transactionInputData.getAmount(),
-                        transactionInputData.getCurrency(),
-                        transactionInputData.getInvoice())).createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getSale(transactionInputData.getAmount(),
+                                        transactionInputData.getCurrency(),
+                                        transactionInputData.getInvoice()))
+                        .createFrame())));
     }
 
     /**
      * Create and send handshake to terminal.
      */
     private void handshakeMbca() {
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
-                        .getPortNumber(), BProtocolMessages.getHanshake())
-                        .createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getHanshake()).createFrame())));
     }
 
     /**
      * Create and send pay request to terminal.
      */
     private void recharge() {
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
-                        .getPortNumber(), VProtocolMessages.getEmvRecharge(
-                        transactionInputData.getAmount(), transactionInputData
-                                .getCurrency(), transactionInputData
-                                .getInvoice(),
-                        transactionInputData.getTranId(), transactionInputData
-                                .getRechargingType().getTag())).createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                                .getEmvRecharge(transactionInputData
+                                        .getAmount(), transactionInputData
+                                        .getCurrency(), transactionInputData
+                                        .getInvoice(), transactionInputData
+                                        .getTranId(), transactionInputData
+                                        .getRechargingType().getTag()))
+                        .createFrame())));
     }
 
     /**
      * Create and send app info request to terminal.
      */
     private void appInfoMbca() {
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MBCA
-                        .getPortNumber(), BProtocolMessages.getAppInfo())
-                        .createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getAppInfo()).createFrame())));
     }
 
     /**
      * Create and send handshake to terminal.
      */
     private void handshakeMvta() {
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
-                        .getPortNumber(), VProtocolMessages.getHanshake())
-                        .createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                                .getHanshake()).createFrame())));
     }
 
     /**
      * Create and send app info request to terminal.
      */
     private void appInfoMvta() {
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(TerminalPorts.MVTA
-                        .getPortNumber(), VProtocolMessages.getAppInfo())
-                        .createFrame())));
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                                .getAppInfo()).createFrame())));
     }
 
     /**
@@ -219,13 +223,13 @@ public class MessageThread extends Thread {
 
     }
 
-    /**
-     * @param service
-     *            Terminal service serving bluetooth.
-     */
-    public void setTerminalService(TerminalServiceBT service) {
-        this.terminalService = service;
-    }
+    // /**
+    // * @param service
+    // * Terminal service serving bluetooth.
+    // */
+    // public void setTerminalService(TerminalServiceBT service) {
+    // this.terminalService = service;
+    // }
 
     // @Override
     public void handleMessage(HandleMessage msg) {
@@ -257,34 +261,40 @@ public class MessageThread extends Thread {
             break;
         }
 
-        case CallMbcaHandshake:
+        case CallMbcaHandshake: {
             handshakeMbca();
             break;
-        case CallMbcaInfo:
+        }
+        case CallMbcaInfo: {
             appInfoMbca();
             break;
-        case CallMbcaPay:
+        }
+        case CallMbcaPay: {
             pay();
             break;
-        case CallMvtaHandshake:
+        }
+        case CallMvtaHandshake: {
             handshakeMvta();
             break;
-        case CallMvtaInfo:
+        }
+        case CallMvtaInfo: {
             appInfoMvta();
             break;
-        case CallMvtaRecharging:
+        }
+        case CallMvtaRecharging: {
             recharge();
             break;
+        }
 
         case TerminalWrite:
             write2Terminal(msg.getBuffer().buffer());
             break;
         case TerminalRead:
-            parseSlipPackets(msg);
+            receiveTerminalPackets(msg);
             break;
 
         case ServerConnected:
-            connectionRequest(msg);
+            serverConnected(msg);
             break;
 
         case ShowMessage:
@@ -357,13 +367,6 @@ public class MessageThread extends Thread {
      *            A string of text to send.
      */
     private void write2Terminal(byte[] message) {
-        // Check that we're actually connected before trying anything
-        // if (terminalService.getState() != TerminalState.STATE_CONNECTED) {
-        // this.addMessage(new HandleMessage(HandleOperations.ShowMessage,
-        // "Terminal isn't connected."));
-        // return;
-        // }
-
         // Check that there's actually something to send
         if (message.length > 0) {
             terminalService.write(message);
@@ -376,20 +379,15 @@ public class MessageThread extends Thread {
      * @param msg
      *            Contains status(arg1) about current connection to server.
      * */
-    private void connectionRequest(HandleMessage msg) {
-        // byte[] status = new byte[1];
-        // status[0] = (byte) msg.arg1;
-        // msg.getBuffer().buffer()
-        ServerFrame soFrame = new ServerFrame(
-                TerminalCommands.TERM_CMD_SERVER_CONNECTED, serverConnectionID,
-                msg.getBuffer().buffer());
+    private void serverConnected(HandleMessage msg) {
+        ServerFrame soFrame = new ServerFrame(TerminalCommands.ServerConnected,
+                serverConnectionID, msg.getBuffer().buffer());
         TerminalFrame toFrame = new TerminalFrame(
-                TerminalPorts.SERVER.getPortNumber(), soFrame.createFrame());
+                TerminalPortApplications.SERVER.getPortApplicationNumber(),
+                soFrame.createFrame());
 
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(toFrame.createFrame())));
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
-        // SLIPFrame.createFrame(toFrame.createFrame()));
     }
 
     /**
@@ -398,71 +396,46 @@ public class MessageThread extends Thread {
      * @param msg
      *            Messaget contains information read from terminal.
      */
-    private void parseSlipPackets(HandleMessage msg) {
-        // slipOutputpFraming.write((byte[]) msg.obj, 0, msg.arg1);
+    private void receiveTerminalPackets(HandleMessage msg) {
         try {
             slipOutputpFraming.write(msg.getBuffer().buffer());
 
             // Check
             if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {
 
-                TerminalFrame termFrame = new TerminalFrame(
-                        SLIPFrame.parseFrame(slipOutputpFraming.toByteArray()));
-                slipOutputpFraming.reset();
+                TerminalFrame termFrame = getTerminalFrame(slipOutputpFraming);
 
                 if (termFrame != null) {
-                    switch (termFrame.getPort()) {
-                    case UNDEFINED:
-                        Log.d(TAG, "undefined port");
-                        break;
-
-                    case SERVER:
+                    switch (termFrame.getPortApplication()) {
+                    case SERVER: {
                         // messages for server
                         handleServerMessage(termFrame);
                         break;
-
-                    case FLEET:
-                        Log.d(TAG, "fleet data");
-                        break;
-
-                    case MAINTENANCE:
-                        Log.d(TAG, "maintentace data");
-                        break;
+                    }
 
                     case MBCA: {
                         BProtocol bprotocol = new BProtocolFactory()
                                 .deserialize(termFrame.getData());
-
                         if (bprotocol.getProtocolType().equals("B2")) {
                             ParseB2(bprotocol);
                         }
-                    }
+
                         break;
+                    }
 
                     case MVTA: {
                         BProtocol bprotocol = new BProtocolFactory()
                                 .deserialize(termFrame.getData());
-
                         if (bprotocol.getProtocolType().equals("V2")) {
                             ParseB2(bprotocol);
                         }
+                        break;
+                    }
                     }
 
-                        break;
-
-                    default:
-                        // Nedelej nic, spatne data, format, nebo
-                        // crc
-                        Log.e(TAG,
-                                String.format("Invalid port {}",
-                                        termFrame.getPort()));
-                        break;
-
-                    }
+                } else {
+                    Log.e(TAG, "Corrupted data. It's not slip frame.");
                 }
-
-            } else {
-                Log.e(TAG, "Corrupted data. It's not slip frame.");
             }
 
         } catch (IOException e) {
@@ -470,8 +443,19 @@ public class MessageThread extends Thread {
         }
     }
 
+    /**
+     * @param stream
+     * @return
+     */
+    private TerminalFrame getTerminalFrame(ByteArrayOutputStream stream) {
+        TerminalFrame termFrame = new TerminalFrame(SLIPFrame.parseFrame(stream
+                .toByteArray()));
+        stream.reset();
+        return termFrame;
+    }
+
     private void ParseB2(BProtocol bprotocol) {
-        transactionOutputData = new TransactionOut();
+        // transactionOutputData = new TransactionOut();
         try {
             transactionOutputData.setResultCode(Integer.valueOf(bprotocol
                     .getTagMap().get(BProtocolTag.ResponseCode)));
@@ -497,9 +481,13 @@ public class MessageThread extends Thread {
         transactionOutputData.setCardType(bprotocol.getTagMap().get(
                 BProtocolTag.CardType));
 
-        this.stopThread();
+        // this.stopThread();
+        addMessage(HandleOperations.Exit);
     }
 
+    /**
+     * 
+     */
     private void stopThread() {
 
         // Zastav terminal
@@ -557,16 +545,16 @@ public class MessageThread extends Thread {
     // }
 
     private void handleServerMessage(TerminalFrame termFrame) {
-        // sends the message to the server
         final ServerFrame serverFrame = new ServerFrame(termFrame.getData());
 
         Log.d(TAG, "Server command: " + serverFrame.getCommand());
+
         switch (serverFrame.getCommand()) {
-        case TerminalCommands.TERM_CMD_ECHO:
+        case TerminalCommands.EchoReq:
             echoResponse(termFrame, serverFrame);
             break;
 
-        case TerminalCommands.TERM_CMD_CONNECT:
+        case TerminalCommands.ConnectReq:
             serverConnectionID = serverFrame.getId();
 
             int port = MonetUtils.getInt(serverFrame.getData()[4],
@@ -584,24 +572,22 @@ public class MessageThread extends Thread {
             tcpThread.start();
 
             TerminalFrame responseTerminal = new TerminalFrame(termFrame
-                    .getPort().getPortNumber(), new ServerFrame(
-                    (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
-                    serverFrame.getId(), new byte[1]).createFrame());
-
-            // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+                    .getPortApplication().getPortApplicationNumber(),
+                    new ServerFrame((byte) TerminalCommands.ConnectRes,
+                            serverFrame.getId(), new byte[1]).createFrame());
             this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
                     SLIPFrame.createFrame(responseTerminal.createFrame())));
 
             break;
 
-        case TerminalCommands.TERM_CMD_DISCONNECT:
+        case TerminalCommands.DisconnectReq:
             if (tcpThread != null) {
                 tcpThread.interrupt();
                 tcpThread = null;
             }
             break;
 
-        case TerminalCommands.TERM_CMD_SERVER_WRITE:
+        case TerminalCommands.ServerWrite:
             // Send data to server.
             tcpThread.sendMessage(serverFrame.getData());
         }
@@ -618,18 +604,18 @@ public class MessageThread extends Thread {
      */
     private void echoResponse(TerminalFrame termFrame,
             final ServerFrame serverFrame) {
-        TerminalFrame responseTerminal = new TerminalFrame(termFrame.getPort()
-                .getPortNumber(),
-                new ServerFrame(TerminalCommands.TERM_CMD_ECHO_RES, serverFrame
-                        .getId(), null).createFrame());
-
-        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        TerminalFrame responseTerminal = new TerminalFrame(termFrame
+                .getPortApplication().getPortApplicationNumber(),
+                new ServerFrame(TerminalCommands.EchoRes, serverFrame.getId(),
+                        null).createFrame());
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(responseTerminal.createFrame())));
     }
 
     public void setOutputMessage(String message) {
-        this.transactionOutputData.setMessage(message);
+        if (this.transactionOutputData != null) {
+            this.transactionOutputData.setMessage(message);
+        }
 
     }
 }

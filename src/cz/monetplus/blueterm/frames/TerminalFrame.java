@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import cz.monetplus.blueterm.terminals.TerminalPorts;
+import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.util.CRCFCS;
 import cz.monetplus.blueterm.util.MonetUtils;
 import android.util.Log;
@@ -25,7 +25,7 @@ public class TerminalFrame {
     /**
      * Port 2Bytes.
      */
-    private TerminalPorts port = TerminalPorts.UNDEFINED;
+    private TerminalPortApplications portApplication = TerminalPortApplications.UNDEFINED;
 
     /**
      * Protokol data.
@@ -53,12 +53,12 @@ public class TerminalFrame {
         this.setCrc(CRCFCS.pppfcs(CRCFCS.PPPINITFCS, createCountedPart()));
     }
 
-    public final TerminalPorts getPort() {
-        return port;
+    public final TerminalPortApplications getPortApplication() {
+        return portApplication;
     }
 
     public void setPort(int port) {
-        this.port = TerminalPorts.valueOf(port & 0xFFFF);
+        this.portApplication = TerminalPortApplications.valueOf(port & 0xFFFF);
     }
 
     public byte[] getData() {
@@ -81,8 +81,8 @@ public class TerminalFrame {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         try {
-            stream.write(MonetUtils.getHigh(this.getPort().getPortNumber()));
-            stream.write(MonetUtils.getLow(this.getPort().getPortNumber()));
+            stream.write(MonetUtils.getHigh(this.getPortApplication().getPortApplicationNumber()));
+            stream.write(MonetUtils.getLow(this.getPortApplication().getPortApplicationNumber()));
             stream.write(this.getData());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -96,8 +96,8 @@ public class TerminalFrame {
 
         try {
             // stream.write(ByteBuffer.allocate(2).putInt(this.getPort()).array());
-            stream.write(MonetUtils.getHigh(this.getPort().getPortNumber()));
-            stream.write(MonetUtils.getLow(this.getPort().getPortNumber()));
+            stream.write(MonetUtils.getHigh(this.getPortApplication().getPortApplicationNumber()));
+            stream.write(MonetUtils.getLow(this.getPortApplication().getPortApplicationNumber()));
             stream.write(this.getData());
             // stream.write(ByteBuffer.allocate(2).putInt(this.getCrc()).array());
             stream.write((byte) this.getCrc() & 0xFF);

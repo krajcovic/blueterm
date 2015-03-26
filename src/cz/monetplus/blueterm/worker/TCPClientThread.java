@@ -9,7 +9,7 @@ import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.server.TCPClient;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
-import cz.monetplus.blueterm.terminals.TerminalPorts;
+import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 
 /**
  * @author "Dusan Krajcovic"
@@ -74,9 +74,27 @@ public final class TCPClientThread extends Thread implements ObjectThreads {
             try {
                 mTcpClient.sendMessage(sendData);
             } catch (IOException e) {
-                Log.d(TAG, e.getMessage());
+                Log.e(TAG, e.getMessage());
+                failedConnection();
             }
+        } else {
+            failedConnection();
         }
+
+    }
+
+    /**
+     * Send terminal empty data. for invalid connection
+     */
+    private void failedConnection() {
+
+        TerminalFrame termFrame = new TerminalFrame(
+                TerminalPortApplications.SERVER.getPortApplicationNumber(),
+                new ServerFrame(TerminalCommands.ServerRead, connectionId,
+                        new byte[0]).createFrame());
+
+        mHandler.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(termFrame.createFrame())));
     }
 
     @Override
@@ -91,16 +109,15 @@ public final class TCPClientThread extends Thread implements ObjectThreads {
                     // here the messageReceived method is implemented
                     public void messageReceived(byte[] message) {
                         TerminalFrame termFrame = new TerminalFrame(
-                                TerminalPorts.SERVER.getPortNumber(),
-                                new ServerFrame(
-                                        TerminalCommands.TERM_CMD_SERVER_READ,
+                                TerminalPortApplications.SERVER
+                                        .getPortApplicationNumber(),
+                                new ServerFrame(TerminalCommands.ServerRead,
                                         connectionId, message).createFrame());
 
                         // send to terminal
-//                        mHandler.addMessage(
-//                                HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
-                        mHandler.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                                SLIPFrame.createFrame(termFrame.createFrame())));
+                        mHandler.addMessage(new HandleMessage(
+                                HandleOperations.TerminalWrite, SLIPFrame
+                                        .createFrame(termFrame.createFrame())));
                     }
                 });
 
@@ -110,13 +127,8 @@ public final class TCPClientThread extends Thread implements ObjectThreads {
     public void interrupt() {
 
         if (mTcpClient != null) {
+            failedConnection();
             mTcpClient.stopClient();
-            // try {
-            // wait(500);
-            // } catch (InterruptedException e) {
-            // // TODO Auto-generated catch block
-            // e.printStackTrace();
-            // }
             mTcpClient = null;
         }
 

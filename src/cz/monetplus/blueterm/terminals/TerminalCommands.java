@@ -2,21 +2,21 @@ package cz.monetplus.blueterm.terminals;
 
 public class TerminalCommands {
     // Terminal commands.
-    public static final byte TERM_CMD_ECHO = 0x00;
+    public static final byte EchoReq = 0x00;
     
-    public static final byte TERM_CMD_ECHO_RES = (byte) 0x80;
+    public static final byte EchoRes = (byte) 0x80;
     
-    public static final byte TERM_CMD_CONNECT = 0x01;
+    public static final byte ConnectReq = 0x01;
     
-    public static final byte TERM_CMD_CONNECT_RES = (byte) 0x81;
+    public static final byte ConnectRes = (byte) 0x81;
     
-    public static final byte TERM_CMD_DISCONNECT = 0x02;
+    public static final byte DisconnectReq = 0x02;
     
-    public static final byte TERM_CMD_SERVER_WRITE = 0x03;
+    public static final byte ServerWrite = 0x03;
     
-    public static final byte TERM_CMD_SERVER_READ = 0x04;
+    public static final byte ServerRead = 0x04;
     
-    public static final byte TERM_CMD_SERVER_CONNECTED = 0x05;
+    public static final byte ServerConnected = 0x05;
 
     
     

@@ -6,7 +6,7 @@ package cz.monetplus.blueterm.terminals;
  * @author "Dusan Krajcovic"
  * 
  */
-public enum TerminalPorts {
+public enum TerminalPortApplications {
     /**
      * 
      */
@@ -40,23 +40,23 @@ public enum TerminalPorts {
     /**
      * Numeric number of port number.
      */
-    private int portNumber;
+    private int portApplicationNumber;
 
-    TerminalPorts(int port) {
-        this.setPort(port);
+    TerminalPortApplications(int port) {
+        this.setPortApplicationNumber(port);
     }
 
-    public int getPortNumber() {
-        return portNumber;
+    public int getPortApplicationNumber() {
+        return portApplicationNumber;
     }
 
-    public void setPort(int port) {
-        this.portNumber = port;
+    public void setPortApplicationNumber(int port) {
+        this.portApplicationNumber = port;
     }
 
-    public static TerminalPorts valueOf(int i) {
-        for (TerminalPorts element : TerminalPorts.values()) {
-            if (element.getPortNumber() == i) {
+    public static TerminalPortApplications valueOf(int i) {
+        for (TerminalPortApplications element : TerminalPortApplications.values()) {
+            if (element.getPortApplicationNumber() == i) {
                 return element;
             }
         }
