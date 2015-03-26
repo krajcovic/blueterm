@@ -63,8 +63,10 @@ public class TerminalServiceBT {
     private ConnectThread mConnectThread;
 
     private ConnectedThread mConnectedThread;
+    
+    private BluetoothSocket mmSocket;
 
-    private int currentTerminalState;
+    //private int currentTerminalState;
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -85,7 +87,7 @@ public class TerminalServiceBT {
     public TerminalServiceBT(Context context, MessageThread messageThread,
             BluetoothAdapter adapter) {
         bluetoothAdapter = adapter;
-        currentTerminalState = TerminalState.STATE_NONE;
+//        currentTerminalState = TerminalState.STATE_NONE;
         this.messageThread = messageThread;
     }
 
@@ -111,43 +113,43 @@ public class TerminalServiceBT {
     /**
      * @return Return the current connection state.
      */
-    public/* synchronized */int getState() {
-        return currentTerminalState;
-    }
+//    public/* synchronized */int getState() {
+//        return currentTerminalState;
+//    }
 
     /**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
-    public synchronized void start() {
-        if (D) {
-            Log.d(TAG, "start");
-        }
-
-        // Cancel any thread attempting to make a connection
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
-        }
-
-        // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
-        }
-
-        //setState(TerminalState.STATE_NONE);
-
-        // Start the thread to listen on a BluetoothServerSocket
-        // if (mSecureAcceptThread == null) {
-        // mSecureAcceptThread = new AcceptThread(true);
-        // mSecureAcceptThread.start();
-        // }
-        // if (mInsecureAcceptThread == null) {
-        // mInsecureAcceptThread = new AcceptThread(false);
-        // mInsecureAcceptThread.start();
-        // }
-    }
+//    public synchronized void start() {
+//        if (D) {
+//            Log.d(TAG, "start");
+//        }
+//
+//        // Cancel any thread attempting to make a connection
+//        if (mConnectThread != null) {
+//            mConnectThread.cancel();
+//            mConnectThread = null;
+//        }
+//
+//        // Cancel any thread currently running a connection
+//        if (mConnectedThread != null) {
+//            mConnectedThread.cancel();
+//            mConnectedThread = null;
+//        }
+//
+//        //setState(TerminalState.STATE_NONE);
+//
+//        // Start the thread to listen on a BluetoothServerSocket
+//        // if (mSecureAcceptThread == null) {
+//        // mSecureAcceptThread = new AcceptThread(true);
+//        // mSecureAcceptThread.start();
+//        // }
+//        // if (mInsecureAcceptThread == null) {
+//        // mInsecureAcceptThread = new AcceptThread(false);
+//        // mInsecureAcceptThread.start();
+//        // }
+//    }
 
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
@@ -163,25 +165,25 @@ public class TerminalServiceBT {
         }
 
         // Cancel any thread attempting to make a connection
-        if (currentTerminalState == TerminalState.STATE_CONNECTING) {
-            if (mConnectThread != null) {
-                mConnectThread.cancel();
-                mConnectThread = null;
-            }
-        }
+//        if (currentTerminalState == TerminalState.STATE_CONNECTING) {
+//            if (mConnectThread != null) {
+//                mConnectThread.cancel();
+//                mConnectThread = null;
+//            }
+//        }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
-        }
+//        if (mConnectedThread != null) {
+//            mConnectedThread.cancel();
+//            mConnectedThread = null;
+//        }
 
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
         
         //setState(TerminalState.STATE_CONNECTING);
-        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnecting));
+        //messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnecting));
     }
 
     /**
@@ -192,26 +194,25 @@ public class TerminalServiceBT {
      * @param device
      *            The BluetoothDevice that has been connected.
      */
-    public synchronized void connected(BluetoothSocket socket,
-            BluetoothDevice device) {
+    public synchronized void connected() {
         if (D) {
             Log.d(TAG, "connected");
         }
 
         // Cancel the thread that completed the connection
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
-        }
+//        if (mConnectThread != null) {
+//            mConnectThread.cancel();
+//            mConnectThread = null;
+//        }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
-        }
+//        if (mConnectedThread != null) {
+//            mConnectedThread.cancel();
+//            mConnectedThread = null;
+//        }
 
         // Start the thread to manage the connection and perform transmissions
-        mConnectedThread = new ConnectedThread(socket);
+        mConnectedThread = new ConnectedThread(mmSocket);
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
@@ -222,39 +223,39 @@ public class TerminalServiceBT {
         // mHandler.sendMessage(msg);
 
 //        setState(TerminalState.STATE_CONNECTED);
-        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnected));
+//        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnected));
     }
 
-    public void join() {
-        if (D) {
-            Log.d(TAG, "join");
-        }
-
-        if (mConnectThread != null) {
-            try {
-                mConnectThread.join();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        if (mConnectedThread != null) {
-            try {
-                mConnectedThread.join();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void join() {
+//        if (D) {
+//            Log.d(TAG, "join");
+//        }
+//
+//        if (mConnectThread != null) {
+//            try {
+//                mConnectThread.join();
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//        }
+//
+//        if (mConnectedThread != null) {
+//            try {
+//                mConnectedThread.join();
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     /**
      * Stop all threads.
@@ -263,7 +264,16 @@ public class TerminalServiceBT {
         if (D) {
             Log.d(TAG, "stop");
         }
+        
+        try {
+            if(mmSocket != null){
+                mmSocket.close();
+            }
+        } catch (IOException e) {
+            Log.i(TAG, e.getMessage());
+        }
 
+        //messageThread.addMessage(new HandleMessage(HandleOperations.TerminalDisconnected));
         messageThread = null;
 
         if (mConnectThread != null) {
@@ -277,9 +287,7 @@ public class TerminalServiceBT {
         }
 
         // Kdyz zastavuju, tak uz nic nikam neposilej.
-        //setState(TerminalState.STATE_NONE);
-        messageThread.addMessage(new HandleMessage(HandleOperations.TerminalDisconnected));
-        
+        //setState(TerminalState.STATE_NONE);        
     }
 
     /**
@@ -289,18 +297,18 @@ public class TerminalServiceBT {
      *            The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public void write(byte[] out) {
+    public synchronized void write(byte[] out) {
         // Create temporary object
-        ConnectedThread r;
+//        ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (currentTerminalState != TerminalState.STATE_CONNECTED) {
-                return;
-            }
-            r = mConnectedThread;
-        }
+//        synchronized (this) {
+//            if (currentTerminalState != TerminalState.STATE_CONNECTED) {
+//                return;
+//            }
+//            r = mConnectedThread;
+//        }
         // Perform the write unsynchronized
-        r.write(out);
+         mConnectedThread.write(out);
     }
 
     /**
@@ -316,11 +324,12 @@ public class TerminalServiceBT {
             // bundle.putString("Toast", "Unable to connect device");
             // msg.setData(bundle);
             //messageThread.addMessage(HandleMessage.MESSAGE_TOAST);
+            messageThread.setOutputMessage("Terminal connection failed.");
             messageThread.addMessage(HandleOperations.Exit);
         }
 
         // Start the service over to restart none mode
-        TerminalServiceBT.this.start();
+        //TerminalServiceBT.this.start();
     }
 
     /**
@@ -332,11 +341,12 @@ public class TerminalServiceBT {
         if (messageThread != null) {
             // Send a failure message back to the Activity
 //            messageThread.addMessage(HandleMessage.MESSAGE_TOAST);
+            messageThread.setOutputMessage("Terminal connection lost.");
             messageThread.addMessage(HandleOperations.Exit);
         }
 
         // Start the service over to restart none mode
-        TerminalServiceBT.this.start();
+        //TerminalServiceBT.this.start();
     }
 
     public BluetoothAdapter getAdapter() {
@@ -349,27 +359,27 @@ public class TerminalServiceBT {
      * fails.
      */
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
+        //private final BluetoothSocket mmSocket;
+        //private final BluetoothDevice mmDevice;
 
         public ConnectThread(BluetoothDevice device, boolean secure) {
-            mmDevice = device;
-            BluetoothSocket tmp = null;
+//            mmDevice = device;
+//            BluetoothSocket tmp = null;
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
                 if (secure) {
-                    tmp = device
+                    mmSocket = device
                             .createRfcommSocketToServiceRecord(MY_UUID_SECURE);
                 } else {
-                    tmp = device
+                    mmSocket = device
                             .createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
                 Log.e(TAG, "create() failed", e);
             }
-            mmSocket = tmp;
+//            mmSocket = tmp;
         }
 
         public void run() {
@@ -402,7 +412,13 @@ public class TerminalServiceBT {
             }
 
             // Start the connected thread
-            connected(mmSocket, mmDevice);
+            //connected(mmSocket, mmDevice);
+            
+            if(mmSocket.isConnected()) {            
+                messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnected));
+            } else {
+                messageThread.addMessage(new HandleMessage(HandleOperations.TerminalConnected));
+            }
         }
 
         public void cancel() {
@@ -443,6 +459,9 @@ public class TerminalServiceBT {
 
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
+            
+            
+            messageThread.addMessage(HandleOperations.TerminalReady);
 
             // Keep listening to the InputStream while connected
             while (true) {
@@ -472,7 +491,11 @@ public class TerminalServiceBT {
          */
         public void write(byte[] buffer) {
             try {
-                mmOutStream.write(buffer);
+                if(mmSocket.isConnected())
+                {
+                    mmOutStream.write(buffer);
+                    mmOutStream.flush();
+                }
 
                 Log.d(">>>term", new String(buffer, "UTF-8"));
                 Log.d(">>>", MonetUtils.bytesToHex(buffer));

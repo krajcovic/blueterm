@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 //import android.R.bool;
 import android.content.Context;
 import android.os.Message;
@@ -79,6 +81,11 @@ public class MessageThread extends Thread {
     private boolean stopThread = false;
 
     /**
+     * BluetoothAdapter
+     */
+    private static BluetoothAdapter bluetoothAdapter = null;
+
+    /**
      * Member object for the chat services.
      */
     private TerminalServiceBT terminalService = null;
@@ -111,11 +118,6 @@ public class MessageThread extends Thread {
             if (queue.peek() != null) {
                 handleMessage(queue.poll());
             }
-        }
-
-        if (tcpThread != null) {
-            tcpThread.interrupt();
-            tcpThread = null;
         }
     }
 
@@ -228,7 +230,33 @@ public class MessageThread extends Thread {
     // @Override
     public void handleMessage(HandleMessage msg) {
 
+        Log.i(TAG, "Operation: " + msg.getOperation());
         switch (msg.getOperation()) {
+
+        case GetBluetoothAddress: {
+            getBluetoothAddress();
+            break;
+        }
+
+        case SetupTerminal: {
+            setupTerminal();
+            break;
+        }
+
+        case TerminalConnect: {
+            connectDevice(transactionInputData.getBlueHwAddress(), false);
+            break;
+        }
+        case TerminalConnected: {
+            connectedDevice();
+            break;
+        }
+
+        case TerminalReady: {
+            addMessage(transactionInputData.getCommand().getOperation());
+            break;
+        }
+
         case CallMbcaHandshake:
             handshakeMbca();
             break;
@@ -260,21 +288,66 @@ public class MessageThread extends Thread {
             break;
 
         case ShowMessage:
-            Toast.makeText(applicationContext,
-                    new String(msg.getBuffer().buffer()), Toast.LENGTH_SHORT)
+            String message = new String(msg.getBuffer().buffer());
+            Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
                     .show();
             break;
 
         case Exit:
             this.stopThread();
             break;
-        case Connected:
-            break;
+        // case Connected:
+        // break;
 
         default:
             break;
 
         }
+    }
+
+    /**
+     * Get the BluetoothDevice object.
+     * 
+     * @param address
+     *            HW address of bluetooth.
+     * @param secure
+     *            True for secure connection, false for insecure.
+     */
+    private void connectDevice(String address, boolean secure) {
+        // Get the BLuetoothDevice object
+        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+
+        // Attempt to connect to the device
+        terminalService.connect(device, secure);
+    }
+
+    private void connectedDevice() {
+        terminalService.connected();
+    }
+
+    private void setupTerminal() {
+        terminalService = new TerminalServiceBT(applicationContext, this,
+                bluetoothAdapter);
+
+        this.addMessage(HandleOperations.TerminalConnect);
+    }
+
+    private void getBluetoothAddress() {
+        // // Get local Bluetooth adapter
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (bluetoothAdapter != null)
+            if (bluetoothAdapter.isEnabled()) {
+                this.addMessage(HandleOperations.SetupTerminal);
+            } else {
+                this.setOutputMessage("Bluetooth is not enabled.");
+                this.addMessage(HandleOperations.Exit);
+            }
+        else {
+            this.setOutputMessage("Bluetooth is not supported on this hardware platform.");
+            this.addMessage(HandleOperations.Exit);
+        }
+
     }
 
     /**
@@ -285,15 +358,11 @@ public class MessageThread extends Thread {
      */
     private void write2Terminal(byte[] message) {
         // Check that we're actually connected before trying anything
-        if (terminalService.getState() != TerminalState.STATE_CONNECTED) {
-
-            // Toast.makeText(applicationContext, R.string.not_connected,
-            // Toast.LENGTH_SHORT).show();
-//            this.addMessage(HandleMessage.MESSAGE_TOAST, -1, -1,
-//                    R.string.not_connected);
-            this.addMessage(new HandleMessage(HandleOperations.ShowMessage, "Termina isn't connected."));
-            return;
-        }
+        // if (terminalService.getState() != TerminalState.STATE_CONNECTED) {
+        // this.addMessage(new HandleMessage(HandleOperations.ShowMessage,
+        // "Terminal isn't connected."));
+        // return;
+        // }
 
         // Check that there's actually something to send
         if (message.length > 0) {
@@ -432,7 +501,17 @@ public class MessageThread extends Thread {
     }
 
     private void stopThread() {
-        terminalService.stop();
+
+        // Zastav terminal
+        if (terminalService != null) {
+            terminalService.stop();
+        }
+
+        if (tcpThread != null) {
+            tcpThread.interrupt();
+            tcpThread = null;
+        }
+
         stopThread = true;
     }
 
@@ -509,7 +588,7 @@ public class MessageThread extends Thread {
                     (byte) TerminalCommands.TERM_CMD_CONNECT_RES,
                     serverFrame.getId(), new byte[1]).createFrame());
 
-//            this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+            // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
             this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
                     SLIPFrame.createFrame(responseTerminal.createFrame())));
 
@@ -544,8 +623,13 @@ public class MessageThread extends Thread {
                 new ServerFrame(TerminalCommands.TERM_CMD_ECHO_RES, serverFrame
                         .getId(), null).createFrame());
 
-//        this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
+        // this.addMessage(HandleMessage.MESSAGE_TERM_WRITE, -1, -1,
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(responseTerminal.createFrame())));
+    }
+
+    public void setOutputMessage(String message) {
+        this.transactionOutputData.setMessage(message);
+
     }
 }
