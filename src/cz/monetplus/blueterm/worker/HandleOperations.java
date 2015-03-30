@@ -18,7 +18,14 @@ public enum HandleOperations {
     // Connected,
     
     
-    CallConnect, CallMbcaHandshake, CallMbcaInfo, CallMbcaPay, CallMvtaHandshake, CallMvtaInfo, CallMvtaRecharging,
+    CallConnect, 
+    CallMbcaHandshake,
+    CallMbcaBalancing,
+    CallMbcaInfo,
+    CallMbcaPay,
+    CallMvtaHandshake, 
+    CallMvtaInfo,
+    CallMvtaRecharging,
     
     ServerConnected,
     
@@ -26,6 +33,6 @@ public enum HandleOperations {
     // public static final int MESSAGE_SERVER_WRITE = 13; Data uz jsou odeslana,
     // jen kdybych s nemi chtel udelat jeste neco.
     
-    Exit,     
+    Exit,      
     ;
 }

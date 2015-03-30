@@ -150,6 +150,17 @@ public class MessageThread extends Thread {
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getHanshake()).createFrame())));
     }
+    
+    /**
+     * Create and send handshake to terminal.
+     */
+    private void balancingMbca() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getBalancing(transactionInputData.getBalancing())).createFrame())));
+    }
 
     /**
      * Create and send pay request to terminal.
@@ -259,6 +270,10 @@ public class MessageThread extends Thread {
             handshakeMbca();
             break;
         }
+        case CallMbcaBalancing: {
+            balancingMbca();
+            break;
+        }        
         case CallMbcaInfo: {
             appInfoMbca();
             break;

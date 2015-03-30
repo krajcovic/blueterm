@@ -6,6 +6,8 @@ public enum TransactionCommand {
     ONLY_CONNECT(HandleOperations.CallConnect),
 
     MBCA_HANDSHAKE(HandleOperations.CallMbcaHandshake),
+    
+    MBCA_BALANCING(HandleOperations.CallMbcaBalancing),
 
     MBCA_PAY(HandleOperations.CallMbcaPay),
 
