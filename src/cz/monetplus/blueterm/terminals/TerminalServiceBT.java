@@ -435,8 +435,8 @@ public class TerminalServiceBT {
                     mmOutStream.flush();
                 }
 
-                Log.d(">>>term", new String(buffer, "UTF-8"));
-                Log.d(">>>", MonetUtils.bytesToHex(buffer));
+                //Log.d(">>>term", new String(buffer, "UTF-8"));
+                Log.d(">>>term", MonetUtils.bytesToHex(buffer));
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }

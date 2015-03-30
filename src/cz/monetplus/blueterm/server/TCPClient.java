@@ -107,7 +107,7 @@ public class TCPClient {
             InetAddress serverAddr = InetAddress.getByAddress(null,
                     this.serverIp);
 
-            Log.e("TCP Client", "C: Connecting...");
+            //Log.e("TCP Client", "C: Connecting...");
 
             // create a socket to make the connection with the server
             // Socket socket = new Socket(serverAddr, this.serverPort);
