@@ -21,7 +21,7 @@ public class MonetBTAPI {
     // The Handler that gets information back from the BluetoothChatService
     private static MessageThread messageThread = null;
 
-     /**
+    /**
      * @param context
      *            Application context.
      * @param in
@@ -52,4 +52,23 @@ public class MonetBTAPI {
             messageThread.addMessage(HandleOperations.Exit);
         }
     }
+
+    public static String getPin(String terminalName) {
+        return String.format("%06d", getDynamicPin(terminalName));
+    }
+
+    private static long getDynamicPin(String terminalName) {
+        long hash = 3735927486l;//0xDEADBABE & 0xFFFFFFFF;
+        byte[] array = terminalName.getBytes();
+        for (byte b : array) {
+            hash += b;
+            //long bad = ((hash * 2^10) & 0xFFFFFFFFl);
+            //long ok = ((hash << 10) & 0xFFFFFFFFl);           
+            hash = ((hash & 0xFFFFFFFFl) + ((hash << 10) & 0xFFFFFFFFl)) & 0xFFFFFFFFl;
+            hash ^= ((hash >> 6) & 0xFFFFFFFFl);
+        }
+        
+        return (hash%1000000) & 0xFFFFFF;
+    }
+
 }
