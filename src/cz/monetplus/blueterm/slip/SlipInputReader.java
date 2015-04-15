@@ -54,7 +54,8 @@ public final class SlipInputReader {
         } while (tempBuffer[0] != SLIPFrame.END);
 
         //Log.d(TAG, slip.toString());
-        Log.d(TAG, MonetUtils.bytesToHex(slip.toByteArray()));
+        Log.d("term<<<", "Read from terminal: " + slip.size());
+        Log.d("term<<<", MonetUtils.bytesToHex(slip.toByteArray()));
         return slip.toByteArray();
     }
 }

@@ -22,7 +22,7 @@ import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
-import cz.monetplus.blueterm.terminals.TerminalServiceBT;
+import cz.monetplus.blueterm.terminals.TerminalServiceBTClient;
 import cz.monetplus.blueterm.util.MonetUtils;
 import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 
@@ -82,7 +82,7 @@ public class MessageThread extends Thread {
     /**
      * Member object for the chat services.
      */
-    private TerminalServiceBT terminalService = null;
+    private TerminalServiceBTClient terminalService = null;
 
     /**
      * Terminal to muze posilat po castech.
@@ -345,7 +345,7 @@ public class MessageThread extends Thread {
     }
 
     private void setupTerminal() {
-        terminalService = new TerminalServiceBT(applicationContext, this,
+        terminalService = new TerminalServiceBTClient(applicationContext, this,
                 bluetoothAdapter);
 
         this.addMessage(HandleOperations.TerminalConnect);

@@ -85,8 +85,8 @@ public class TCPClient {
             out.write(message);
             out.flush();
             
-            // Log.d(TAG, new String(message, "UTF-8"));
-            Log.d(TAG, MonetUtils.bytesToHex(message));
+            Log.d(">>>serv", "Send to server: " + message.length);
+            Log.d(">>>serv", MonetUtils.bytesToHex(message));
 
 //            mHandler.addMessage(HandleMessages.MESSAGE_SERVER_WRITE, -1, -1,
 //                    message);
@@ -129,13 +129,13 @@ public class TCPClient {
                 // receive the message which the server sends back
                 // in = new BufferedReader(new InputStreamReader(
                 // socket.getInputStream()));
+                
                 in = socket.getInputStream();
 
 //                mHandler.addMessage(HandleMessage.MESSAGE_CONNECTED, 0, -1,
 //                        null);
                 mHandler.addMessage(new HandleMessage(HandleOperations.ServerConnected, (byte)0));
                 
-
                 // in this while the client listens for the messages sent by the
                 // server
                 while (isRunning) {
@@ -152,10 +152,14 @@ public class TCPClient {
                             // class
                             mMessageListener.messageReceived(serverMessage);
                         }
-                        serverMessage = null;
+                        //serverMessage = null;
                     } else {
                         // Log.d(TAG, "Sleeping tread");
-                        // Thread.sleep(100);
+                        try {
+                            Thread.sleep(100);
+                        } catch (Exception e) {
+                            
+                        }
                     }
 
                 }
