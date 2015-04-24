@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -52,7 +54,7 @@ public class MessageThread extends Thread {
     /**
      * Message queue for handling messages from threads.
      */
-    private Queue<HandleMessage> queue = new LinkedList<HandleMessage>();
+    private BlockingQueue<HandleMessage> queue = new LinkedBlockingQueue<HandleMessage>();
 
     /**
      * Application context.
@@ -111,9 +113,13 @@ public class MessageThread extends Thread {
     @Override
     public void run() {
         while (!stopThread) {
-            if (queue.peek() != null) {
-                handleMessage(queue.poll());
-            }
+            //if (queue.peek() != null) {
+                try {
+                    handleMessage(queue.take());
+                } catch (InterruptedException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            //}
         }
     }
 
