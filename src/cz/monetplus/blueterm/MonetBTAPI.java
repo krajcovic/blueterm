@@ -1,7 +1,7 @@
-package cz.monetplus.blueterm.worker;
+package cz.monetplus.blueterm;
 
-import cz.monetplus.blueterm.TransactionIn;
-import cz.monetplus.blueterm.TransactionOut;
+import cz.monetplus.blueterm.worker.HandleOperations;
+import cz.monetplus.blueterm.worker.MessageThread;
 import android.content.Context;
 import android.util.Log;
 

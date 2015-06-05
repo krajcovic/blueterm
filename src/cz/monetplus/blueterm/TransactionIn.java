@@ -2,25 +2,49 @@ package cz.monetplus.blueterm;
 
 import cz.monetplus.blueterm.vprotocol.RechargingType;
 
+/**
+ * @author krajcovic
+ *
+ */
 public class TransactionIn {
+    /**
+     * Hardwarova adresa BT zarizeni
+     */
     private String blueHwAddress;
 
-    // private String hostIP;
-
-    // private int hostPort;
-
+    /**
+     * Volana operace
+     */
     private TransactionCommand command;
 
+    /**
+     * Zasilana castka
+     */
     private Long amount;
 
+    /**
+     * Variabilni symbol
+     */
     private String invoice;
 
+    /**
+     * Mena
+     */
     private Integer currency;
 
+    /**
+     * ID transakce
+     */
     private Long tranId;
 
+    /**
+     * Typ dobijeni
+     */
     private RechargingType rechargintType;
 
+    /**
+     * Hodnoty uzaverky, popis v B protokolu
+     */
     private Balancing balancing;
 
     public TransactionIn() {

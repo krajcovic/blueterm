@@ -478,7 +478,7 @@ public class MessageThread extends Thread {
             transactionOutputData.setResultCode(Integer.valueOf(bprotocol
                     .getTagMap().get(BProtocolTag.ResponseCode)));
         } catch (Exception e) {
-            transactionOutputData.setResultCode(-1);
+            //transactionOutputData.setResultCode(-1);
         }
         transactionOutputData.setMessage(bprotocol.getTagMap().get(
                 BProtocolTag.ServerMessage));
