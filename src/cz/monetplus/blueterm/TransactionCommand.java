@@ -18,6 +18,18 @@ public enum TransactionCommand {
     MVTA_INFO(HandleOperations.CallMvtaInfo),
     
     MVTA_RECHARGE(HandleOperations.CallMvtaRecharging),
+    
+    SMART_SHOP_ACTIVATE(HandleOperations.CallSmartShopActivate),
+    
+    SMART_SHOP_DEACTIVATE(HandleOperations.CallSmartShopDeactivate),
+    
+    SMART_SHOP_GET_APP_INFO(HandleOperations.CallSmartShopGetAppInfo),
+    
+    SMART_SHOP_GET_LAST_TRAN(HandleOperations.CallSmartShopGetLastTran),
+    
+    SMART_SHOP_PARAMETRS_CALL(HandleOperations.CallSmartShopParametersCall),
+    
+    SMART_SHOP_HANDSHAKE(HandleOperations.CallSmartShopHandshake),
     ;
     
     

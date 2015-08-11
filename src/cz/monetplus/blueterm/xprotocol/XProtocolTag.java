@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm.bprotocol;
+package cz.monetplus.blueterm.xprotocol;
 
 /**
  * @author "Dusan Krajcovic"
@@ -12,7 +12,7 @@ package cz.monetplus.blueterm.bprotocol;
  * @author "Dusan Krajcovic"
  * 
  */
-public enum BProtocolTag {
+public enum XProtocolTag {
     /**
      * 
      */
@@ -119,7 +119,7 @@ public enum BProtocolTag {
      * @param tag
      *            Character tag in B protocol.
      */
-    private BProtocolTag(Character tag) {
+    private XProtocolTag(Character tag) {
         this.tag = tag;
     }
 
@@ -127,14 +127,14 @@ public enum BProtocolTag {
         return tag;
     }
 
-    public static BProtocolTag tagOf(Character tag) {
-        for (BProtocolTag e : BProtocolTag.class.getEnumConstants()) {
+    public static XProtocolTag tagOf(Character tag) {
+        for (XProtocolTag e : XProtocolTag.class.getEnumConstants()) {
             if (e.getTag().equals(tag)) {
                 return e;
             }
         }
         throw new IllegalArgumentException("Unknown "
-                + BProtocolTag.class.getName() + " enum tag:" + tag);
+                + XProtocolTag.class.getName() + " enum tag:" + tag);
     }
 
 }

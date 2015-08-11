@@ -1,13 +1,15 @@
-package cz.monetplus.blueterm.bprotocol;
+package cz.monetplus.blueterm.xprotocol;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author "Dusan Krajcovic"
  * 
  */
-public class BProtocol implements Serializable {
+public class XProtocol implements Serializable {
 
     /**
      * Serial version UID.
@@ -17,7 +19,12 @@ public class BProtocol implements Serializable {
     /**
      * Protocol type.
      */
-    private String protocolType;
+    private ProtocolType protocolType;
+
+    /**
+     * 
+     */
+    private MessageNumber messageNumber;
 
     /**
      * Protocol version.
@@ -37,7 +44,7 @@ public class BProtocol implements Serializable {
     /**
      * Flags.
      */
-    private String flag;
+    private Integer flag;
 
     /**
      * Optional data len in hexa.
@@ -52,12 +59,22 @@ public class BProtocol implements Serializable {
     /**
      * Tag map.
      */
-    private HashMap<BProtocolTag, String> tagMap = new HashMap<BProtocolTag, String>();
+    private HashMap<XProtocolTag, String> tagMap = new HashMap<XProtocolTag, String>();
+
+    /**
+     * Tag map.
+     */
+    private HashMap<XProtocolCustomerTag, String> customerTagMap = new HashMap<XProtocolCustomerTag, String>();
+    
+    /**
+     * Rows for printing.
+     */
+    private List<String> ticketList = new ArrayList<String>();
 
     /**
      * 
      */
-    BProtocol() {
+    XProtocol() {
         super();
     }
 
@@ -75,10 +92,12 @@ public class BProtocol implements Serializable {
      * @param standardCRC16
      *            Control sum.
      */
-    public BProtocol(String protocolType, String protocolVersion, String posId,
-            String transactionDateTime, String flag, String standardCRC16) {
+    public XProtocol(ProtocolType protocolType, MessageNumber messageNumber,
+            String protocolVersion, String posId, String transactionDateTime,
+            Integer flag, String standardCRC16) {
         super();
         this.protocolType = protocolType;
+        this.setMessageNumber(messageNumber);
         this.protocolVersion = protocolVersion;
         this.posId = posId;
         this.transactionDateTime = transactionDateTime;
@@ -86,11 +105,11 @@ public class BProtocol implements Serializable {
         this.standardCRC16 = standardCRC16;
     }
 
-    public String getProtocolType() {
+    public ProtocolType getProtocolType() {
         return protocolType;
     }
 
-    public void setProtocolType(String protocolType) {
+    public void setProtocolType(ProtocolType protocolType) {
         this.protocolType = protocolType;
     }
 
@@ -118,11 +137,11 @@ public class BProtocol implements Serializable {
         this.transactionDateTime = transactionDateTime;
     }
 
-    public String getFlag() {
+    public Integer getFlag() {
         return flag;
     }
 
-    public void setFlag(String flag) {
+    public void setFlag(Integer flag) {
         this.flag = flag;
     }
 
@@ -142,18 +161,44 @@ public class BProtocol implements Serializable {
         this.standardCRC16 = standardCRC16;
     }
 
-    public HashMap<BProtocolTag, String> getTagMap() {
+    public HashMap<XProtocolTag, String> getTagMap() {
         return tagMap;
     }
 
-    public void setTagMap(HashMap<BProtocolTag, String> tagMap) {
-        this.tagMap = tagMap;
-    }
+//    public void setTagMap(HashMap<XProtocolTag, String> tagMap) {
+//        this.tagMap = tagMap;
+//    }
 
     @Override
     public String toString() {
         return this.getProtocolType() + " " + this.getProtocolVersion() + " "
-                + this.getTransactionDateTime() + "\n" + tagMap.values();
+                + this.getTransactionDateTime() + "\n" + tagMap.values()
+                + "\n9:" + customerTagMap.values();
     }
+
+    public MessageNumber getMessageNumber() {
+        return messageNumber;
+    }
+
+    public void setMessageNumber(MessageNumber messageNumber) {
+        this.messageNumber = messageNumber;
+    }
+
+    public HashMap<XProtocolCustomerTag, String> getCustomerTagMap() {
+        return customerTagMap;
+    }
+
+    public List<String> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<String> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+//    public void setCustomerTagMap(
+//            HashMap<XProtocolCustomerTag, String> customerTagMap) {
+//        this.customerTagMap = customerTagMap;
+//    }
 
 }

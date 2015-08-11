@@ -3,9 +3,11 @@ package cz.monetplus.blueterm.vprotocol;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import cz.monetplus.blueterm.bprotocol.BProtocol;
-import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
-import cz.monetplus.blueterm.bprotocol.BProtocolTag;
+import cz.monetplus.blueterm.xprotocol.MessageNumber;
+import cz.monetplus.blueterm.xprotocol.ProtocolType;
+import cz.monetplus.blueterm.xprotocol.XProtocol;
+import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
+import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
 public final class VProtocolMessages {
 
@@ -18,47 +20,44 @@ public final class VProtocolMessages {
 
     public static byte[] getAppInfo() {
 
-        BProtocol bprotocol = new BProtocol("V1", "01", "        ",
-                getCurrentDateTimeForHeader(), "    ", "A5A5");
+        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
 
-        bprotocol.getTagMap().put(BProtocolTag.TransactionType, "80");
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "80");
 
-        BProtocolFactory factory = new BProtocolFactory();
-
-        return factory.serialize(bprotocol);
+        return XProtocolFactory.serialize(bprotocol);
     }
 
     public static byte[] getEmvRecharge(long amount, int currencyCode,
             String invoiceNumber, long ticketId, char rechargingType) {
 
-        BProtocol bprotocol = new BProtocol("V1", "01", "        ",
-                getCurrentDateTimeForHeader(), "0000", "A5A5");
+        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
 
-        bprotocol.getTagMap().put(BProtocolTag.TransactionType, "17");
-        bprotocol.getTagMap().put(BProtocolTag.Amount1, String.valueOf(amount));
-        bprotocol.getTagMap().put(BProtocolTag.CurrencyCode2,
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "17");
+        bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(BProtocolTag.InvoiceNumber, invoiceNumber);
-        bprotocol.getTagMap().put(BProtocolTag.SaleTicketId, String.valueOf(ticketId));
-        bprotocol.getTagMap().put(BProtocolTag.RechargingType, String.valueOf(rechargingType));
+        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        bprotocol.getTagMap().put(XProtocolTag.SaleTicketId,
+                String.valueOf(ticketId));
+        bprotocol.getTagMap().put(XProtocolTag.RechargingType,
+                String.valueOf(rechargingType));
 
-        BProtocolFactory factory = new BProtocolFactory();
-
-        return factory.serialize(bprotocol);
+        return XProtocolFactory.serialize(bprotocol);
     }
-    
-   
 
     public static byte[] getHanshake() {
 
-        BProtocol bprotocol = new BProtocol("V1", "01", "        ",
-                getCurrentDateTimeForHeader(), "0000", "A5A5");
+        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
 
-        bprotocol.getTagMap().put(BProtocolTag.TransactionType, "95");
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "95");
 
-        BProtocolFactory factory = new BProtocolFactory();
-
-        return factory.serialize(bprotocol);
+        return XProtocolFactory.serialize(bprotocol);
     }
 
     private static String getCurrentDateTimeForHeader() {

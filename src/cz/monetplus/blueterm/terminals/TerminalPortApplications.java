@@ -35,7 +35,12 @@ public enum TerminalPortApplications {
     /**
      * 
      */
-    MAINTENANCE(33336);
+    MAINTENANCE(33336),
+    
+    /**
+     * 
+     */
+    SMARTSHOP(33338);
 
     /**
      * Numeric number of port number.

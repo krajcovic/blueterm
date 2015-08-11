@@ -15,18 +15,23 @@ import android.util.Log;
 import android.widget.Toast;
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
-import cz.monetplus.blueterm.bprotocol.BProtocol;
-import cz.monetplus.blueterm.bprotocol.BProtocolFactory;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
-import cz.monetplus.blueterm.bprotocol.BProtocolTag;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.server.ServerFrame;
+import cz.monetplus.blueterm.sprotocol.SProtocolMessages;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.terminals.TerminalServiceBTClient;
 import cz.monetplus.blueterm.util.MonetUtils;
 import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
+import cz.monetplus.blueterm.xprotocol.MessageNumber;
+import cz.monetplus.blueterm.xprotocol.ProtocolType;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
+import cz.monetplus.blueterm.xprotocol.XProtocol;
+import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
+import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
+import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
 /**
  * Thread for handling all messages.
@@ -113,13 +118,13 @@ public class MessageThread extends Thread {
     @Override
     public void run() {
         while (!stopThread) {
-            //if (queue.peek() != null) {
-                try {
-                    handleMessage(queue.take());
-                } catch (InterruptedException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            //}
+            // if (queue.peek() != null) {
+            try {
+                handleMessage(queue.take());
+            } catch (InterruptedException e) {
+                Log.e(TAG, e.getMessage());
+            }
+            // }
         }
     }
 
@@ -156,7 +161,7 @@ public class MessageThread extends Thread {
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getHanshake()).createFrame())));
     }
-    
+
     /**
      * Create and send handshake to terminal.
      */
@@ -165,7 +170,8 @@ public class MessageThread extends Thread {
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.MBCA
                                 .getPortApplicationNumber(), BProtocolMessages
-                                .getBalancing(transactionInputData.getBalancing())).createFrame())));
+                                .getBalancing(transactionInputData
+                                        .getBalancing())).createFrame())));
     }
 
     /**
@@ -183,6 +189,70 @@ public class MessageThread extends Thread {
                                         .getTranId(), transactionInputData
                                         .getRechargingType().getTag()))
                         .createFrame())));
+    }
+
+    private void smartShopActivate() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getActivate()).createFrame())));
+    }
+
+    private void smartShopDeactivate() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getDeactivate()).createFrame())));
+    }
+
+    private void smartShopGetAppInfo() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getAppInfo()).createFrame())));
+    }
+
+    private void smartShopGetLastTrans() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getLastTran()).createFrame())));
+    }
+
+    private void smartShopParametersCall() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getParametersCall()).createFrame())));
+    }
+
+    private void smartShopHandshake() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getHanshake()).createFrame())));
+    }
+
+    private void smartShopTicketRequest(TicketCommand command) {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getTicketRequest(command)).createFrame())));
+    }
+
+    private void smartShopAck() {
+        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(), SProtocolMessages
+                                .getAck()).createFrame())));
     }
 
     /**
@@ -279,7 +349,7 @@ public class MessageThread extends Thread {
         case CallMbcaBalancing: {
             balancingMbca();
             break;
-        }        
+        }
         case CallMbcaInfo: {
             appInfoMbca();
             break;
@@ -298,6 +368,36 @@ public class MessageThread extends Thread {
         }
         case CallMvtaRecharging: {
             recharge();
+            break;
+        }
+
+        case CallSmartShopActivate: {
+            smartShopActivate();
+            break;
+        }
+
+        case CallSmartShopDeactivate: {
+            smartShopDeactivate();
+            break;
+        }
+
+        case CallSmartShopGetAppInfo: {
+            smartShopGetAppInfo();
+            break;
+        }
+
+        case CallSmartShopGetLastTran: {
+            smartShopGetLastTrans();
+            break;
+        }
+
+        case CallSmartShopParametersCall: {
+            smartShopParametersCall();
+            break;
+        }
+
+        case CallSmartShopHandshake: {
+            smartShopHandshake();
             break;
         }
 
@@ -428,26 +528,73 @@ public class MessageThread extends Thread {
                         break;
                     }
 
-                    case MBCA: {
-                        BProtocol bprotocol = new BProtocolFactory()
+                    case MBCA:
+                    case MVTA:
+                    case SMARTSHOP: {
+                        XProtocol xprotocol = XProtocolFactory
                                 .deserialize(termFrame.getData());
-                        if (bprotocol.getProtocolType().equals("B2")) {
-                            ParseB2(bprotocol);
+
+                        switch (xprotocol.getMessageNumber()) {
+                        case TransactionResponse:
+                            ParseTransactionResponse(xprotocol);
+
+                            if (isTicketFlagOn(xprotocol)) {
+                                smartShopTicketRequest(TicketCommand.Merchant);
+                            } else {
+                                addMessage(HandleOperations.Exit);
+                            }
+                            break;
+                        case TicketResponse:
+                            ParseTicketResponse(xprotocol);
+                            smartShopAck();
+
+                            if (xprotocol
+                                    .getCustomerTagMap()
+                                    .containsKey(
+                                            XProtocolCustomerTag.TerminalTicketInformation)) {
+                                TicketCommand ticketCommand = TicketCommand
+                                        .tagOf((String
+                                                .valueOf(xprotocol
+                                                        .getCustomerTagMap()
+                                                        .get(XProtocolCustomerTag.TerminalTicketInformation))
+                                                .charAt(0)));
+                            }
+                            
+                            
+
+                            break;
+                        default:
+                            Log.w(TAG,
+                                    "Unexpected messageNumber: "
+                                            + xprotocol.getMessageNumber());
+                            break;
+
                         }
 
                         break;
                     }
 
-                    case MVTA: {
-                        BProtocol bprotocol = new BProtocolFactory()
-                                .deserialize(termFrame.getData());
-                        if (bprotocol.getProtocolType().equals("V2")) {
-                            ParseB2(bprotocol);
-                        }
-                        break;
-                    }
+                    // case MVTA: {
+                    // XProtocol bprotocol = XProtocolFactory
+                    // .deserialize(termFrame.getData());
+                    // if (bprotocol.getProtocolType().equals("V2")) {
+                    // ParseX2(bprotocol);
+                    // }
+                    // break;
+                    // }
+                    //
+                    // case SMARTSHOP: {
+                    // XProtocol bprotocol = XProtocolFactory
+                    // .deserialize(termFrame.getData());
+                    // if (bprotocol.getProtocolType().equals("S2")) {
+                    // ParseX2(bprotocol);
+                    // }
+                    // break;
+                    // }
+
                     default:
-                        Log.w(TAG, "Unsupported application port number: " + termFrame.getPortApplication());
+                        Log.w(TAG, "Unsupported application port number: "
+                                + termFrame.getPortApplication());
                         break;
                     }
 
@@ -461,6 +608,10 @@ public class MessageThread extends Thread {
         }
     }
 
+    private boolean isTicketFlagOn(XProtocol xprotocol) {
+        return (xprotocol.getFlag() & 0x1) == 1;
+    }
+
     /**
      * @param stream
      * @return
@@ -472,35 +623,38 @@ public class MessageThread extends Thread {
         return termFrame;
     }
 
-    private void ParseB2(BProtocol bprotocol) {
+    private void ParseTransactionResponse(XProtocol xprotocol) {
         // transactionOutputData = new TransactionOut();
         try {
-            transactionOutputData.setResultCode(Integer.valueOf(bprotocol
-                    .getTagMap().get(BProtocolTag.ResponseCode)));
+            transactionOutputData.setResultCode(Integer.valueOf(xprotocol
+                    .getTagMap().get(XProtocolTag.ResponseCode)));
         } catch (Exception e) {
-            //transactionOutputData.setResultCode(-1);
+            // transactionOutputData.setResultCode(-1);
+            Log.w(TAG, "Missing ResponseCode TAG");
         }
-        transactionOutputData.setMessage(bprotocol.getTagMap().get(
-                BProtocolTag.ServerMessage));
+        transactionOutputData.setMessage(xprotocol.getTagMap().get(
+                XProtocolTag.ServerMessage));
         try {
-            transactionOutputData.setAuthCode(Integer.valueOf(bprotocol
-                    .getTagMap().get(BProtocolTag.AuthCode)));
+            transactionOutputData.setAuthCode(Integer.valueOf(xprotocol
+                    .getTagMap().get(XProtocolTag.AuthCode)));
         } catch (Exception e) {
             transactionOutputData.setAuthCode(0);
         }
         try {
-            transactionOutputData.setSeqId(Integer.valueOf(bprotocol
-                    .getTagMap().get(BProtocolTag.SequenceId)));
+            transactionOutputData.setSeqId(Integer.valueOf(xprotocol
+                    .getTagMap().get(XProtocolTag.SequenceId)));
         } catch (Exception e) {
             transactionOutputData.setSeqId(0);
         }
-        transactionOutputData.setCardNumber(bprotocol.getTagMap().get(
-                BProtocolTag.PAN));
-        transactionOutputData.setCardType(bprotocol.getTagMap().get(
-                BProtocolTag.CardType));
+        transactionOutputData.setCardNumber(xprotocol.getTagMap().get(
+                XProtocolTag.PAN));
+        transactionOutputData.setCardType(xprotocol.getTagMap().get(
+                XProtocolTag.CardType));
+    }
 
-        // this.stopThread();
-        addMessage(HandleOperations.Exit);
+    private void ParseTicketResponse(XProtocol xprotocol) {
+        // TODO: dodelat
+
     }
 
     /**
