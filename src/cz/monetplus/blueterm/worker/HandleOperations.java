@@ -104,6 +104,21 @@ public enum HandleOperations {
     /**
      * 
      */
+    CallSmartShopPay,
+    
+    /**
+     * 
+     */
+    CallSmartShopReturn, 
+    
+    /**
+     * 
+     */
+    CallSmartShopCardState,
+    
+    /**
+     * 
+     */
     CallSmartShopGetAppInfo,
     
     /**
@@ -129,6 +144,6 @@ public enum HandleOperations {
     /**
      * 
      */
-    Exit,   
+    Exit,    
     ;
 }

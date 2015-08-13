@@ -29,13 +29,53 @@ public final class SProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "80");
 
-        // XProtocolFactory factory = new XProtocolFactory();
+        return XProtocolFactory.serialize(bprotocol);
+    }
+    
+    public static byte[] getSale(long amount, int currencyCode,
+            String invoiceNumber) {
+
+        XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "00");
+        bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
+                String.valueOf(currencyCode));
+        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
 
         return XProtocolFactory.serialize(bprotocol);
     }
 
+    public static byte[] getReturn(long amount, int currencyCode,
+            String invoiceNumber) {
+
+        XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "04");
+        bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
+                String.valueOf(currencyCode));
+        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+
+        return XProtocolFactory.serialize(bprotocol);
+    }
+    
+    public static byte[] getCardState() {
+
+        XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "07");
+        return XProtocolFactory.serialize(bprotocol);
+    }
+    
+    
+
     public static byte[] getActivate() {
-        // TODO: not finished
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");

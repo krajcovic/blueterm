@@ -18,6 +18,9 @@ import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
+import cz.monetplus.blueterm.requests.MbcaRequests;
+import cz.monetplus.blueterm.requests.MvtaRequests;
+import cz.monetplus.blueterm.requests.SmartShopRequests;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.sprotocol.SProtocolMessages;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
@@ -138,157 +141,6 @@ public class MessageThread extends Thread {
     }
 
     /**
-     * Create and send pay request to terminal.
-     */
-    private void pay() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MBCA
-                                .getPortApplicationNumber(), BProtocolMessages
-                                .getSale(transactionInputData.getAmount(),
-                                        transactionInputData.getCurrency(),
-                                        transactionInputData.getInvoice()))
-                        .createFrame())));
-    }
-
-    /**
-     * Create and send handshake to terminal.
-     */
-    private void handshakeMbca() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MBCA
-                                .getPortApplicationNumber(), BProtocolMessages
-                                .getHanshake()).createFrame())));
-    }
-
-    /**
-     * Create and send handshake to terminal.
-     */
-    private void balancingMbca() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MBCA
-                                .getPortApplicationNumber(), BProtocolMessages
-                                .getBalancing(transactionInputData
-                                        .getBalancing())).createFrame())));
-    }
-
-    /**
-     * Create and send pay request to terminal.
-     */
-    private void recharge() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MVTA
-                                .getPortApplicationNumber(), VProtocolMessages
-                                .getEmvRecharge(transactionInputData
-                                        .getAmount(), transactionInputData
-                                        .getCurrency(), transactionInputData
-                                        .getInvoice(), transactionInputData
-                                        .getTranId(), transactionInputData
-                                        .getRechargingType().getTag()))
-                        .createFrame())));
-    }
-
-    private void smartShopActivate() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getActivate()).createFrame())));
-    }
-
-    private void smartShopDeactivate() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getDeactivate()).createFrame())));
-    }
-
-    private void smartShopGetAppInfo() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getAppInfo()).createFrame())));
-    }
-
-    private void smartShopGetLastTrans() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getLastTran()).createFrame())));
-    }
-
-    private void smartShopParametersCall() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getParametersCall()).createFrame())));
-    }
-
-    private void smartShopHandshake() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getHanshake()).createFrame())));
-    }
-
-    private void smartShopTicketRequest(TicketCommand command) {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getTicketRequest(command)).createFrame())));
-    }
-
-    private void smartShopAck() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getAck()).createFrame())));
-    }
-
-    /**
-     * Create and send app info request to terminal.
-     */
-    private void appInfoMbca() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MBCA
-                                .getPortApplicationNumber(), BProtocolMessages
-                                .getAppInfo()).createFrame())));
-    }
-
-    /**
-     * Create and send handshake to terminal.
-     */
-    private void handshakeMvta() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MVTA
-                                .getPortApplicationNumber(), VProtocolMessages
-                                .getHanshake()).createFrame())));
-    }
-
-    /**
-     * Create and send app info request to terminal.
-     */
-    private void appInfoMvta() {
-        this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
-                SLIPFrame.createFrame(new TerminalFrame(
-                        TerminalPortApplications.MVTA
-                                .getPortApplicationNumber(), VProtocolMessages
-                                .getAppInfo()).createFrame())));
-    }
-
-    /**
      * @param msg
      *            Message for addding to queue.
      */
@@ -304,15 +156,6 @@ public class MessageThread extends Thread {
 
     }
 
-    // /**
-    // * @param service
-    // * Terminal service serving bluetooth.
-    // */
-    // public void setTerminalService(TerminalServiceBT service) {
-    // this.terminalService = service;
-    // }
-
-    // @Override
     public void handleMessage(HandleMessage msg) {
 
         Log.i(TAG, "Operation: " + msg.getOperation());
@@ -343,70 +186,88 @@ public class MessageThread extends Thread {
         }
 
         case CallMbcaHandshake: {
-            handshakeMbca();
+            addMessage(MbcaRequests.handshakeMbca());
             break;
         }
         case CallMbcaBalancing: {
-            balancingMbca();
+            addMessage(MbcaRequests.balancingMbca(transactionInputData));
             break;
         }
         case CallMbcaInfo: {
-            appInfoMbca();
+            addMessage(MbcaRequests.appInfoMbca());
             break;
         }
         case CallMbcaPay: {
-            pay();
+            addMessage(MbcaRequests.pay(transactionInputData));
             break;
         }
         case CallMvtaHandshake: {
-            handshakeMvta();
+            addMessage(MvtaRequests.handshakeMvta());
             break;
         }
         case CallMvtaInfo: {
-            appInfoMvta();
+            addMessage(MvtaRequests.appInfoMvta());
             break;
         }
         case CallMvtaRecharging: {
-            recharge();
+            addMessage(MvtaRequests.recharge(transactionInputData));
             break;
         }
 
         case CallSmartShopActivate: {
-            smartShopActivate();
+            addMessage(SmartShopRequests.activate());
             break;
         }
 
         case CallSmartShopDeactivate: {
-            smartShopDeactivate();
+            addMessage(SmartShopRequests.deactivate());
+            break;
+        }
+
+        case CallSmartShopPay: {
+            addMessage(SmartShopRequests.pay(transactionInputData));
+            break;
+        }
+
+        case CallSmartShopReturn: {
+            addMessage(SmartShopRequests.getReturn(transactionInputData));
+            break;
+        }
+
+        case CallSmartShopCardState: {
+            addMessage(SmartShopRequests.getCardState());
             break;
         }
 
         case CallSmartShopGetAppInfo: {
-            smartShopGetAppInfo();
+            addMessage(SmartShopRequests.getAppInfo());
             break;
         }
 
         case CallSmartShopGetLastTran: {
-            smartShopGetLastTrans();
+            this.addMessage(SmartShopRequests.getLastTrans());
             break;
         }
 
         case CallSmartShopParametersCall: {
-            smartShopParametersCall();
+            this.addMessage(SmartShopRequests.parametersCall());
             break;
         }
 
         case CallSmartShopHandshake: {
-            smartShopHandshake();
+            this.addMessage(SmartShopRequests.handshake());
             break;
         }
 
-        case TerminalWrite:
+        case TerminalWrite: {
             write2Terminal(msg.getBuffer().buffer());
             break;
-        case TerminalRead:
+        }
+
+        case TerminalRead: {
             receiveTerminalPackets(msg);
             break;
+        }
 
         case ServerConnected:
             serverConnected(msg);
@@ -539,14 +400,15 @@ public class MessageThread extends Thread {
                             ParseTransactionResponse(xprotocol);
 
                             if (isTicketFlagOn(xprotocol)) {
-                                smartShopTicketRequest(TicketCommand.Merchant);
+                                addMessage(SmartShopRequests
+                                        .ticketRequest(TicketCommand.Merchant));
                             } else {
                                 addMessage(HandleOperations.Exit);
                             }
                             break;
                         case TicketResponse:
                             ParseTicketResponse(xprotocol);
-                            smartShopAck();
+                            addMessage(SmartShopRequests.ack());
 
                             if (xprotocol
                                     .getCustomerTagMap()
@@ -559,8 +421,6 @@ public class MessageThread extends Thread {
                                                         .get(XProtocolCustomerTag.TerminalTicketInformation))
                                                 .charAt(0)));
                             }
-                            
-                            
 
                             break;
                         default:

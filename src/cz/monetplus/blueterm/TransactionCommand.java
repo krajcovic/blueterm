@@ -23,6 +23,12 @@ public enum TransactionCommand {
     
     SMART_SHOP_DEACTIVATE(HandleOperations.CallSmartShopDeactivate),
     
+    SMART_SHOP_PAY(HandleOperations.CallSmartShopPay),
+    
+    SMART_SHOP_RETURN(HandleOperations.CallSmartShopReturn),
+    
+    SMART_SHOP_STATE(HandleOperations.CallSmartShopCardState),
+    
     SMART_SHOP_GET_APP_INFO(HandleOperations.CallSmartShopGetAppInfo),
     
     SMART_SHOP_GET_LAST_TRAN(HandleOperations.CallSmartShopGetLastTran),
