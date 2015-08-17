@@ -43,7 +43,6 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        // bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
         bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
                 invoiceNumber);
 
@@ -61,7 +60,6 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        // bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
         bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
                 invoiceNumber);
 
@@ -83,40 +81,28 @@ public final class SProtocolMessages {
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "15");
-
-        // XProtocolFactory factory = new XProtocolFactory();
-
         return XProtocolFactory.serialize(bprotocol);
     }
 
     public static byte[] getDeactivate() {
-        // TODO: not finished
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "20");
-
-        // XProtocolFactory factory = new XProtocolFactory();
-
         return XProtocolFactory.serialize(bprotocol);
     }
 
     public static byte[] getLastTran() {
-        // TODO: not finished
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "82");
-
-        // XProtocolFactory factory = new XProtocolFactory();
-
         return XProtocolFactory.serialize(bprotocol);
     }
 
     public static byte[] getParametersCall() {
-        // TODO: not finished
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");

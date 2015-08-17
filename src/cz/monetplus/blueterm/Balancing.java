@@ -1,16 +1,43 @@
 package cz.monetplus.blueterm;
 
+/**
+ * @author krajcovic
+ *
+ */
 public class Balancing {
+    
+    /**
+     * 
+     */
     private Integer shiftNumber = 0;
+    
+    /**
+     * 
+     */
     private Integer batchNumber = 0;
+    
+    /**
+     * 
+     */
     private Integer debitCount = 0;
+    
+    /**
+     * 
+     */
     private Integer debitAmount = 0;
+    
+    /**
+     * 
+     */
     private Integer creditCount = 0;
+    
+    /**
+     * 
+     */
     private Integer creditAmount = 0;
 
     public Balancing() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     public Balancing(Integer shiftNumber, Integer batchNumber,
