@@ -28,7 +28,6 @@ import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.worker.MessageThread;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
@@ -65,8 +64,8 @@ public class TerminalServiceBTClient {
 
     private ConnectedThread mConnectedThread;
 
-    //private BluetoothServerSocket mmServerSocket;
-    
+    // private BluetoothServerSocket mmServerSocket;
+
     private BluetoothSocket mmSocket;
 
     // private int currentTerminalState;
@@ -87,8 +86,8 @@ public class TerminalServiceBTClient {
      * @param adapter
      *            Bluetooth adapter (only one for application).
      */
-    public TerminalServiceBTClient(Context context, MessageThread messageThread,
-            BluetoothAdapter adapter) {
+    public TerminalServiceBTClient(Context context,
+            MessageThread messageThread, BluetoothAdapter adapter) {
         bluetoothAdapter = adapter;
         // currentTerminalState = TerminalState.STATE_NONE;
         this.messageThread = messageThread;
@@ -202,78 +201,6 @@ public class TerminalServiceBTClient {
 
     public BluetoothAdapter getAdapter() {
         return bluetoothAdapter;
-    }
-    
-    /**
-     * This thread runs while attempting to make an outgoing connection with a
-     * device. It runs straight through; the connection either succeeds or
-     * fails.
-     */
-    private class AcceptThread extends Thread {
-
-        public AcceptThread(BluetoothDevice device, boolean secure) {
-            // Get a BluetoothSocket for a connection with the
-            // given BluetoothDevice
-//            try {
-//                if (secure) {
-//                    mmSocket = device
-//                            .createRfcommSocketToServiceRecord(MY_UUID_SECURE);
-//                } else {
-//                    mmSocket = device
-//                            .createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
-//                }
-                
-//                mmServerSocket = device.listenUsingRfcommWithServiceRecord(NAME, MY_UUID_INSECURE);
-//            } catch (IOException e) {
-//                Log.e(TAG, "create() failed", e);
-//            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Thread#run()
-         */
-        public void run() {
-            
-            BluetoothSocket socket = null;
-
-            
-            Log.i(TAG, "BEGIN mAcceptThread:");
-            setName("AcceptThread");
-
-            // Always cancel discovery because it will slow down a connection
-            getAdapter().cancelDiscovery();
-
-            // Make a connection to the BluetoothSocket
-//            try {
-//                socket = mmServerSocket.accept();
-//            } catch (IOException e) {
-//                break;
-//            }
-
-            // Reset the ConnectThread because we're done
-//            synchronized (TerminalServiceBT.this) {
-//                mConnectThread = null;
-//            }
-
-//            if (mmSocket.isConnected()) {
-//                messageThread.addMessage(new HandleMessage(
-//                        HandleOperations.TerminalConnected));
-//            } else {
-//                messageThread.setOutputMessage("Socket is closed");
-//                messageThread.addMessage(new HandleMessage(
-//                        HandleOperations.Exit));
-//            }
-        }
-
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "close() of connect " + " socket failed", e);
-            }
-        }
     }
 
     /**

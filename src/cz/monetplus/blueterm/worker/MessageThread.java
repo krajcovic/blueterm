@@ -2,10 +2,7 @@ package cz.monetplus.blueterm.worker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.acl.LastOwnerException;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,21 +13,16 @@ import android.util.Log;
 import android.widget.Toast;
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
-import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.requests.MbcaRequests;
 import cz.monetplus.blueterm.requests.MvtaRequests;
 import cz.monetplus.blueterm.requests.SmartShopRequests;
 import cz.monetplus.blueterm.server.ServerFrame;
-import cz.monetplus.blueterm.sprotocol.SProtocolMessages;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.terminals.TerminalServiceBTClient;
 import cz.monetplus.blueterm.util.MonetUtils;
-import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
-import cz.monetplus.blueterm.xprotocol.MessageNumber;
-import cz.monetplus.blueterm.xprotocol.ProtocolType;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
 import cz.monetplus.blueterm.xprotocol.XProtocol;
 import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
@@ -282,7 +274,7 @@ public class MessageThread extends Thread {
         }
 
         case TerminalWrite: {
-            write2Terminal(msg.getBuffer().buffer());
+            write2Terminal(msg.getBuffer().array());
             break;
         }
 
@@ -296,7 +288,7 @@ public class MessageThread extends Thread {
             break;
 
         case ShowMessage:
-            String message = new String(msg.getBuffer().buffer());
+            String message = new String(msg.getBuffer().array());
             Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
                     .show();
 
@@ -392,7 +384,7 @@ public class MessageThread extends Thread {
      * */
     private void serverConnected(HandleMessage msg) {
         ServerFrame soFrame = new ServerFrame(TerminalCommands.ServerConnected,
-                serverConnectionID, msg.getBuffer().buffer());
+                serverConnectionID, msg.getBuffer().array());
         TerminalFrame toFrame = new TerminalFrame(
                 TerminalPortApplications.SERVER.getPortApplicationNumber(),
                 soFrame.createFrame());
@@ -409,7 +401,7 @@ public class MessageThread extends Thread {
      */
     private void receiveTerminalPackets(HandleMessage msg) {
         try {
-            slipOutputpFraming.write(msg.getBuffer().buffer());
+            slipOutputpFraming.write(msg.getBuffer().array());
 
             // Check
             if (SLIPFrame.isFrame(slipOutputpFraming.toByteArray())) {

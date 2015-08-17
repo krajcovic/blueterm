@@ -1,7 +1,5 @@
 package cz.monetplus.blueterm;
 
-import android.content.Context;
-
 public interface PosCallbacks {
 
     /**

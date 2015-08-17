@@ -1,6 +1,6 @@
 package cz.monetplus.blueterm.worker;
 
-import org.apache.http.util.ByteArrayBuffer;
+import java.nio.ByteBuffer;
 
 /**
  * Identificators for Handle message thread.
@@ -10,17 +10,26 @@ import org.apache.http.util.ByteArrayBuffer;
  */
 public class HandleMessage {
 
+    /**
+     * Handle operation.
+     */
     private HandleOperations operation;
 
-    private ByteArrayBuffer buffer;
+    /**
+     * Buffer with data.
+     */
+    private ByteBuffer buffer;
 
+    /**
+     * @param operation
+     */
     public HandleMessage(HandleOperations operation) {
         super();
         this.operation = operation;
-        this.buffer = new ByteArrayBuffer(0);
+        this.buffer = ByteBuffer.allocate(0);
     }
 
-    public HandleMessage(HandleOperations operation, ByteArrayBuffer buffer) {
+    public HandleMessage(HandleOperations operation, ByteBuffer buffer) {
         super();
         this.operation = operation;
         this.buffer = buffer;
@@ -30,25 +39,25 @@ public class HandleMessage {
         super();
         this.operation = operation;
         if (data != null) {
-            this.buffer = new ByteArrayBuffer(data.length);
-            this.buffer.append(data, 0, data.length);
+            this.buffer = ByteBuffer.allocate(data.length);
+            this.buffer.put(data, 0, data.length);
         } else {
-            this.buffer = new ByteArrayBuffer(0);
+            this.buffer = ByteBuffer.allocate(0);// new ByteArrayBuffer(0);
         }
     }
 
     public HandleMessage(HandleOperations operation, byte data) {
         super();
         this.operation = operation;
-        this.buffer = new ByteArrayBuffer(1);
-        this.buffer.append(data);
+        this.buffer = ByteBuffer.allocate(1);//new ByteArrayBuffer(1);
+        this.buffer.put(data);
 
     }
 
     public HandleMessage(HandleOperations operation, String string) {
         this.operation = operation;
-        this.buffer = new ByteArrayBuffer(string.getBytes().length);
-        this.buffer.append(string.getBytes(), 0, string.getBytes().length);
+        this.buffer = ByteBuffer.allocate(string.getBytes().length);//new ByteArrayBuffer(string.getBytes().length);
+        this.buffer.put(string.getBytes(), 0, string.getBytes().length);
     }
 
     public HandleOperations getOperation() {
@@ -59,11 +68,11 @@ public class HandleMessage {
         this.operation = operation;
     }
 
-    public ByteArrayBuffer getBuffer() {
+    public ByteBuffer getBuffer() {
         return buffer;
     }
 
-    public void setBuffer(ByteArrayBuffer buffer) {
+    public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 

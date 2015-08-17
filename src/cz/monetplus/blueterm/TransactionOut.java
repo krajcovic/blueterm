@@ -1,13 +1,39 @@
 package cz.monetplus.blueterm;
 
-import java.lang.reflect.Field;
-
+/**
+ * @author krajcovic
+ *
+ */
 public class TransactionOut {
+    
+    /**
+     * 
+     */
     private Integer resultCode;
+    
+    /**
+     * 
+     */
     private String message;
+    
+    /**
+     * 
+     */
     private Integer authCode;
+    
+    /**
+     * 
+     */
     private Integer seqId;
+    
+    /**
+     * 
+     */
     private String cardNumber;
+    
+    /**
+     * 
+     */
     private String cardType;
 
     public Integer getResultCode() {

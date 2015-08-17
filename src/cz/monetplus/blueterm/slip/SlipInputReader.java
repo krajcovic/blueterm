@@ -18,11 +18,6 @@ import cz.monetplus.blueterm.util.MonetUtils;
 public final class SlipInputReader {
 
     /**
-     * TAG for logging.
-     */
-    private static final String TAG = "SlipInputReader";
-
-    /**
      * Private constructor.
      */
     private SlipInputReader() {

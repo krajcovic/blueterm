@@ -2,8 +2,8 @@ package cz.monetplus.blueterm.sprotocol;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-import cz.monetplus.blueterm.TransactionCommand;
 import cz.monetplus.blueterm.xprotocol.MessageNumber;
 import cz.monetplus.blueterm.xprotocol.ProtocolType;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
@@ -136,7 +136,7 @@ public final class SProtocolMessages {
     }
 
     private static String getCurrentDateTimeForHeader() {
-        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss");
+        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
         return formater.format(new Date());
 
     }

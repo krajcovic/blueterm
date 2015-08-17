@@ -17,14 +17,9 @@
 package cz.monetplus.blueterm.terminals;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.UUID;
 
-import cz.monetplus.blueterm.slip.SlipInputReader;
 import cz.monetplus.blueterm.util.MonetUtils;
-import cz.monetplus.blueterm.worker.HandleMessage;
-import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.worker.MessageThread;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -42,7 +37,7 @@ import android.util.Log;
 public class TerminalServiceBTServer {
     // Debugging
     private static final String TAG = "TerminalService";
-    private static final boolean D = true;
+    // private static final boolean D = true;
 
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothChatSecure";
@@ -59,11 +54,7 @@ public class TerminalServiceBTServer {
     // Member fields
     private final BluetoothAdapter bluetoothAdapter;
 
-    private MessageThread messageThread;
-
-    // private ConnectThread mConnectThread;
-
-    // private ConnectedThread mConnectedThread;
+    // private MessageThread messageThread;
 
     private AcceptThread mAcceptThread;
 
@@ -91,7 +82,7 @@ public class TerminalServiceBTServer {
             MessageThread messageThread, BluetoothAdapter adapter) {
         bluetoothAdapter = adapter;
         // currentTerminalState = TerminalState.STATE_NONE;
-        this.messageThread = messageThread;
+        // this.messageThread = messageThread;
     }
 
     /**
@@ -103,9 +94,7 @@ public class TerminalServiceBTServer {
      *            Socket Security type - Secure (true) , Insecure (false)
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
-        if (D) {
-            Log.d(TAG, "connect to: " + device);
-        }
+        Log.d(TAG, "connect to: " + device);
 
         // Start the thread to connect with the given device
         // mConnectThread = new ConnectThread(device, secure);
@@ -124,22 +113,14 @@ public class TerminalServiceBTServer {
      *            The BluetoothDevice that has been connected.
      */
     public synchronized void connected() {
-        if (D) {
-            Log.d(TAG, "connected");
-        }
-
-        // Start the thread to manage the connection and perform transmissions
-        // mConnectedThread = new ConnectedThread();
-        // mConnectedThread.start();
+        Log.d(TAG, "connected");
     }
 
     /**
      * Stop all threads.
      */
     public synchronized void stop() {
-        if (D) {
-            Log.d(TAG, "stop");
-        }
+        Log.d(TAG, "stop");
 
         try {
             if (mmSocket != null) {
@@ -149,17 +130,10 @@ public class TerminalServiceBTServer {
             Log.i(TAG, e.getMessage());
         }
 
-        // messageThread.addMessage(new
-        // HandleMessage(HandleOperations.TerminalDisconnected));
-        messageThread = null;
-
         if (mAcceptThread != null) {
             mAcceptThread.cancel();
             mAcceptThread = null;
         }
-
-        // Kdyz zastavuju, tak uz nic nikam neposilej.
-        // setState(TerminalState.STATE_NONE);
     }
 
     /**
@@ -176,27 +150,22 @@ public class TerminalServiceBTServer {
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
-    private void connectionFailed() {
-        // if (Looper.myLooper() != null && mHandler != null) {
-        if (messageThread != null) {
-            messageThread.setOutputMessage("Terminal connection failed.");
-            messageThread.addMessage(HandleOperations.Exit);
-        }
-
-        // Start the service over to restart none mode
-        // TerminalServiceBT.this.start();
-    }
+    // private void connectionFailed() {
+    // if (messageThread != null) {
+    // messageThread.setOutputMessage("Terminal connection failed.");
+    // messageThread.addMessage(HandleOperations.Exit);
+    // }
+    // }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
-    private void connectionLost() {
-
-        if (messageThread != null) {
-            // messageThread.setOutputMessage("Terminal connection lost.");
-            messageThread.addMessage(HandleOperations.Exit);
-        }
-    }
+    // private void connectionLost() {
+    //
+    // if (messageThread != null) {
+    // messageThread.addMessage(HandleOperations.Exit);
+    // }
+    // }
 
     public BluetoothAdapter getAdapter() {
         return bluetoothAdapter;
@@ -222,8 +191,9 @@ public class TerminalServiceBTServer {
             // }
 
             try {
-                mmServerSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME_INSECURE,
-                        MY_UUID_INSECURE);
+                mmServerSocket = bluetoothAdapter
+                        .listenUsingRfcommWithServiceRecord(NAME_INSECURE,
+                                MY_UUID_INSECURE);
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }

@@ -1,14 +1,12 @@
 package cz.monetplus.blueterm.requests;
 
 import cz.monetplus.blueterm.TransactionIn;
-import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.sprotocol.SProtocolMessages;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.worker.HandleOperations;
-import cz.monetplus.blueterm.worker.MessageThread;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
 
 public class SmartShopRequests {
