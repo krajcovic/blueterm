@@ -50,6 +50,8 @@ public class MessageThread extends Thread {
      */
     private static final String TAG = "MessageThread";
 
+    private static volatile MessageThread instance = null;
+
     /**
      * Server connection ID. Only one serverconnection.
      */
@@ -107,7 +109,7 @@ public class MessageThread extends Thread {
      * @param terminalPort
      * @param transactionInputData
      */
-    public MessageThread(final Context context,
+    private MessageThread(final Context context,
             TransactionIn transactionInputData) {
         super();
 
@@ -119,6 +121,21 @@ public class MessageThread extends Thread {
         this.transactionOutputData = new TransactionOut();
 
         addMessage(HandleOperations.GetBluetoothAddress);
+    }
+
+    public static MessageThread getInstance(final Context context,
+            TransactionIn transactionInputData) throws Exception {
+        if (instance == null) {
+            synchronized (MessageThread.class) {
+                if (instance == null) {
+                    instance = new MessageThread(context, transactionInputData);
+                }
+            }
+        } else {
+            throw new Exception("Another thread communicate with blueterm");
+        }
+        
+        return instance;
     }
 
     @Override
@@ -298,6 +315,7 @@ public class MessageThread extends Thread {
 
         case Exit:
             this.stopThread();
+            instance = null;
             break;
         // case Connected:
         // break;

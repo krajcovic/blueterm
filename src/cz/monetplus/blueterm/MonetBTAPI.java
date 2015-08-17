@@ -27,11 +27,13 @@ public class MonetBTAPI {
      * @param in
      *            Transcation input parameters.
      * @return true for corect connected device. false for some error.
+     * @throws Exception
      */
     public static final TransactionOut doTransaction(final Context context,
-            final TransactionIn in) {
+            final TransactionIn in) throws Exception {
 
-        messageThread = new MessageThread(context, in);
+        // messageThread = new MessageThread(context, in);
+        messageThread = MessageThread.getInstance(context, in);
         messageThread.start();
 
         try {
@@ -58,17 +60,17 @@ public class MonetBTAPI {
     }
 
     private static long getDynamicPin(String terminalName) {
-        long hash = 3735927486l;//0xDEADBABE & 0xFFFFFFFF;
+        long hash = 3735927486l;// 0xDEADBABE & 0xFFFFFFFF;
         byte[] array = terminalName.getBytes();
         for (byte b : array) {
             hash += b;
-            //long bad = ((hash * 2^10) & 0xFFFFFFFFl);
-            //long ok = ((hash << 10) & 0xFFFFFFFFl);           
+            // long bad = ((hash * 2^10) & 0xFFFFFFFFl);
+            // long ok = ((hash << 10) & 0xFFFFFFFFl);
             hash = ((hash & 0xFFFFFFFFl) + ((hash << 10) & 0xFFFFFFFFl)) & 0xFFFFFFFFl;
             hash ^= ((hash >> 6) & 0xFFFFFFFFl);
         }
-        
-        return (hash%1000000) & 0xFFFFFF;
+
+        return (hash % 1000000) & 0xFFFFFF;
     }
 
 }
