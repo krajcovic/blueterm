@@ -31,7 +31,7 @@ public final class SProtocolMessages {
 
         return XProtocolFactory.serialize(bprotocol);
     }
-    
+
     public static byte[] getSale(long amount, int currencyCode,
             String invoiceNumber) {
 
@@ -43,7 +43,9 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        // bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
+                invoiceNumber);
 
         return XProtocolFactory.serialize(bprotocol);
     }
@@ -59,11 +61,13 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        // bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
+                invoiceNumber);
 
         return XProtocolFactory.serialize(bprotocol);
     }
-    
+
     public static byte[] getCardState() {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
@@ -72,8 +76,6 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "07");
         return XProtocolFactory.serialize(bprotocol);
     }
-    
-    
 
     public static byte[] getActivate() {
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
@@ -144,7 +146,9 @@ public final class SProtocolMessages {
                 MessageNumber.TicketRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
-       bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.TerminalTicketInformation, command.getTag().toString());
+        bprotocol.getCustomerTagMap().put(
+                XProtocolCustomerTag.TerminalTicketInformation,
+                command.getTag().toString());
         return XProtocolFactory.serialize(bprotocol);
     }
 

@@ -25,6 +25,7 @@ public class XProtocolFactory {
     private static final String TAG = "XProtocolFactory";
 
     public static byte[] serialize(XProtocol bprotocol) {
+        Log.i(TAG, bprotocol.toString());
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         try {
@@ -55,7 +56,7 @@ public class XProtocolFactory {
             bout.write(optionalData);
             bout.write(ETX);
         } catch (IOException e) {
-            Log.e(TAG, "Serialize bprotocol", e);
+            Log.e(TAG, "Serialize xprotocol", e);
         }
 
         return bout.toByteArray();
@@ -91,10 +92,10 @@ public class XProtocolFactory {
 
             String[] split = splitTags(
                     Arrays.copyOfRange(buffer, 37, buffer.length - 1),
-                    "[\\x1c]");
+                    "ISO-8859-2", "[\\x1c]");
 
             for (String element : split) {
-                if (element.length() > 1) {
+                if (element != null && element.length() > 0) {
                     XProtocolTag tagOf = XProtocolTag.tagOf(element.charAt(0));
                     if (tagOf.equals(XProtocolTag.CustomerFid)) {
                         deserializeCustomer(bprotocol, element);
@@ -105,28 +106,39 @@ public class XProtocolFactory {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "Desearilize xprotocol", e);
         }
 
+        Log.i(TAG, bprotocol.toString());
         return bprotocol;
     }
 
     private static void deserializeCustomer(XProtocol xprotocol, String element)
             throws UnsupportedEncodingException {
-        String[] customerTags = splitTags(Arrays.copyOfRange(element.getBytes(), 1, element.getBytes().length - 1), "[\\x1d]");
+        String[] customerTags = splitTags(Arrays.copyOfRange(
+                element.getBytes(), 1, element.getBytes().length), "UTF-8",
+                "[\\x1d]");
         for (String customerElement : customerTags) {
-            XProtocolCustomerTag tagOf = XProtocolCustomerTag.tagOf(customerElement.charAt(0));
-            if(tagOf.equals(XProtocolCustomerTag.TerminalTicketLine)) {
-                xprotocol.getTicketList().add(customerElement.substring(1));
-            } else {
-                xprotocol.getCustomerTagMap().put(tagOf, customerElement.substring(1));
+            if (customerElement != null && customerElement.length() > 0) {
+                XProtocolCustomerTag tagOf = XProtocolCustomerTag
+                        .tagOf(customerElement.charAt(0));
+                if (tagOf.equals(XProtocolCustomerTag.TerminalTicketLine)) {
+                    // String temp = new
+                    // String(customerElement.substring(1).getBytes(),
+                    // "ISO-8859-2");
+
+                    xprotocol.getTicketList().add(customerElement.substring(1));
+                } else {
+                    xprotocol.getCustomerTagMap().put(tagOf,
+                            customerElement.substring(1));
+                }
             }
         }
     }
 
-    private static String[] splitTags(byte[] buffer, String regex)
-            throws UnsupportedEncodingException {
-        String dp = new String(buffer, "ISO-8859-2");
+    private static String[] splitTags(byte[] buffer, String codepage,
+            String regex) throws UnsupportedEncodingException {
+        String dp = new String(buffer, codepage);
         String[] split = dp.split(regex);
         return split;
     }
@@ -167,7 +179,7 @@ public class XProtocolFactory {
         Iterator<?> it = tagMap.entrySet().iterator();
         while (it.hasNext()) {
             @SuppressWarnings("unchecked")
-            Map.Entry<XProtocolTag, String> pairs = (Entry<XProtocolTag, String>) it
+            Map.Entry<XProtocolCustomerTag, String> pairs = (Entry<XProtocolCustomerTag, String>) it
                     .next();
             try {
                 bout.write(GS);

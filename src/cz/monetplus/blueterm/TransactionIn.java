@@ -43,30 +43,38 @@ public class TransactionIn {
     private RechargingType rechargintType;
 
     /**
+     * Metody pro komunikaci s pokladnou
+     */
+    private PosCallbacks posCallbacks;
+
+    /**
      * Hodnoty uzaverky, popis v B protokolu
      */
     private Balancing balancing;
 
-    public TransactionIn() {
+/*    public TransactionIn() {
         super();
         this.amount = (long) 0;
         this.currency = 203;
         this.tranId = (long) 0;
         this.rechargintType = RechargingType.Cash;
         this.setBalancing(new Balancing());
+    }*/
+
+    public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
+        super();
+
+        this.blueHwAddress = blueHwAddress;
+        this.command = command;
+
+        this.posCallbacks = posCallbacks;
     }
 
-    public TransactionIn(String blueHwAddress, TransactionCommand command,
-            Long amount, String invoice, Integer currency, Long tranId, Balancing balancing) {
-        super();
-        this.blueHwAddress = blueHwAddress;
-        // this.hostIP = hostIP;
-        this.command = command;
+    public void setPayment(Long amount, String invoice, Integer currency,
+            Long tranId) {
         this.amount = amount;
         this.invoice = invoice;
         this.currency = currency;
-        this.tranId = tranId;
-        this.setBalancing(balancing);
     }
 
     public Long getAmount() {
@@ -97,33 +105,17 @@ public class TransactionIn {
         return blueHwAddress;
     }
 
-    public void setBlueHwAddress(String blueHwAddress) {
-        this.blueHwAddress = blueHwAddress;
-    }
+//    public void setBlueHwAddress(String blueHwAddress) {
+//        this.blueHwAddress = blueHwAddress;
+//    }
 
     public TransactionCommand getCommand() {
         return command;
     }
 
-    public void setCommand(TransactionCommand command) {
-        this.command = command;
-    }
-
-    // public String getHostIP() {
-    // return hostIP;
-    // }
-
-    // public void setHostIP(String hostIP) {
-    // this.hostIP = hostIP;
-    // }
-
-    // public int getHostPort() {
-    // return hostPort;
-    // }
-    //
-    // public void setHostPort(int hostPort) {
-    // this.hostPort = hostPort;
-    // }
+//    public void setCommand(TransactionCommand command) {
+//        this.command = command;
+//    }
 
     public Long getTranId() {
         return this.tranId;
@@ -148,4 +140,12 @@ public class TransactionIn {
     public void setBalancing(Balancing balancing) {
         this.balancing = balancing;
     }
+
+    public PosCallbacks getPosCallbacks() {
+        return posCallbacks;
+    }
+
+//    public void setPosCallbacks(PosCallbacks posCallbacks) {
+//        this.posCallbacks = posCallbacks;
+//    }
 }

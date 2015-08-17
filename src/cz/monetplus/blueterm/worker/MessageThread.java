@@ -2,6 +2,7 @@ package cz.monetplus.blueterm.worker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.acl.LastOwnerException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -94,6 +95,8 @@ public class MessageThread extends Thread {
      */
     private TerminalServiceBTClient terminalService = null;
 
+    private TicketCommand lastTicket;
+
     /**
      * Terminal to muze posilat po castech.
      */
@@ -159,8 +162,10 @@ public class MessageThread extends Thread {
     public void handleMessage(HandleMessage msg) {
 
         Log.i(TAG, "Operation: " + msg.getOperation());
-        switch (msg.getOperation()) {
+        transactionInputData.getPosCallbacks().progress(
+                msg.getOperation().toString());
 
+        switch (msg.getOperation()) {
         case GetBluetoothAddress: {
             getBluetoothAddress();
             break;
@@ -277,6 +282,18 @@ public class MessageThread extends Thread {
             String message = new String(msg.getBuffer().buffer());
             Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
                     .show();
+
+            break;
+
+        case CheckSign:
+            if (transactionInputData.getPosCallbacks().isSingOk()) {
+                // Sign is OK
+                addMessage(SmartShopRequests
+                        .ticketRequest(TicketCommand.Customer));
+            } else {
+                // Sign is Bad
+                addMessage(HandleOperations.Exit);
+            }
             break;
 
         case Exit:
@@ -396,12 +413,15 @@ public class MessageThread extends Thread {
                                 .deserialize(termFrame.getData());
 
                         switch (xprotocol.getMessageNumber()) {
+                        case Ack:
+                            break;
                         case TransactionResponse:
                             ParseTransactionResponse(xprotocol);
 
                             if (isTicketFlagOn(xprotocol)) {
                                 addMessage(SmartShopRequests
                                         .ticketRequest(TicketCommand.Merchant));
+                                lastTicket = TicketCommand.Merchant;
                             } else {
                                 addMessage(HandleOperations.Exit);
                             }
@@ -415,11 +435,35 @@ public class MessageThread extends Thread {
                                     .containsKey(
                                             XProtocolCustomerTag.TerminalTicketInformation)) {
                                 TicketCommand ticketCommand = TicketCommand
-                                        .tagOf((String
-                                                .valueOf(xprotocol
-                                                        .getCustomerTagMap()
-                                                        .get(XProtocolCustomerTag.TerminalTicketInformation))
-                                                .charAt(0)));
+                                        .tagOf(xprotocol
+                                                .getCustomerTagMap()
+                                                .get(XProtocolCustomerTag.TerminalTicketInformation)
+                                                .charAt(0));
+                                switch (ticketCommand) {
+                                case Continue:
+                                    addMessage(SmartShopRequests
+                                            .ticketRequest(TicketCommand.Next));
+                                    break;
+                                case End:
+                                    transactionInputData.getPosCallbacks()
+                                            .ticketFinish();
+                                    if (isSingFlagOn(xprotocol)) {
+                                        addMessage(HandleOperations.CheckSign);
+                                    } else {
+                                        if (lastTicket == TicketCommand.Merchant) {
+                                            addMessage(SmartShopRequests
+                                                    .ticketRequest(TicketCommand.Customer));
+                                            lastTicket = TicketCommand.Customer;
+
+                                        } else {
+                                            addMessage(HandleOperations.Exit);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
+
+                                }
                             }
 
                             break;
@@ -433,24 +477,6 @@ public class MessageThread extends Thread {
 
                         break;
                     }
-
-                    // case MVTA: {
-                    // XProtocol bprotocol = XProtocolFactory
-                    // .deserialize(termFrame.getData());
-                    // if (bprotocol.getProtocolType().equals("V2")) {
-                    // ParseX2(bprotocol);
-                    // }
-                    // break;
-                    // }
-                    //
-                    // case SMARTSHOP: {
-                    // XProtocol bprotocol = XProtocolFactory
-                    // .deserialize(termFrame.getData());
-                    // if (bprotocol.getProtocolType().equals("S2")) {
-                    // ParseX2(bprotocol);
-                    // }
-                    // break;
-                    // }
 
                     default:
                         Log.w(TAG, "Unsupported application port number: "
@@ -468,8 +494,16 @@ public class MessageThread extends Thread {
         }
     }
 
+    private boolean checkBit(int value, int i) {
+        return (value & (1L << i)) == (1L << i);
+    }
+
     private boolean isTicketFlagOn(XProtocol xprotocol) {
-        return (xprotocol.getFlag() & 0x1) == 1;
+        return checkBit(xprotocol.getFlag(), 1);
+    }
+
+    private boolean isSingFlagOn(XProtocol xprotocol) {
+        return checkBit(xprotocol.getFlag(), 0);
     }
 
     /**
@@ -513,8 +547,9 @@ public class MessageThread extends Thread {
     }
 
     private void ParseTicketResponse(XProtocol xprotocol) {
-        // TODO: dodelat
-
+        for (String string : xprotocol.getTicketList()) {
+            transactionInputData.getPosCallbacks().ticketLine(string);
+        }
     }
 
     /**
@@ -534,47 +569,6 @@ public class MessageThread extends Thread {
 
         stopThread = true;
     }
-
-    // @Deprecated
-    // private void handleStateChange(HandleMessage msg) {
-    // Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-    // switch (msg.arg1) {
-    // case TerminalState.STATE_CONNECTED:
-    // if (msg.arg2 >= 0) {
-    // switch (TransactionCommand.values()[msg.arg2]) {
-    // case MBCA_HANDSHAKE:
-    // handshakeMbca();
-    // break;
-    // case MBCA_INFO:
-    // appInfoMbca();
-    // break;
-    // case MBCA_PAY:
-    // pay();
-    // break;
-    // case MVTA_HANDSHAKE:
-    // handshakeMvta();
-    // break;
-    // case MVTA_INFO:
-    // appInfoMvta();
-    // break;
-    // case MVTA_RECHARGE:
-    // recharge();
-    // break;
-    // case UNKNOWN:
-    // break;
-    // default:
-    // break;
-    //
-    // }
-    // }
-    // break;
-    // case TerminalState.STATE_CONNECTING:
-    // case TerminalState.STATE_LISTEN:
-    // break;
-    // case TerminalState.STATE_NONE:
-    // break;
-    // }
-    // }
 
     private void handleServerMessage(TerminalFrame termFrame) {
         final ServerFrame serverFrame = new ServerFrame(termFrame.getData());

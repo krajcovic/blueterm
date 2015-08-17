@@ -2,8 +2,20 @@ package cz.monetplus.blueterm.xprotocol;
 
 public enum XProtocolCustomerTag {
     
+    /**
+     * 
+     */
     TerminalTicketInformation('t'),
-    TerminalTicketLine('T')
+    
+    /**
+     * 
+     */
+    TerminalTicketLine('T'), 
+    
+    /**
+     * Dlouhy variabilni symbol
+     */
+    InvoiceNumber('S'),
     ;
     
     /**

@@ -169,15 +169,53 @@ public class XProtocol implements Serializable {
 //        this.tagMap = tagMap;
 //    }
 
-    @Override
-    public String toString() {
-        return this.getProtocolType() + " " + this.getProtocolVersion() + " "
-                + this.getTransactionDateTime() + "\n" + tagMap.values()
-                + "\n9:" + customerTagMap.values();
-    }
-
     public MessageNumber getMessageNumber() {
         return messageNumber;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("XProtocol [");
+        if (protocolType != null) {
+            builder.append("protocolType=").append(protocolType).append(", ");
+        }
+        if (messageNumber != null) {
+            builder.append("messageNumber=").append(messageNumber).append(", ");
+        }
+        if (protocolVersion != null) {
+            builder.append("protocolVersion=").append(protocolVersion)
+                    .append(", ");
+        }
+        if (posId != null) {
+            builder.append("posId=").append(posId).append(", ");
+        }
+        if (transactionDateTime != null) {
+            builder.append("transactionDateTime=").append(transactionDateTime)
+                    .append(", ");
+        }
+        if (flag != null) {
+            builder.append("flag=").append(flag).append(", ");
+        }
+        if (optionalDataLen != null) {
+            builder.append("length=").append(optionalDataLen)
+                    .append(", ");
+        }
+        if (standardCRC16 != null) {
+            builder.append("crc=").append(standardCRC16).append(", ");
+        }
+        if (tagMap != null) {
+            builder.append("FID's=").append(tagMap).append(", ");
+        }
+        if (customerTagMap != null) {
+            builder.append("SubFID's 9=").append(customerTagMap)
+                    .append(", ");
+        }
+        if (ticketList != null) {
+            builder.append("ticketList=").append(ticketList);
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     public void setMessageNumber(MessageNumber messageNumber) {

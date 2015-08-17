@@ -140,10 +140,12 @@ public enum HandleOperations {
      * 
      */
     ServerConnected,
+    
+    CheckSign,
       
     /**
      * 
      */
-    Exit,    
+    Exit,     
     ;
 }
