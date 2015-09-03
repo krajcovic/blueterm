@@ -153,21 +153,24 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_handshake" />
+                android:text="@string/button_handshake" 
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
                 android:id="@+id/button_app_info"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_app_info" />
+                android:text="@string/button_app_info"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button_clear"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Clear" />
+                android:text="Clear" 
+                style="?android:attr/buttonBarButtonStyle"/>
         </LinearLayout>
     </LinearLayout>
 
