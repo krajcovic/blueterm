@@ -21,29 +21,29 @@
 
     <!-- BluetoothChat -->
     <string name="button_app_info">AppInfo</string>
-    <string name="not_connected">You are not connected to a device</string>
-    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
-    <string name="title_connecting">Connecting</string>
-    <string name="title_connected_to">Connected: </string>
-    <string name="title_not_connected">Not connected</string>
+    <string name="not_connected">Nepodařilo se připojit k zařízení</string>
+    <string name="bt_not_enabled_leaving">Bluetooth není zapnuté. Ukončuji aplikaci.</string>
+    <string name="title_connecting">Připojuji</string>
+    <string name="title_connected_to">Připojeno</string>
+    <string name="title_not_connected">Nepřipoojeno</string>
 
     <!-- DeviceListActivity -->
-    <string name="scanning">Scanning for devices</string>
-    <string name="select_device">select a device to connect</string>
-    <string name="none_paired">No devices have been paired</string>
-    <string name="none_found">No devices found</string>
-    <string name="title_paired_devices">Paired Devices</string>
-    <string name="title_other_devices">Other Available Devices</string>
-    <string name="button_scan">Scan for devices</string>
+    <string name="scanning">Scanuji zařízení</string>
+    <string name="select_device">Vyber zařízení ke spárování</string>
+    <string name="none_paired">Nepodařilo se spárovat zařízení</string>
+    <string name="none_found">Nenalezeno žádné zařízení</string>
+    <string name="title_paired_devices">Spárované zařízení</string>
+    <string name="title_other_devices">Dostupné zařízení</string>
+    <string name="button_scan">Hledej zařízení</string>
 
     <!-- Options Menu -->
-    <string name="secure_connect">Connect a device - Secure</string>
-    <string name="insecure_connect">Connect a device - Insecure</string>
-    <string name="discoverable">Make discoverable</string>
-    <string name="button_pay">Pay</string>
+    <string name="secure_connect">Připoj zařízení - Secure</string>
+    <string name="insecure_connect">Připoj zařízení - Insecure</string>
+    <string name="discoverable">Nastav viditelnost</string>
+    <string name="button_pay">Platba</string>
     <string name="button_handshake">Handshake</string>
     <string name="onoff_log">On/Off log</string>
-    <string name="preferences">Preferences</string>
+    <string name="preferences">Nastavení</string>
 
     <!-- Preferences -->
     <string name="preferences_log">pref_log</string>
