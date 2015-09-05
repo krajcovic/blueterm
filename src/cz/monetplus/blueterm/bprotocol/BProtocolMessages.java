@@ -2,6 +2,7 @@ package cz.monetplus.blueterm.bprotocol;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.xprotocol.MessageNumber;
@@ -113,13 +114,13 @@ public final class BProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "60");
 
-        String format = String.format("%03d%03d%04d%c%016d%04d%c%016d",
-                balancing.getShiftNumber(), balancing.getBatchNumber(),
-                balancing.getDebitCount(),
-                balancing.getDebitAmount() >= 0 ? '+' : '-', balancing
-                        .getDebitAmount(), balancing.getCreditCount(),
-                balancing.getCreditAmount() >= 0 ? '+' : '-', balancing
-                        .getCreditAmount());
+        String format = String.format(Locale.US,
+                "%03d%03d%04d%c%016d%04d%c%016d", balancing.getShiftNumber(),
+                balancing.getBatchNumber(), balancing.getDebitCount(),
+                balancing.getDebitAmount() >= 0 ? '+' : '-',
+                balancing.getDebitAmount(), balancing.getCreditCount(),
+                balancing.getCreditAmount() >= 0 ? '+' : '-',
+                balancing.getCreditAmount());
 
         bprotocol.getTagMap().put(XProtocolTag.TotalsBatch1, format);
         return XProtocolFactory.serialize(bprotocol);

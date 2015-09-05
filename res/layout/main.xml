@@ -38,8 +38,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" >
+            android:layout_height="wrap_content" >
 
             <EditText
                 android:id="@+id/edit_text_out"
@@ -58,7 +57,6 @@
             android:id="@+id/inputValuesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -70,7 +68,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Amount:"
+                    android:text="@string/title_amount"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <EditText
@@ -84,15 +82,14 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" >
+                android:layout_height="0dp" >
 
                 <TextView
                     android:id="@+id/textCurrency"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Currency:"
+                    android:text="@string/title_currency"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <EditText
@@ -113,7 +110,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Invoice:"
+                    android:text="@string/invoice_invoice"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <EditText
@@ -125,7 +122,6 @@
                     android:inputType="number"
                     android:maxLength="10" />
             </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout
@@ -139,7 +135,6 @@
                 android:layout_weight="1"
                 android:selectAllOnFocus="true"
                 android:text="@string/button_pay" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -150,27 +145,27 @@
 
             <Button
                 android:id="@+id/button_handshake"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_handshake" 
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/button_handshake" />
 
             <Button
                 android:id="@+id/button_app_info"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_app_info"
-                style="?android:attr/buttonBarButtonStyle" />
+                android:text="@string/button_app_info" />
 
             <Button
                 android:id="@+id/button_clear"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Clear" 
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:text="@string/button_clear" />
         </LinearLayout>
     </LinearLayout>
 
@@ -196,8 +191,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:text="Stop" />
-
+            android:text="@string/button_stop" />
     </LinearLayout>
 
 </LinearLayout>

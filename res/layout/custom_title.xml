@@ -18,16 +18,18 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
   >
-  <TextView android:id="@+id/title_left_text"
-      android:layout_alignParentLeft="true"
-      android:ellipsize="end"
-      android:singleLine="true"
+
+  <TextView
+      android:id="@+id/title_left_text"
       style="?android:attr/windowTitleStyle"
       android:layout_width="wrap_content"
       android:layout_height="match_parent"
-    />
+      android:ellipsize="end"
+      android:gravity="start|end"
+      android:singleLine="true" />
+
     <TextView android:id="@+id/title_right_text"
-        android:layout_alignParentRight="true"
+        android:gravity="start|end"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_width="wrap_content"

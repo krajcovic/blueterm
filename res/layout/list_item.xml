@@ -10,7 +10,7 @@
         android:id="@+id/list_item_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
+        android:gravity="start|end"
         android:padding="10dp"
         android:textIsSelectable="true"
         android:textSize="20sp" />
