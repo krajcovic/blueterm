@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
+import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.frames.SLIPFrame;
@@ -542,18 +543,26 @@ public class MessageThread extends Thread {
         }
         transactionOutputData.setMessage(xprotocol.getTagMap().get(
                 XProtocolTag.ServerMessage));
+        
         try {
             transactionOutputData.setAuthCode(xprotocol
                     .getTagMap().get(XProtocolTag.AuthCode));
         } catch (Exception e) {
             transactionOutputData.setAuthCode(null);
         }
+        
         try {
             transactionOutputData.setSeqId(Integer.valueOf(xprotocol
                     .getTagMap().get(XProtocolTag.SequenceId)));
         } catch (Exception e) {
             transactionOutputData.setSeqId(0);
         }
+        
+        if(xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
+            transactionOutputData.setBalancing(new Balancing(xprotocol
+                    .getTagMap().get(XProtocolTag.TotalsBatch1)));
+        }
+        
         transactionOutputData.setCardNumber(xprotocol.getTagMap().get(
                 XProtocolTag.PAN));
         transactionOutputData.setCardType(xprotocol.getTagMap().get(

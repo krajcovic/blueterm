@@ -52,10 +52,10 @@ public class TransactionIn {
      */
     private PosCallbacks posCallbacks;
 
-    /**
-     * Hodnoty uzaverky, popis v B protokolu
-     */
-    private Balancing balancing;
+//    /**
+//     * Hodnoty uzaverky, popis v B protokolu
+//     */
+//    private Balancing balancing;
 
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
@@ -121,13 +121,13 @@ public class TransactionIn {
         this.rechargintType = type;
     }
 
-    public Balancing getBalancing() {
-        return balancing;
-    }
-
-    public void setBalancing(Balancing balancing) {
-        this.balancing = balancing;
-    }
+//    public Balancing getBalancing() {
+//        return balancing;
+//    }
+//
+//    public void setBalancing(Balancing balancing) {
+//        this.balancing = balancing;
+//    }
 
     public PosCallbacks getPosCallbacks() {
         return posCallbacks;

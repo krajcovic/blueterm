@@ -98,7 +98,7 @@ public final class BProtocolMessages {
 
     }
 
-    public static byte[] getBalancing(Balancing balancing) {
+    public static byte[] getBalancing(/*Balancing balancing*/) {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
@@ -106,15 +106,15 @@ public final class BProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "60");
 
-        String format = String.format(Locale.US,
-                "%03d%03d%04d%c%016d%04d%c%016d", balancing.getShiftNumber(),
-                balancing.getBatchNumber(), balancing.getDebitCount(),
-                balancing.getDebitAmount() >= 0 ? '+' : '-',
-                balancing.getDebitAmount(), balancing.getCreditCount(),
-                balancing.getCreditAmount() >= 0 ? '+' : '-',
-                balancing.getCreditAmount());
-
-        bprotocol.getTagMap().put(XProtocolTag.TotalsBatch1, format);
+//        String format = String.format(Locale.US,
+//                "%03d%03d%04d%c%016d%04d%c%016d", balancing.getShiftNumber(),
+//                balancing.getBatchNumber(), balancing.getDebitCount(),
+//                balancing.getDebitAmount() >= 0 ? '+' : '-',
+//                balancing.getDebitAmount(), balancing.getCreditCount(),
+//                balancing.getCreditAmount() >= 0 ? '+' : '-',
+//                balancing.getCreditAmount());
+//
+//        bprotocol.getTagMap().put(XProtocolTag.TotalsBatch1, format);
         return XProtocolFactory.serialize(bprotocol);
     }
 }

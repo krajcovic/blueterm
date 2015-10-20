@@ -1,36 +1,39 @@
 package cz.monetplus.blueterm;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author krajcovic
  *
  */
 public class Balancing {
-    
+
     /**
      * 
      */
     private Integer shiftNumber = 0;
-    
+
     /**
      * 
      */
     private Integer batchNumber = 0;
-    
+
     /**
      * 
      */
     private Integer debitCount = 0;
-    
+
     /**
      * 
      */
     private Integer debitAmount = 0;
-    
+
     /**
      * 
      */
     private Integer creditCount = 0;
-    
+
     /**
      * 
      */
@@ -50,6 +53,24 @@ public class Balancing {
         this.debitAmount = debitsAmount;
         this.creditCount = creditCount;
         this.creditAmount = debitAmount;
+    }
+
+    public Balancing(String batchFormat) {
+        Pattern pattern = Pattern
+                .compile("(^\\d{3})(\\d{3})(\\d{4})([+-])(\\d{17})(\\d{4})([+-])(\\d{17})");
+        Matcher matcher = pattern.matcher(batchFormat);
+        if (matcher.find()) {
+            this.setShiftNumber(Integer.valueOf(matcher.group(1)));
+            this.setBatchNumber(Integer.valueOf(matcher.group(2)));
+            this.setDebitCount(Integer.valueOf(matcher.group(3)));
+            char sign = matcher.group(4).charAt(0);
+            this.setDebitAmount((sign == '+' ? 1 : -1)
+                    * Integer.valueOf(matcher.group(5)));
+            this.setCreditCount(Integer.valueOf(matcher.group(6)));
+            sign = matcher.group(7).charAt(0);
+            this.setCreditAmount((sign == '+' ? 1 : -1)
+                    * Integer.valueOf(matcher.group(8)));
+        }
     }
 
     public Integer getShiftNumber() {
@@ -98,6 +119,32 @@ public class Balancing {
 
     public void setCreditAmount(Integer creditAmount) {
         this.creditAmount = creditAmount;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Balancing [");
+        if (shiftNumber != null) {
+            builder.append("shiftNumber=").append(shiftNumber).append(", ");
+        }
+        if (batchNumber != null) {
+            builder.append("batchNumber=").append(batchNumber).append(", ");
+        }
+        if (debitCount != null) {
+            builder.append("debitCount=").append(debitCount).append(", ");
+        }
+        if (debitAmount != null) {
+            builder.append("debitAmount=").append(debitAmount).append(", ");
+        }
+        if (creditCount != null) {
+            builder.append("creditCount=").append(creditCount).append(", ");
+        }
+        if (creditAmount != null) {
+            builder.append("creditAmount=").append(creditAmount);
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
 }

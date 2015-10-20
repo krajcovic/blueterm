@@ -58,8 +58,7 @@ public class MbcaRequests {
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.MBCA
                                 .getPortApplicationNumber(), BProtocolMessages
-                                .getBalancing(transactionInputData
-                                        .getBalancing())).createFrame())));
+                                .getBalancing()).createFrame())));
     }
 
      /**

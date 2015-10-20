@@ -5,36 +5,41 @@ package cz.monetplus.blueterm;
  *
  */
 public class TransactionOut {
-    
+
     /**
      * 
      */
     private Integer resultCode;
-    
+
     /**
      * 
      */
     private String message;
-    
+
     /**
      * 
      */
     private String authCode;
-    
+
     /**
      * 
      */
     private Integer seqId;
-    
+
     /**
      * 
      */
     private String cardNumber;
-    
+
     /**
      * 
      */
     private String cardType;
+
+    /**
+     * Hodnoty uzaverky, popis v B protokolu
+     */
+    private Balancing balancing;
 
     public Integer getResultCode() {
         return resultCode;
@@ -106,8 +111,19 @@ public class TransactionOut {
         if (cardType != null) {
             builder.append("cardType=").append(cardType);
         }
+        if (balancing != null) {
+            builder.append(balancing.toString());
+        }
         builder.append("]");
         return builder.toString();
-    }  
+    }
+
+    public Balancing getBalancing() {
+        return balancing;
+    }
+
+    public void setBalancing(Balancing balancing) {
+        this.balancing = balancing;
+    }
 
 }
