@@ -38,14 +38,14 @@ public class TransactionIn {
     private Long tranId;
     
     /**
-     * 
+     * Autorizacni kod
      */
     private String authCode;
 
     /**
      * Typ dobijeni
      */
-    private RechargingType rechargintType;
+    private RechargingType rechargingType;
 
     /**
      * Metody pro komunikaci s pokladnou
@@ -114,11 +114,11 @@ public class TransactionIn {
     }
 
     public RechargingType getRechargingType() {
-        return rechargintType;
+        return rechargingType;
     }
 
     public void setRechargingType(RechargingType type) {
-        this.rechargintType = type;
+        this.rechargingType = type;
     }
 
 //    public Balancing getBalancing() {
