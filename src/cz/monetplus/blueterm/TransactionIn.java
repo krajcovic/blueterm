@@ -36,6 +36,11 @@ public class TransactionIn {
      * ID transakce
      */
     private Long tranId;
+    
+    /**
+     * 
+     */
+    private String authCode;
 
     /**
      * Typ dobijeni
@@ -51,15 +56,6 @@ public class TransactionIn {
      * Hodnoty uzaverky, popis v B protokolu
      */
     private Balancing balancing;
-
-/*    public TransactionIn() {
-        super();
-        this.amount = (long) 0;
-        this.currency = 203;
-        this.tranId = (long) 0;
-        this.rechargintType = RechargingType.Cash;
-        this.setBalancing(new Balancing());
-    }*/
 
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
@@ -105,17 +101,9 @@ public class TransactionIn {
         return blueHwAddress;
     }
 
-//    public void setBlueHwAddress(String blueHwAddress) {
-//        this.blueHwAddress = blueHwAddress;
-//    }
-
     public TransactionCommand getCommand() {
         return command;
     }
-
-//    public void setCommand(TransactionCommand command) {
-//        this.command = command;
-//    }
 
     public Long getTranId() {
         return this.tranId;
@@ -145,7 +133,11 @@ public class TransactionIn {
         return posCallbacks;
     }
 
-//    public void setPosCallbacks(PosCallbacks posCallbacks) {
-//        this.posCallbacks = posCallbacks;
-//    }
-}
+    public String getAuthCode() {
+        return authCode;
+    }
+
+    public void setAuthCode(String authCode) {
+        this.authCode = authCode;
+    }
+ }

@@ -215,6 +215,10 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.pay(transactionInputData));
             break;
         }
+        case CallMbcaReversal: {
+            addMessage(MbcaRequests.reversal(transactionInputData));
+            break;
+        }        
         case CallMvtaHandshake: {
             addMessage(MvtaRequests.handshakeMvta());
             break;
@@ -539,10 +543,10 @@ public class MessageThread extends Thread {
         transactionOutputData.setMessage(xprotocol.getTagMap().get(
                 XProtocolTag.ServerMessage));
         try {
-            transactionOutputData.setAuthCode(Integer.valueOf(xprotocol
-                    .getTagMap().get(XProtocolTag.AuthCode)));
+            transactionOutputData.setAuthCode(xprotocol
+                    .getTagMap().get(XProtocolTag.AuthCode));
         } catch (Exception e) {
-            transactionOutputData.setAuthCode(0);
+            transactionOutputData.setAuthCode(null);
         }
         try {
             transactionOutputData.setSeqId(Integer.valueOf(xprotocol

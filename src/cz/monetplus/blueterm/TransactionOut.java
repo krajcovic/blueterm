@@ -19,7 +19,7 @@ public class TransactionOut {
     /**
      * 
      */
-    private Integer authCode;
+    private String authCode;
     
     /**
      * 
@@ -52,11 +52,11 @@ public class TransactionOut {
         this.message = message;
     }
 
-    public Integer getAuthCode() {
+    public String getAuthCode() {
         return authCode;
     }
 
-    public void setAuthCode(Integer authCode) {
+    public void setAuthCode(String authCode) {
         this.authCode = authCode;
     }
 

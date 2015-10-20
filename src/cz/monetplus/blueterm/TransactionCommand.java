@@ -10,6 +10,8 @@ public enum TransactionCommand {
     MBCA_BALANCING(HandleOperations.CallMbcaBalancing),
 
     MBCA_PAY(HandleOperations.CallMbcaPay),
+    
+    MBCA_REVERSAL(HandleOperations.CallMbcaReversal),
 
     MBCA_INFO(HandleOperations.CallMbcaInfo),
 

@@ -69,20 +69,14 @@ public final class BProtocolMessages {
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    public static byte[] getReversal(int amount, int currencyCode,
-            String invoiceNumber) {
+    public static byte[] getReversal(String authCode) {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "10");
-        bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
-        bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
-                String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
-
-        // XProtocolFactory factory = new XProtocolFactory();
+        bprotocol.getTagMap().put(XProtocolTag.AuthCode, authCode);
 
         return XProtocolFactory.serialize(bprotocol);
     }
@@ -94,8 +88,6 @@ public final class BProtocolMessages {
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "95");
-
-        // XProtocolFactory factory = new XProtocolFactory();
 
         return XProtocolFactory.serialize(bprotocol);
     }

@@ -24,6 +24,20 @@ public class MbcaRequests {
                                         transactionInputData.getInvoice()))
                         .createFrame())));
     }
+    
+    /**
+     * Create and send pay request to terminal.
+     * @param transactionInputData 
+     * @return 
+     */
+    public static HandleMessage reversal(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getReversal(transactionInputData.getAuthCode()))
+                        .createFrame())));
+    }
 
     /**
      * Create and send handshake to terminal.
