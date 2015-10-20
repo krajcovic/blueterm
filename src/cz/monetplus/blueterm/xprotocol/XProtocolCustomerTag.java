@@ -15,7 +15,13 @@ public enum XProtocolCustomerTag {
     /**
      * Dlouhy variabilni symbol
      */
-    InvoiceNumber('S'),
+    InvoiceNumber('S'), 
+    
+    
+    /**
+     * Token generovany na zaklade pan karty.
+     */
+    CardToken('Z'),
     ;
     
     /**

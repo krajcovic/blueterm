@@ -7,32 +7,37 @@ package cz.monetplus.blueterm;
 public class TransactionOut {
 
     /**
-     * 
+     * Result code.
      */
     private Integer resultCode;
 
     /**
-     * 
+     * Odpoved.
      */
     private String message;
 
     /**
-     * 
+     * Autorizacni kod.
      */
     private String authCode;
 
     /**
-     * 
+     * Sequence Id.
      */
     private Integer seqId;
 
     /**
-     * 
+     * Cislo karty.
      */
     private String cardNumber;
 
     /**
-     * 
+     * Token generovany na zaklade PAN karty.
+     */
+    private String cardToken;
+
+    /**
+     * Typ karty
      */
     private String cardType;
 
@@ -109,10 +114,13 @@ public class TransactionOut {
             builder.append("cardNumber=").append(cardNumber).append("\n ");
         }
         if (cardType != null) {
-            builder.append("cardType=").append(cardType);
+            builder.append("cardType=").append(cardType).append("\n ");
+        }
+        if (cardToken != null) {
+            builder.append("cardToken=").append(cardToken).append("\n ");
         }
         if (balancing != null) {
-            builder.append(balancing.toString());
+            builder.append(balancing.toString()).append("\n ");
         }
         builder.append("]");
         return builder.toString();
@@ -124,6 +132,14 @@ public class TransactionOut {
 
     public void setBalancing(Balancing balancing) {
         this.balancing = balancing;
+    }
+
+    public String getCardToken() {
+        return cardToken;
+    }
+
+    public void setCardToken(String cardToken) {
+        this.cardToken = cardToken;
     }
 
 }

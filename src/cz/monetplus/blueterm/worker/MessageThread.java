@@ -127,7 +127,7 @@ public class MessageThread extends Thread {
         } else {
             throw new Exception("Another thread communicate with blueterm");
         }
-        
+
         return instance;
     }
 
@@ -219,7 +219,7 @@ public class MessageThread extends Thread {
         case CallMbcaReversal: {
             addMessage(MbcaRequests.reversal(transactionInputData));
             break;
-        }        
+        }
         case CallMvtaHandshake: {
             addMessage(MvtaRequests.handshakeMvta());
             break;
@@ -543,28 +543,40 @@ public class MessageThread extends Thread {
         }
         transactionOutputData.setMessage(xprotocol.getTagMap().get(
                 XProtocolTag.ServerMessage));
-        
-        try {
-            transactionOutputData.setAuthCode(xprotocol
-                    .getTagMap().get(XProtocolTag.AuthCode));
-        } catch (Exception e) {
-            transactionOutputData.setAuthCode(null);
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
+            transactionOutputData.setAuthCode(xprotocol.getTagMap().get(
+                    XProtocolTag.AuthCode));
         }
-        
-        try {
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.SequenceId)) {
             transactionOutputData.setSeqId(Integer.valueOf(xprotocol
                     .getTagMap().get(XProtocolTag.SequenceId)));
-        } catch (Exception e) {
-            transactionOutputData.setSeqId(0);
         }
-        
-        if(xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
             transactionOutputData.setBalancing(new Balancing(xprotocol
                     .getTagMap().get(XProtocolTag.TotalsBatch1)));
         }
-        
-        transactionOutputData.setCardNumber(xprotocol.getTagMap().get(
-                XProtocolTag.PAN));
+
+        if (xprotocol.getCustomerTagMap().containsKey(
+                XProtocolCustomerTag.CardToken)) {
+            transactionOutputData.setCardToken(xprotocol.getCustomerTagMap()
+                    .get(XProtocolCustomerTag.CardToken));
+        }
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)) {
+            transactionOutputData.setCardNumber(xprotocol.getTagMap().get(
+                    XProtocolTag.PAN));
+        }
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)
+                && !xprotocol.getCustomerTagMap().containsKey(
+                        XProtocolCustomerTag.CardToken)) {
+            transactionOutputData
+                    .setCardToken("000000000000000000000000000000000000000000000000");
+        }
+
         transactionOutputData.setCardType(xprotocol.getTagMap().get(
                 XProtocolTag.CardType));
     }
