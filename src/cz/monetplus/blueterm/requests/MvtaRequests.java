@@ -7,8 +7,9 @@ import cz.monetplus.blueterm.terminals.TerminalPortApplications;
 import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.worker.HandleOperations;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
 
-public class MvtaRequests {
+public class MvtaRequests implements Requests {
 
     /**
      * Create and send handshake to terminal.
@@ -51,6 +52,24 @@ public class MvtaRequests {
                                         .getTranId(), transactionInputData
                                         .getRechargingType().getTag()))
                         .createFrame())));
+    }
+    
+    @Override
+    public HandleMessage ticketRequest(TicketCommand command) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                                .getTicketRequest(command)).createFrame())));
+    }
+
+    @Override
+    public HandleMessage ack() {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                                .getAck()).createFrame())));
     }
     
 }

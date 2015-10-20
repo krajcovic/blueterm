@@ -5,10 +5,12 @@ import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
+import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.worker.HandleOperations;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
 
-public class MbcaRequests {
+public class MbcaRequests implements Requests {
     /**
      * Create and send pay request to terminal.
      * @param transactionInputData 
@@ -70,5 +72,23 @@ public class MbcaRequests {
                         TerminalPortApplications.MBCA
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getAppInfo()).createFrame())));
+    }
+
+    @Override
+    public HandleMessage ticketRequest(TicketCommand command) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getTicketRequest(command)).createFrame())));
+    }
+
+    @Override
+    public HandleMessage ack() {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getAck()).createFrame())));
     }
 }

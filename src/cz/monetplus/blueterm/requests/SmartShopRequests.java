@@ -9,7 +9,7 @@ import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
 
-public class SmartShopRequests {
+public class SmartShopRequests implements Requests {
 
     public static HandleMessage activate() {
         return new HandleMessage(HandleOperations.TerminalWrite,
@@ -99,7 +99,8 @@ public class SmartShopRequests {
                                 .getHanshake()).createFrame())));
     }
 
-    public static HandleMessage ticketRequest(TicketCommand command) {
+    @Override
+    public HandleMessage ticketRequest(TicketCommand command) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
@@ -107,7 +108,8 @@ public class SmartShopRequests {
                                 .getTicketRequest(command)).createFrame())));
     }
 
-    public static HandleMessage ack() {
+    @Override
+    public HandleMessage ack() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP

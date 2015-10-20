@@ -7,7 +7,9 @@ import java.util.Locale;
 import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.xprotocol.MessageNumber;
 import cz.monetplus.blueterm.xprotocol.ProtocolType;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
 import cz.monetplus.blueterm.xprotocol.XProtocol;
+import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
 import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
 import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
@@ -98,7 +100,7 @@ public final class BProtocolMessages {
 
     }
 
-    public static byte[] getBalancing(/*Balancing balancing*/) {
+    public static byte[] getBalancing() {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
@@ -106,15 +108,25 @@ public final class BProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "60");
 
-//        String format = String.format(Locale.US,
-//                "%03d%03d%04d%c%016d%04d%c%016d", balancing.getShiftNumber(),
-//                balancing.getBatchNumber(), balancing.getDebitCount(),
-//                balancing.getDebitAmount() >= 0 ? '+' : '-',
-//                balancing.getDebitAmount(), balancing.getCreditCount(),
-//                balancing.getCreditAmount() >= 0 ? '+' : '-',
-//                balancing.getCreditAmount());
-//
-//        bprotocol.getTagMap().put(XProtocolTag.TotalsBatch1, format);
+        return XProtocolFactory.serialize(bprotocol);
+    }
+
+    public static byte[] getTicketRequest(TicketCommand command) {
+        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
+                MessageNumber.TicketRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
+        bprotocol.getCustomerTagMap().put(
+                XProtocolCustomerTag.TerminalTicketInformation,
+                command.getTag().toString());
+        return XProtocolFactory.serialize(bprotocol);
+    }
+
+    public static byte[] getAck() {
+        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
+                MessageNumber.Ack, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
         return XProtocolFactory.serialize(bprotocol);
     }
 }

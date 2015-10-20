@@ -18,6 +18,7 @@ import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.requests.MbcaRequests;
 import cz.monetplus.blueterm.requests.MvtaRequests;
+import cz.monetplus.blueterm.requests.Requests;
 import cz.monetplus.blueterm.requests.SmartShopRequests;
 import cz.monetplus.blueterm.server.ServerFrame;
 import cz.monetplus.blueterm.terminals.TerminalCommands;
@@ -166,7 +167,12 @@ public class MessageThread extends Thread {
      */
     public void addMessage(HandleOperations operation) {
         addMessage(new HandleMessage(operation));
+    }
 
+    private void addMessage(HandleOperations operation, Requests request) {
+        HandleMessage handleMessage = new HandleMessage(operation);
+        handleMessage.setRequest(request);
+        addMessage(handleMessage);
     }
 
     public void handleMessage(HandleMessage msg) {
@@ -300,14 +306,7 @@ public class MessageThread extends Thread {
             break;
 
         case CheckSign:
-            if (transactionInputData.getPosCallbacks().isSingOk()) {
-                // Sign is OK
-                addMessage(SmartShopRequests
-                        .ticketRequest(TicketCommand.Customer));
-            } else {
-                // Sign is Bad
-                addMessage(HandleOperations.Exit);
-            }
+            checkSign(msg.getRequest());
             break;
 
         case Exit:
@@ -320,6 +319,16 @@ public class MessageThread extends Thread {
         default:
             break;
 
+        }
+    }
+
+    private void checkSign(Requests request) {
+        if (transactionInputData.getPosCallbacks().isSingOk()) {
+            // Sign is OK
+            addMessage(request.ticketRequest(TicketCommand.Customer));
+        } else {
+            // Sign is Bad
+            addMessage(HandleOperations.Exit);
         }
     }
 
@@ -431,55 +440,10 @@ public class MessageThread extends Thread {
                         case Ack:
                             break;
                         case TransactionResponse:
-                            ParseTransactionResponse(xprotocol);
-
-                            if (isTicketFlagOn(xprotocol)) {
-                                addMessage(SmartShopRequests
-                                        .ticketRequest(TicketCommand.Merchant));
-                                lastTicket = TicketCommand.Merchant;
-                            } else {
-                                addMessage(HandleOperations.Exit);
-                            }
+                            transactionResponse(new MbcaRequests(), xprotocol);
                             break;
                         case TicketResponse:
-                            ParseTicketResponse(xprotocol);
-                            addMessage(SmartShopRequests.ack());
-
-                            if (xprotocol
-                                    .getCustomerTagMap()
-                                    .containsKey(
-                                            XProtocolCustomerTag.TerminalTicketInformation)) {
-                                TicketCommand ticketCommand = TicketCommand
-                                        .tagOf(xprotocol
-                                                .getCustomerTagMap()
-                                                .get(XProtocolCustomerTag.TerminalTicketInformation)
-                                                .charAt(0));
-                                switch (ticketCommand) {
-                                case Continue:
-                                    addMessage(SmartShopRequests
-                                            .ticketRequest(TicketCommand.Next));
-                                    break;
-                                case End:
-                                    transactionInputData.getPosCallbacks()
-                                            .ticketFinish();
-                                    if (isSingFlagOn(xprotocol)) {
-                                        addMessage(HandleOperations.CheckSign);
-                                    } else {
-                                        if (lastTicket == TicketCommand.Merchant) {
-                                            addMessage(SmartShopRequests
-                                                    .ticketRequest(TicketCommand.Customer));
-                                            lastTicket = TicketCommand.Customer;
-
-                                        } else {
-                                            addMessage(HandleOperations.Exit);
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    break;
-
-                                }
-                            }
+                            ticketResponse(new MbcaRequests(), xprotocol);
 
                             break;
                         default:
@@ -506,6 +470,53 @@ public class MessageThread extends Thread {
 
         } catch (IOException e) {
             Log.e(TAG, "Exception by parsing slip packets.");
+        }
+    }
+
+    private void ticketResponse(Requests request, XProtocol xprotocol) {
+        ParseTicketResponse(xprotocol);
+        addMessage(request.ack());
+
+        if (xprotocol.getCustomerTagMap().containsKey(
+                XProtocolCustomerTag.TerminalTicketInformation)) {
+            TicketCommand ticketCommand = TicketCommand.tagOf(xprotocol
+                    .getCustomerTagMap()
+                    .get(XProtocolCustomerTag.TerminalTicketInformation)
+                    .charAt(0));
+            switch (ticketCommand) {
+            case Continue:
+                addMessage(request.ticketRequest(TicketCommand.Next));
+                break;
+            case End:
+                transactionInputData.getPosCallbacks().ticketFinish();
+                if (isSingFlagOn(xprotocol)) {
+                    addMessage(HandleOperations.CheckSign, request);
+                } else {
+                    if (lastTicket == TicketCommand.Merchant) {
+                        addMessage(request
+                                .ticketRequest(TicketCommand.Customer));
+                        lastTicket = TicketCommand.Customer;
+
+                    } else {
+                        addMessage(HandleOperations.Exit);
+                    }
+                }
+                break;
+            default:
+                break;
+
+            }
+        }
+    }
+
+    private void transactionResponse(Requests request, XProtocol xprotocol) {
+        ParseTransactionResponse(xprotocol);
+
+        if (isTicketFlagOn(xprotocol)) {
+            addMessage(request.ticketRequest(TicketCommand.Merchant));
+            lastTicket = TicketCommand.Merchant;
+        } else {
+            addMessage(HandleOperations.Exit);
         }
     }
 

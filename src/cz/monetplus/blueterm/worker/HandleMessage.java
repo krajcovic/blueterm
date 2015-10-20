@@ -2,6 +2,8 @@ package cz.monetplus.blueterm.worker;
 
 import java.nio.ByteBuffer;
 
+import cz.monetplus.blueterm.requests.Requests;
+
 /**
  * Identificators for Handle message thread.
  * 
@@ -14,7 +16,12 @@ public class HandleMessage {
      * Handle operation.
      */
     private HandleOperations operation;
-
+    
+    /**
+     * Who call it.
+     */
+    private Requests request;
+    
     /**
      * Buffer with data.
      */
@@ -76,4 +83,11 @@ public class HandleMessage {
         this.buffer = buffer;
     }
 
+    public Requests getRequest() {
+        return request;
+    }
+
+    public void setRequest(Requests request) {
+        this.request = request;
+    }
 }
