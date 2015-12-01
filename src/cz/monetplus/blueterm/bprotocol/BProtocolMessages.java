@@ -100,6 +100,15 @@ public final class BProtocolMessages {
 
     }
 
+    public static byte[] getLastTran() {
+        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "82");
+        return XProtocolFactory.serialize(bprotocol);
+    }
+
     public static byte[] getBalancing() {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,

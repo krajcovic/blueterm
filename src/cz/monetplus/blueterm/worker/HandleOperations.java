@@ -73,6 +73,11 @@ public enum HandleOperations {
     /**
      * 
      */
+    CallMbcaGetLastTran,     
+    
+    /**
+     * 
+     */
     CallMbcaPay,
     
     /**
@@ -89,6 +94,11 @@ public enum HandleOperations {
      * 
      */
     CallMvtaInfo,
+    
+    /**
+     * 
+     */
+    CallMvtaGetLastTran,
     
     /**
      * 
@@ -146,11 +156,14 @@ public enum HandleOperations {
      */
     ServerConnected,
     
+    /**
+     * 
+     */
     CheckSign,
       
     /**
      * 
      */
-    Exit,     
+    Exit,  
     ;
 }

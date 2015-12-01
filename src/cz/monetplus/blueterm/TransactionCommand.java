@@ -11,6 +11,8 @@ public enum TransactionCommand {
 
     MBCA_PAY(HandleOperations.CallMbcaPay),
     
+    MBCA_LAST_TRAN(HandleOperations.CallMbcaGetLastTran),
+    
     MBCA_REVERSAL(HandleOperations.CallMbcaReversal),
 
     MBCA_INFO(HandleOperations.CallMbcaInfo),
@@ -18,6 +20,8 @@ public enum TransactionCommand {
     MVTA_HANDSHAKE(HandleOperations.CallMvtaHandshake),
     
     MVTA_INFO(HandleOperations.CallMvtaInfo),
+    
+    MVTA_LAST_TRAN(HandleOperations.CallMvtaGetLastTran),
     
     MVTA_RECHARGE(HandleOperations.CallMvtaRecharging),
     

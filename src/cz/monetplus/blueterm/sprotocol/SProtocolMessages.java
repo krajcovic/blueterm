@@ -33,7 +33,7 @@ public final class SProtocolMessages {
     }
 
     public static byte[] getSale(long amount, int currencyCode,
-            String invoiceNumber) {
+            String invoiceNumber, Boolean partialPayment, String ticketNumber) {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
@@ -43,11 +43,43 @@ public final class SProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
+
         bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
                 invoiceNumber);
 
+        if (partialPayment != null && partialPayment == true) {
+            bprotocol.getCustomerTagMap()
+                    .put(XProtocolCustomerTag.SupportPartialPayment, "1");
+        }
+
+        if (ticketNumber != null && ticketNumber.length() > 0) {
+            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.TicketNumber,
+                    ticketNumber);
+        }
+
         return XProtocolFactory.serialize(bprotocol);
     }
+
+    // public static byte[] getPartialPayment(long amount, int currencyCode,
+    // String invoiceNumber) {
+    //
+    // XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
+    // MessageNumber.TransactionRequest, "01", " ",
+    // getCurrentDateTimeForHeader(), 0, "A5A5");
+    //
+    // bprotocol.getTagMap().put(XProtocolTag.TransactionType, "00");
+    // bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+    // bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
+    // String.valueOf(currencyCode));
+    //
+    // bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.SupportPartialPayment,
+    // "1");
+    //
+    // bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
+    // invoiceNumber);
+    //
+    // return XProtocolFactory.serialize(bprotocol);
+    // }
 
     public static byte[] getReturn(long amount, int currencyCode,
             String invoiceNumber) {
@@ -122,7 +154,8 @@ public final class SProtocolMessages {
     }
 
     private static String getCurrentDateTimeForHeader() {
-        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss",
+                Locale.US);
         return formater.format(new Date());
 
     }

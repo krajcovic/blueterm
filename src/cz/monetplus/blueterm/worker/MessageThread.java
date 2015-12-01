@@ -218,6 +218,12 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.appInfoMbca());
             break;
         }
+        
+        case CallMbcaGetLastTran: {
+            addMessage(MbcaRequests.getLastTran());
+            break;
+        }
+        
         case CallMbcaPay: {
             addMessage(MbcaRequests.pay(transactionInputData));
             break;
@@ -234,6 +240,12 @@ public class MessageThread extends Thread {
             addMessage(MvtaRequests.appInfoMvta());
             break;
         }
+        
+        case CallMvtaGetLastTran: {
+            addMessage(MvtaRequests.getLastTran());
+            break;
+        }
+        
         case CallMvtaRecharging: {
             addMessage(MvtaRequests.recharge(transactionInputData));
             break;

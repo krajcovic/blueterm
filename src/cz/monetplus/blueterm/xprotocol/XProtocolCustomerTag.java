@@ -1,29 +1,37 @@
 package cz.monetplus.blueterm.xprotocol;
 
 public enum XProtocolCustomerTag {
-    
+
     /**
      * 
      */
     TerminalTicketInformation('t'),
-    
+
     /**
      * 
      */
-    TerminalTicketLine('T'), 
-    
+    TerminalTicketLine('T'),
+
     /**
      * Dlouhy variabilni symbol
      */
-    InvoiceNumber('S'), 
-    
-    
+    InvoiceNumber('S'),
+
+    /**
+     * Castecna platba
+     */
+    SupportPartialPayment('P'),
+
+    /**
+     * Platba ticketem.
+     */
+    TicketNumber('T'),
+
     /**
      * Token generovany na zaklade pan karty.
      */
-    CardToken('Z'),
-    ;
-    
+    CardToken('Z'),;
+
     /**
      * Character tag.
      */
@@ -44,7 +52,8 @@ public enum XProtocolCustomerTag {
     }
 
     public static XProtocolCustomerTag tagOf(Character tag) {
-        for (XProtocolCustomerTag e : XProtocolCustomerTag.class.getEnumConstants()) {
+        for (XProtocolCustomerTag e : XProtocolCustomerTag.class
+                .getEnumConstants()) {
             if (e.getTag().equals(tag)) {
                 return e;
             }

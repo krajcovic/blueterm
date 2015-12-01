@@ -21,6 +21,16 @@ public class TransactionIn {
      * Zasilana castka
      */
     private Long amount;
+    
+    /**
+     * Castecna platba.
+     */
+    private Boolean partialPayment;
+    
+    /**
+     * Cislo tiketu.
+     */
+    private String ticketNumber;
 
     /**
      * Variabilni symbol
@@ -52,17 +62,13 @@ public class TransactionIn {
      */
     private PosCallbacks posCallbacks;
 
-//    /**
-//     * Hodnoty uzaverky, popis v B protokolu
-//     */
-//    private Balancing balancing;
-
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
 
         this.blueHwAddress = blueHwAddress;
-        this.command = command;
-
+        this.command = command;       
+        this.partialPayment = false;
+        this.ticketNumber = "";
         this.posCallbacks = posCallbacks;
     }
 
@@ -121,14 +127,6 @@ public class TransactionIn {
         this.rechargingType = type;
     }
 
-//    public Balancing getBalancing() {
-//        return balancing;
-//    }
-//
-//    public void setBalancing(Balancing balancing) {
-//        this.balancing = balancing;
-//    }
-
     public PosCallbacks getPosCallbacks() {
         return posCallbacks;
     }
@@ -139,5 +137,21 @@ public class TransactionIn {
 
     public void setAuthCode(String authCode) {
         this.authCode = authCode;
+    }
+
+    public Boolean getPartialPayment() {
+        return partialPayment;
+    }
+
+    public void setPartialPayment(Boolean partialPayment) {
+        this.partialPayment = partialPayment;
+    }
+
+    public String getTicketNumber() {
+        return ticketNumber;
+    }
+
+    public void setTicketNumber(String ticketNumber) {
+        this.ticketNumber = ticketNumber;
     }
  }

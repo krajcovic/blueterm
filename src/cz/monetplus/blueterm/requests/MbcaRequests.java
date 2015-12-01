@@ -62,6 +62,17 @@ public class MbcaRequests implements Requests {
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getBalancing()).createFrame())));
     }
+    
+    /**
+    * Create and send app info request to terminal.
+    */
+   public static HandleMessage getLastTran() {
+       return (new HandleMessage(HandleOperations.TerminalWrite,
+               SLIPFrame.createFrame(new TerminalFrame(
+                       TerminalPortApplications.MBCA
+                               .getPortApplicationNumber(), BProtocolMessages
+                               .getLastTran()).createFrame())));
+   }
 
      /**
      * Create and send app info request to terminal.

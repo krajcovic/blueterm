@@ -1,6 +1,7 @@
 package cz.monetplus.blueterm.requests;
 
 import cz.monetplus.blueterm.TransactionIn;
+import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
@@ -53,6 +54,17 @@ public class MvtaRequests implements Requests {
                                         .getRechargingType().getTag()))
                         .createFrame())));
     }
+    
+    /**
+    * Create and send app info request to terminal.
+    */
+   public static HandleMessage getLastTran() {
+       return (new HandleMessage(HandleOperations.TerminalWrite,
+               SLIPFrame.createFrame(new TerminalFrame(
+                       TerminalPortApplications.MBCA
+                               .getPortApplicationNumber(), BProtocolMessages
+                               .getLastTran()).createFrame())));
+   }
     
     @Override
     public HandleMessage ticketRequest(TicketCommand command) {

@@ -15,88 +15,95 @@ public class SmartShopRequests implements Requests {
         return new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getActivate()).createFrame()));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getActivate()).createFrame()));
     }
 
     public static HandleMessage deactivate() {
         return new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getDeactivate()).createFrame()));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getDeactivate()).createFrame()));
     }
-    
+
     /**
      * Create and send pay request to terminal.
-     * @param transactionInputData 
-     * @return 
+     * 
+     * @param transactionInputData
+     * @return
      */
     public static HandleMessage pay(TransactionIn transactionInputData) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
+                                .getPortApplicationNumber(),
+                        SProtocolMessages
                                 .getSale(transactionInputData.getAmount(),
                                         transactionInputData.getCurrency(),
-                                        transactionInputData.getInvoice()))
-                        .createFrame())));
+                                        transactionInputData.getInvoice(),
+                                        transactionInputData
+                                                .getPartialPayment(),
+                                transactionInputData.getTicketNumber()))
+                                        .createFrame())));
     }
-    
+
     /**
      * Create and send return request to terminal.
-     * @param transactionInputData 
-     * @return 
+     * 
+     * @param transactionInputData
+     * @return
      */
     public static HandleMessage getReturn(TransactionIn transactionInputData) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getReturn(transactionInputData.getAmount(),
-                                        transactionInputData.getCurrency(),
-                                        transactionInputData.getInvoice()))
-                        .createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getReturn(
+                                transactionInputData.getAmount(),
+                                transactionInputData.getCurrency(),
+                                transactionInputData.getInvoice()))
+                                        .createFrame())));
     }
-    
+
     public static HandleMessage getCardState() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getCardState()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getCardState()).createFrame())));
     }
 
     public static HandleMessage getAppInfo() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getAppInfo()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getAppInfo()).createFrame())));
     }
 
     public static HandleMessage getLastTrans() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getLastTran()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getLastTran()).createFrame())));
     }
 
     public static HandleMessage parametersCall() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getParametersCall()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getParametersCall()).createFrame())));
     }
 
     public static HandleMessage handshake() {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getHanshake()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getHanshake()).createFrame())));
     }
 
     @Override
@@ -104,8 +111,9 @@ public class SmartShopRequests implements Requests {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getTicketRequest(command)).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getTicketRequest(command))
+                                .createFrame())));
     }
 
     @Override
@@ -113,8 +121,8 @@ public class SmartShopRequests implements Requests {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
-                                .getPortApplicationNumber(), SProtocolMessages
-                                .getAck()).createFrame())));
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getAck()).createFrame())));
     }
 
 }
