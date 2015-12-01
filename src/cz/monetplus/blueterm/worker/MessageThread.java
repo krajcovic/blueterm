@@ -431,29 +431,13 @@ public class MessageThread extends Thread {
                     }
 
                     case MBCA:
+                        TTResponse(new MbcaRequests(), termFrame);
+                        break;
                     case MVTA:
+                        TTResponse(new MvtaRequests(), termFrame);
+                        break;
                     case SMARTSHOP: {
-                        XProtocol xprotocol = XProtocolFactory
-                                .deserialize(termFrame.getData());
-
-                        switch (xprotocol.getMessageNumber()) {
-                        case Ack:
-                            break;
-                        case TransactionResponse:
-                            transactionResponse(new MbcaRequests(), xprotocol);
-                            break;
-                        case TicketResponse:
-                            ticketResponse(new MbcaRequests(), xprotocol);
-
-                            break;
-                        default:
-                            Log.w(TAG,
-                                    "Unexpected messageNumber: "
-                                            + xprotocol.getMessageNumber());
-                            break;
-
-                        }
-
+                        TTResponse(new SmartShopRequests(), termFrame);
                         break;
                     }
 
@@ -470,6 +454,29 @@ public class MessageThread extends Thread {
 
         } catch (IOException e) {
             Log.e(TAG, "Exception by parsing slip packets.");
+        }
+    }
+
+    private void TTResponse(Requests request, TerminalFrame termFrame) {
+        XProtocol xprotocol = XProtocolFactory
+                .deserialize(termFrame.getData());
+
+        switch (xprotocol.getMessageNumber()) {
+        case Ack:
+            break;
+        case TransactionResponse:
+            transactionResponse(request, xprotocol);
+            break;
+        case TicketResponse:
+            ticketResponse(request, xprotocol);
+
+            break;
+        default:
+            Log.w(TAG,
+                    "Unexpected messageNumber: "
+                            + xprotocol.getMessageNumber());
+            break;
+
         }
     }
 
