@@ -2,14 +2,6 @@ package cz.monetplus.blueterm.xprotocol;
 
 /**
  * @author "Dusan Krajcovic"
- *
- */
-/**
- * @author "Dusan Krajcovic"
- *
- */
-/**
- * @author "Dusan Krajcovic"
  * 
  */
 public enum XProtocolTag {
