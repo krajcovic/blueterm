@@ -37,14 +37,19 @@ public class TransactionOut {
     private String cardToken;
 
     /**
-     * Typ karty
+     * Typ karty.
      */
     private String cardType;
 
     /**
-     * Hodnoty uzaverky, popis v B protokolu
+     * Hodnoty uzaverky, popis v B protokolu.
      */
     private Balancing balancing;
+    
+    /**
+     * Zbytek po platbe.
+     */
+    private Long remainPayment;
 
     public Integer getResultCode() {
         return resultCode;
@@ -122,6 +127,10 @@ public class TransactionOut {
         if (balancing != null) {
             builder.append(balancing.toString()).append("\n ");
         }
+        if (remainPayment != null) {
+            builder.append(remainPayment.toString()).append("\n ");
+        }
+        
         builder.append("]");
         return builder.toString();
     }
@@ -140,6 +149,14 @@ public class TransactionOut {
 
     public void setCardToken(String cardToken) {
         this.cardToken = cardToken;
+    }
+
+    public Long getRemainPayment() {
+        return remainPayment;
+    }
+
+    public void setRemainPayment(Long remainPayment) {
+        this.remainPayment = remainPayment;
     }
 
 }

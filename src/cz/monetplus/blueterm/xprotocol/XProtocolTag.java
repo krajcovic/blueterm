@@ -94,6 +94,11 @@ public enum XProtocolTag {
     CardType('J'),
     
     /**
+     * 
+     */
+    RemainPayment('L'),
+    
+    /**
      * pole nese informaci o způsobu dobití karty:
          0 dobití provedeno hotovostí 
          1 dobití provedeno platební kartou

@@ -178,8 +178,8 @@ public class MessageThread extends Thread {
     public void handleMessage(HandleMessage msg) {
 
         Log.i(TAG, "Operation: " + msg.getOperation());
-        transactionInputData.getPosCallbacks().progress(
-                msg.getOperation().toString());
+        transactionInputData.getPosCallbacks()
+                .progress(msg.getOperation().toString());
 
         switch (msg.getOperation()) {
         case GetBluetoothAddress: {
@@ -218,12 +218,12 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.appInfoMbca());
             break;
         }
-        
+
         case CallMbcaGetLastTran: {
             addMessage(MbcaRequests.getLastTran());
             break;
         }
-        
+
         case CallMbcaPay: {
             addMessage(MbcaRequests.pay(transactionInputData));
             break;
@@ -240,12 +240,12 @@ public class MessageThread extends Thread {
             addMessage(MvtaRequests.appInfoMvta());
             break;
         }
-        
+
         case CallMvtaGetLastTran: {
             addMessage(MvtaRequests.getLastTran());
             break;
         }
-        
+
         case CallMvtaRecharging: {
             addMessage(MvtaRequests.recharge(transactionInputData));
             break;
@@ -383,7 +383,8 @@ public class MessageThread extends Thread {
                 this.addMessage(HandleOperations.Exit);
             }
         else {
-            this.setOutputMessage("Bluetooth is not supported on this hardware platform.");
+            this.setOutputMessage(
+                    "Bluetooth is not supported on this hardware platform.");
             this.addMessage(HandleOperations.Exit);
         }
 
@@ -407,7 +408,7 @@ public class MessageThread extends Thread {
      * 
      * @param msg
      *            Contains status(arg1) about current connection to server.
-     * */
+     */
     private void serverConnected(HandleMessage msg) {
         ServerFrame soFrame = new ServerFrame(TerminalCommands.ServerConnected,
                 serverConnectionID, msg.getBuffer().array());
@@ -470,8 +471,7 @@ public class MessageThread extends Thread {
     }
 
     private void TTResponse(Requests request, TerminalFrame termFrame) {
-        XProtocol xprotocol = XProtocolFactory
-                .deserialize(termFrame.getData());
+        XProtocol xprotocol = XProtocolFactory.deserialize(termFrame.getData());
 
         switch (xprotocol.getMessageNumber()) {
         case Ack:
@@ -484,9 +484,8 @@ public class MessageThread extends Thread {
 
             break;
         default:
-            Log.w(TAG,
-                    "Unexpected messageNumber: "
-                            + xprotocol.getMessageNumber());
+            Log.w(TAG, "Unexpected messageNumber: "
+                    + xprotocol.getMessageNumber());
             break;
 
         }
@@ -496,12 +495,12 @@ public class MessageThread extends Thread {
         ParseTicketResponse(xprotocol);
         addMessage(request.ack());
 
-        if (xprotocol.getCustomerTagMap().containsKey(
-                XProtocolCustomerTag.TerminalTicketInformation)) {
-            TicketCommand ticketCommand = TicketCommand.tagOf(xprotocol
-                    .getCustomerTagMap()
-                    .get(XProtocolCustomerTag.TerminalTicketInformation)
-                    .charAt(0));
+        if (xprotocol.getCustomerTagMap()
+                .containsKey(XProtocolCustomerTag.TerminalTicketInformation)) {
+            TicketCommand ticketCommand = TicketCommand
+                    .tagOf(xprotocol.getCustomerTagMap()
+                            .get(XProtocolCustomerTag.TerminalTicketInformation)
+                            .charAt(0));
             switch (ticketCommand) {
             case Continue:
                 addMessage(request.ticketRequest(TicketCommand.Next));
@@ -512,8 +511,8 @@ public class MessageThread extends Thread {
                     addMessage(HandleOperations.CheckSign, request);
                 } else {
                     if (lastTicket == TicketCommand.Merchant) {
-                        addMessage(request
-                                .ticketRequest(TicketCommand.Customer));
+                        addMessage(
+                                request.ticketRequest(TicketCommand.Customer));
                         lastTicket = TicketCommand.Customer;
 
                     } else {
@@ -556,8 +555,8 @@ public class MessageThread extends Thread {
      * @return
      */
     private TerminalFrame getTerminalFrame(ByteArrayOutputStream stream) {
-        TerminalFrame termFrame = new TerminalFrame(SLIPFrame.parseFrame(stream
-                .toByteArray()));
+        TerminalFrame termFrame = new TerminalFrame(
+                SLIPFrame.parseFrame(stream.toByteArray()));
         stream.reset();
         return termFrame;
     }
@@ -565,50 +564,57 @@ public class MessageThread extends Thread {
     private void ParseTransactionResponse(XProtocol xprotocol) {
         // transactionOutputData = new TransactionOut();
         try {
-            transactionOutputData.setResultCode(Integer.valueOf(xprotocol
-                    .getTagMap().get(XProtocolTag.ResponseCode)));
+            transactionOutputData.setResultCode(Integer.valueOf(
+                    xprotocol.getTagMap().get(XProtocolTag.ResponseCode)));
         } catch (Exception e) {
             // transactionOutputData.setResultCode(-1);
             Log.w(TAG, "Missing ResponseCode TAG");
         }
-        transactionOutputData.setMessage(xprotocol.getTagMap().get(
-                XProtocolTag.ServerMessage));
+        transactionOutputData.setMessage(
+                xprotocol.getTagMap().get(XProtocolTag.ServerMessage));
 
         if (xprotocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
-            transactionOutputData.setAuthCode(xprotocol.getTagMap().get(
-                    XProtocolTag.AuthCode));
+            transactionOutputData.setAuthCode(
+                    xprotocol.getTagMap().get(XProtocolTag.AuthCode));
         }
 
         if (xprotocol.getTagMap().containsKey(XProtocolTag.SequenceId)) {
-            transactionOutputData.setSeqId(Integer.valueOf(xprotocol
-                    .getTagMap().get(XProtocolTag.SequenceId)));
+            transactionOutputData.setSeqId(Integer.valueOf(
+                    xprotocol.getTagMap().get(XProtocolTag.SequenceId)));
         }
 
         if (xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
-            transactionOutputData.setBalancing(new Balancing(xprotocol
-                    .getTagMap().get(XProtocolTag.TotalsBatch1)));
+            transactionOutputData.setBalancing(new Balancing(
+                    xprotocol.getTagMap().get(XProtocolTag.TotalsBatch1)));
         }
 
-        if (xprotocol.getCustomerTagMap().containsKey(
-                XProtocolCustomerTag.CardToken)) {
+        if (xprotocol.getCustomerTagMap()
+                .containsKey(XProtocolCustomerTag.CardToken)) {
             transactionOutputData.setCardToken(xprotocol.getCustomerTagMap()
                     .get(XProtocolCustomerTag.CardToken));
         }
 
         if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)) {
-            transactionOutputData.setCardNumber(xprotocol.getTagMap().get(
-                    XProtocolTag.PAN));
+            transactionOutputData
+                    .setCardNumber(xprotocol.getTagMap().get(XProtocolTag.PAN));
         }
 
         if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)
-                && !xprotocol.getCustomerTagMap().containsKey(
-                        XProtocolCustomerTag.CardToken)) {
-            transactionOutputData
-                    .setCardToken("000000000000000000000000000000000000000000000000");
+                && !xprotocol.getCustomerTagMap()
+                        .containsKey(XProtocolCustomerTag.CardToken)) {
+            transactionOutputData.setCardToken(
+                    "000000000000000000000000000000000000000000000000");
         }
 
-        transactionOutputData.setCardType(xprotocol.getTagMap().get(
-                XProtocolTag.CardType));
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.CardType)) {
+            transactionOutputData.setCardType(
+                    xprotocol.getTagMap().get(XProtocolTag.CardType));
+        }
+
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.RemainPayment)) {
+            transactionOutputData.setRemainPayment(Long.valueOf(xprotocol
+                    .getTagMap().get(XProtocolTag.RemainPayment).toString()));
+        }
     }
 
     private void ParseTicketResponse(XProtocol xprotocol) {
@@ -662,8 +668,8 @@ public class MessageThread extends Thread {
             Log.i(TAG, "TCP thread starting.");
             tcpThread.start();
 
-            TerminalFrame responseTerminal = new TerminalFrame(termFrame
-                    .getPortApplication().getPortApplicationNumber(),
+            TerminalFrame responseTerminal = new TerminalFrame(
+                    termFrame.getPortApplication().getPortApplicationNumber(),
                     new ServerFrame((byte) TerminalCommands.ConnectRes,
                             serverFrame.getId(), new byte[1]).createFrame());
             this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
@@ -695,8 +701,8 @@ public class MessageThread extends Thread {
      */
     private void echoResponse(TerminalFrame termFrame,
             final ServerFrame serverFrame) {
-        TerminalFrame responseTerminal = new TerminalFrame(termFrame
-                .getPortApplication().getPortApplicationNumber(),
+        TerminalFrame responseTerminal = new TerminalFrame(
+                termFrame.getPortApplication().getPortApplicationNumber(),
                 new ServerFrame(TerminalCommands.EchoRes, serverFrame.getId(),
                         null).createFrame());
         this.addMessage(new HandleMessage(HandleOperations.TerminalWrite,
