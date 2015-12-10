@@ -66,6 +66,11 @@ public enum HandleOperations {
     CallMbcaBalancing,
     
     /**
+     * Call MBCA parameters.
+     */
+    CallMbcaParameters,
+    
+    /**
      * 
      */
     CallMbcaInfo,
@@ -172,7 +177,7 @@ public enum HandleOperations {
     CheckSign,
       
     /**
-     * 
+     * Finish all threads and communication with terminal.
      */
     Exit,  
     ;

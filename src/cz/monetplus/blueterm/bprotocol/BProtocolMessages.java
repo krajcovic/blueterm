@@ -25,23 +25,24 @@ public final class BProtocolMessages extends ProtocolMessages {
 
     public static byte[] getAppInfo() {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "80");
 
-        // XProtocolFactory factory = new XProtocolFactory();
-
         return XProtocolFactory.serialize(bprotocol);
+    }
+
+    private static XProtocol getInstance() {
+        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+        return bprotocol;
     }
 
     public static byte[] getSale(long amount, int currencyCode,
             String invoiceNumber) {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "00");
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
@@ -57,9 +58,7 @@ public final class BProtocolMessages extends ProtocolMessages {
     public static byte[] getReturn(int amount, int currencyCode,
             String invoiceNumber) {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "04");
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
@@ -74,9 +73,7 @@ public final class BProtocolMessages extends ProtocolMessages {
 
     public static byte[] getReversal(String authCode) {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "10");
         bprotocol.getTagMap().put(XProtocolTag.AuthCode, authCode);
@@ -86,25 +83,15 @@ public final class BProtocolMessages extends ProtocolMessages {
 
     public static byte[] getHanshake() {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "95");
 
         return XProtocolFactory.serialize(bprotocol);
     }
 
-//    private static String getCurrentDateTimeForHeader() {
-//        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss");
-//        return formater.format(new Date());
-//
-//    }
-
     public static byte[] getLastTran() {
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "82");
         return XProtocolFactory.serialize(bprotocol);
@@ -112,11 +99,17 @@ public final class BProtocolMessages extends ProtocolMessages {
 
     public static byte[] getBalancing() {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "60");
+
+        return XProtocolFactory.serialize(bprotocol);
+    }
+    
+    public static byte[] getParametersCall() {
+        XProtocol bprotocol = getInstance();
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "90");
 
         return XProtocolFactory.serialize(bprotocol);
     }

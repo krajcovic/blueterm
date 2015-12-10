@@ -8,6 +8,8 @@ public enum TransactionCommand {
     MBCA_HANDSHAKE(HandleOperations.CallMbcaHandshake),
     
     MBCA_BALANCING(HandleOperations.CallMbcaBalancing),
+    
+    MBCA_PARAMETERS(HandleOperations.CallMbcaParameters),
 
     MBCA_PAY(HandleOperations.CallMbcaPay),
     

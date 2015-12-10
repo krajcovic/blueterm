@@ -211,10 +211,17 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.handshakeMbca());
             break;
         }
+        
         case CallMbcaBalancing: {
-            addMessage(MbcaRequests.balancingMbca(transactionInputData));
+            addMessage(MbcaRequests.balancing(transactionInputData));
             break;
         }
+        
+        case CallMbcaParameters: {
+            addMessage(MbcaRequests.parameters(transactionInputData));
+            break;
+        }
+        
         case CallMbcaInfo: {
             addMessage(MbcaRequests.appInfoMbca());
             break;

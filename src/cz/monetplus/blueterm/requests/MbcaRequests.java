@@ -55,12 +55,23 @@ public class MbcaRequests implements Requests {
     /**
      * Create and send handshake to terminal.
      */
-    public static HandleMessage balancingMbca(TransactionIn transactionInputData) {
+    public static HandleMessage balancing(TransactionIn transactionInputData) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.MBCA
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getBalancing()).createFrame())));
+    }
+    
+    /**
+     * Create and send call mbca parameters.
+     */
+    public static HandleMessage parameters(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                                .getParametersCall()).createFrame())));
     }
     
     /**
