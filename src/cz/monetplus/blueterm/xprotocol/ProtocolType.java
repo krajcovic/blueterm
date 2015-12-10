@@ -4,7 +4,8 @@ package cz.monetplus.blueterm.xprotocol;
 public enum ProtocolType {
     BProtocol('B'),
     VProtocol('V'),
-    SProtocol('S');
+    SProtocol('S'),
+    NProtocol('N');
     
     private Character tag;
 

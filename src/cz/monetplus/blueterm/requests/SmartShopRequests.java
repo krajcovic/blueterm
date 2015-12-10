@@ -33,7 +33,7 @@ public class SmartShopRequests implements Requests {
      * @param transactionInputData
      * @return
      */
-    public static HandleMessage pay(TransactionIn transactionInputData) {
+    public static HandleMessage getSale(TransactionIn transactionInputData) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.SMARTSHOP
@@ -45,6 +45,24 @@ public class SmartShopRequests implements Requests {
                                         transactionInputData
                                                 .getPartialPayment(),
                                 transactionInputData.getTicketNumber()))
+                                        .createFrame())));
+    }
+    
+    /**
+     * Create and send pay request to terminal.
+     * 
+     * @param transactionInputData
+     * @return
+     */
+    public static HandleMessage getRecharging(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(),
+                        SProtocolMessages
+                                .getRecharging(transactionInputData.getAmount(),
+                                        transactionInputData.getCurrency(),
+                                        transactionInputData.getInvoice()))
                                         .createFrame())));
     }
 

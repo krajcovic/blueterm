@@ -129,6 +129,11 @@ public enum HandleOperations {
     /**
      * 
      */
+    CallSmartShopRecharging,
+    
+    /**
+     * 
+     */
     CallSmartShopCardState,
     
     /**
@@ -150,6 +155,11 @@ public enum HandleOperations {
      * 
      */
     CallSmartShopHandshake,
+    
+    /**
+     * 
+     */
+    CallMaintenanceUpdate,
     
     /**
      * 

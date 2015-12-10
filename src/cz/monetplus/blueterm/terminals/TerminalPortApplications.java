@@ -16,6 +16,11 @@ public enum TerminalPortApplications {
      * Communication for auth server.
      */
     SERVER(0),
+    
+    /**
+     * 
+     */
+    MAINTENANCE(33332),
 
     /**
      * 
@@ -31,12 +36,7 @@ public enum TerminalPortApplications {
      * 
      */
     FLEET(33335),
-
-    /**
-     * 
-     */
-    MAINTENANCE(33336),
-    
+   
     /**
      * 
      */

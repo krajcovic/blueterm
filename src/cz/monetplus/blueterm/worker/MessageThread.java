@@ -16,6 +16,7 @@ import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
+import cz.monetplus.blueterm.requests.MaintenanceRequests;
 import cz.monetplus.blueterm.requests.MbcaRequests;
 import cz.monetplus.blueterm.requests.MvtaRequests;
 import cz.monetplus.blueterm.requests.Requests;
@@ -262,7 +263,12 @@ public class MessageThread extends Thread {
         }
 
         case CallSmartShopPay: {
-            addMessage(SmartShopRequests.pay(transactionInputData));
+            addMessage(SmartShopRequests.getSale(transactionInputData));
+            break;
+        }
+
+        case CallSmartShopRecharging: {
+            addMessage(SmartShopRequests.getRecharging(transactionInputData));
             break;
         }
 
@@ -293,6 +299,11 @@ public class MessageThread extends Thread {
 
         case CallSmartShopHandshake: {
             this.addMessage(SmartShopRequests.handshake());
+            break;
+        }
+        
+        case CallMaintenanceUpdate: {
+            addMessage(MaintenanceRequests.getMaintenanceUpdate());
             break;
         }
 
@@ -443,15 +454,20 @@ public class MessageThread extends Thread {
                         break;
                     }
 
-                    case MBCA:
+                    case MBCA: {
                         TTResponse(new MbcaRequests(), termFrame);
                         break;
-                    case MVTA:
+                    }
+                    case MVTA: {
                         TTResponse(new MvtaRequests(), termFrame);
                         break;
+                    }
                     case SMARTSHOP: {
                         TTResponse(new SmartShopRequests(), termFrame);
                         break;
+                    }
+                    case MAINTENANCE: {
+                        TTResponse(new MaintenanceRequests(), termFrame);
                     }
 
                     default:

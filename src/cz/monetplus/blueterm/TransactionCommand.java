@@ -30,8 +30,10 @@ public enum TransactionCommand {
     SMART_SHOP_DEACTIVATE(HandleOperations.CallSmartShopDeactivate),
     
     SMART_SHOP_PAY(HandleOperations.CallSmartShopPay),
-    
+       
     SMART_SHOP_RETURN(HandleOperations.CallSmartShopReturn),
+    
+    SMART_SHOP_RECHARGING(HandleOperations.CallSmartShopRecharging),
     
     SMART_SHOP_STATE(HandleOperations.CallSmartShopCardState),
     
@@ -42,6 +44,8 @@ public enum TransactionCommand {
     SMART_SHOP_PARAMETRS_CALL(HandleOperations.CallSmartShopParametersCall),
     
     SMART_SHOP_HANDSHAKE(HandleOperations.CallSmartShopHandshake),
+    
+    MAINTENANCE_UPDATE(HandleOperations.CallMaintenanceUpdate),
     ;
     
     

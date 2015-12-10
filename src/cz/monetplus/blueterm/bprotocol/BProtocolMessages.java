@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.xprotocol.MessageNumber;
+import cz.monetplus.blueterm.xprotocol.ProtocolMessages;
 import cz.monetplus.blueterm.xprotocol.ProtocolType;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
 import cz.monetplus.blueterm.xprotocol.XProtocol;
@@ -13,7 +14,7 @@ import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
 import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
 import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
-public final class BProtocolMessages {
+public final class BProtocolMessages extends ProtocolMessages {
 
     /**
      * Private protocols.
@@ -94,11 +95,11 @@ public final class BProtocolMessages {
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    private static String getCurrentDateTimeForHeader() {
-        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss");
-        return formater.format(new Date());
-
-    }
+//    private static String getCurrentDateTimeForHeader() {
+//        SimpleDateFormat formater = new SimpleDateFormat("yyMMddHHmmss");
+//        return formater.format(new Date());
+//
+//    }
 
     public static byte[] getLastTran() {
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
