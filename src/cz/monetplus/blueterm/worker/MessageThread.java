@@ -638,6 +638,11 @@ public class MessageThread extends Thread {
             transactionOutputData.setRemainPayment(Long.valueOf(xprotocol
                     .getTagMap().get(XProtocolTag.RemainPayment).toString()));
         }
+        
+        if (xprotocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
+            transactionOutputData.setAmount(Long.valueOf(xprotocol
+                    .getTagMap().get(XProtocolTag.Amount1).toString()));
+        }
     }
 
     private void ParseTicketResponse(XProtocol xprotocol) {

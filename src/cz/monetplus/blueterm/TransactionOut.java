@@ -45,11 +45,18 @@ public class TransactionOut {
      * Hodnoty uzaverky, popis v B protokolu.
      */
     private Balancing balancing;
+  
+    /**
+     * Skutecne zaplacena castka
+     */
+    private Long amount;
     
     /**
      * Zbytek po platbe.
      */
     private Long remainPayment;
+    
+    
 
     public Integer getResultCode() {
         return resultCode;
@@ -128,7 +135,10 @@ public class TransactionOut {
             builder.append(balancing.toString()).append("\n ");
         }
         if (remainPayment != null) {
-            builder.append(remainPayment.toString()).append("\n ");
+            builder.append("remainPayment=").append(remainPayment.toString()).append("\n ");
+        }
+        if (amount != null) {
+            builder.append("amount=").append(amount.toString()).append("\n ");
         }
         
         builder.append("]");
@@ -157,6 +167,14 @@ public class TransactionOut {
 
     public void setRemainPayment(Long remainPayment) {
         this.remainPayment = remainPayment;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
     }
 
 }
