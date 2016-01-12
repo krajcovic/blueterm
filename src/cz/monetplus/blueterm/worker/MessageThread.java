@@ -372,10 +372,16 @@ public class MessageThread extends Thread {
      */
     private void connectDevice(String address, boolean secure) {
         // Get the BLuetoothDevice object
+        try {
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
 
         // Attempt to connect to the device
         terminalService.connect(device, secure);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            this.setOutputMessage(e.getMessage());
+            this.addMessage(HandleOperations.Exit);
+        }
     }
 
     private void connectedDevice() {
