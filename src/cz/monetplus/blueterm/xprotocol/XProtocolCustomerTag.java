@@ -1,6 +1,11 @@
 package cz.monetplus.blueterm.xprotocol;
 
 public enum XProtocolCustomerTag {
+    
+    /**
+     * Restriction / cardType
+     */
+    Restriction('r'),
 
     /**
      * 

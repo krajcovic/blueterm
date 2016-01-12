@@ -30,7 +30,7 @@ public final class SProtocolMessages extends ProtocolMessages {
     }
 
     public static byte[] getSale(long amount, int currencyCode,
-            String invoiceNumber, Boolean partialPayment, String ticketNumber) {
+            String invoiceNumber, Boolean partialPayment, String ticketNumber, Integer cardType) {
 
         XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
@@ -43,6 +43,11 @@ public final class SProtocolMessages extends ProtocolMessages {
 
         bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
                 invoiceNumber);
+        
+        if(cardType != null) {
+            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.Restriction,
+                    cardType.toString());
+        }
 
         if (partialPayment != null && partialPayment == true) {
             bprotocol.getCustomerTagMap()

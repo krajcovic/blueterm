@@ -56,6 +56,11 @@ public class TransactionIn {
      * Typ dobijeni
      */
     private RechargingType rechargingType;
+    
+    /**
+     * Typy smartshop karet.
+     */
+    private Integer cardType;
 
     /**
      * Metody pro komunikaci s pokladnou
@@ -70,6 +75,7 @@ public class TransactionIn {
         this.partialPayment = false;
         this.ticketNumber = "";
         this.posCallbacks = posCallbacks;
+        this.cardType = null;
     }
 
     public void setPayment(Long amount, String invoice, Integer currency,
@@ -77,6 +83,7 @@ public class TransactionIn {
         this.amount = amount;
         this.invoice = invoice;
         this.currency = currency;
+        this.cardType = null;
     }
 
     public Long getAmount() {
@@ -153,5 +160,13 @@ public class TransactionIn {
 
     public void setTicketNumber(String ticketNumber) {
         this.ticketNumber = ticketNumber;
+    }
+
+    public Integer getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
  }
