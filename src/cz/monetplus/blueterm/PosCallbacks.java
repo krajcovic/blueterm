@@ -28,7 +28,7 @@ public interface PosCallbacks {
      * 
      * @return
      */
-    public Boolean isSingOk();
+    public Boolean isSignOk();
 
     /**
      * Je vyzadavan kontrola online dostupnosti. Jakekoliv

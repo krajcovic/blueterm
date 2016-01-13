@@ -353,7 +353,7 @@ public class MessageThread extends Thread {
     }
 
     private void checkSign(Requests request) {
-        if (transactionInputData.getPosCallbacks().isSingOk()) {
+        if (transactionInputData.getPosCallbacks().isSignOk()) {
             // Sign is OK
             addMessage(request.ticketRequest(TicketCommand.Customer));
         } else {
