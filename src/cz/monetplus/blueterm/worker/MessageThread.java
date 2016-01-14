@@ -92,7 +92,17 @@ public class MessageThread extends Thread {
      */
     private TerminalServiceBTClient terminalService = null;
 
+    /**
+     * Type of ticket command.
+     */
     private TicketCommand lastTicket;
+
+    /**
+     * Check sign after merchant ticket. To jesteli se ma kontrolovat podpis na
+     * listku se neposila v odpovedi na listek, ale v odpovedi na transakci
+     * Takze si to musim zapamatovat, a vyvolat to az po samotnem vytisknuti.
+     */
+    private Boolean checkSignFlag = false;
 
     /**
      * Terminal to muze posilat po castech.
@@ -211,17 +221,17 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.handshakeMbca());
             break;
         }
-        
+
         case CallMbcaBalancing: {
             addMessage(MbcaRequests.balancing(transactionInputData));
             break;
         }
-        
+
         case CallMbcaParameters: {
             addMessage(MbcaRequests.parameters(transactionInputData));
             break;
         }
-        
+
         case CallMbcaInfo: {
             addMessage(MbcaRequests.appInfoMbca());
             break;
@@ -308,7 +318,7 @@ public class MessageThread extends Thread {
             this.addMessage(SmartShopRequests.handshake());
             break;
         }
-        
+
         case CallMaintenanceUpdate: {
             addMessage(MaintenanceRequests.getMaintenanceUpdate());
             break;
@@ -353,9 +363,10 @@ public class MessageThread extends Thread {
     }
 
     private void checkSign(Requests request) {
-        if (transactionInputData.getPosCallbacks().isSignOk()) {
+        if (!checkSignFlag || transactionInputData.getPosCallbacks().isSignOk()) {
             // Sign is OK
-            addMessage(request.ticketRequest(TicketCommand.Customer));
+            lastTicket = TicketCommand.Customer;
+            addMessage(request.ticketRequest(lastTicket));
         } else {
             // Sign is Bad
             addMessage(HandleOperations.Exit);
@@ -373,10 +384,10 @@ public class MessageThread extends Thread {
     private void connectDevice(String address, boolean secure) {
         // Get the BLuetoothDevice object
         try {
-        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
 
-        // Attempt to connect to the device
-        terminalService.connect(device, secure);
+            // Attempt to connect to the device
+            terminalService.connect(device, secure);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
             this.setOutputMessage(e.getMessage());
@@ -536,17 +547,10 @@ public class MessageThread extends Thread {
                 break;
             case End:
                 transactionInputData.getPosCallbacks().ticketFinish();
-                if (isSingFlagOn(xprotocol)) {
+                if (lastTicket == TicketCommand.Merchant) {
                     addMessage(HandleOperations.CheckSign, request);
                 } else {
-                    if (lastTicket == TicketCommand.Merchant) {
-                        addMessage(
-                                request.ticketRequest(TicketCommand.Customer));
-                        lastTicket = TicketCommand.Customer;
-
-                    } else {
-                        addMessage(HandleOperations.Exit);
-                    }
+                    addMessage(HandleOperations.Exit);
                 }
                 break;
             default:
@@ -560,10 +564,21 @@ public class MessageThread extends Thread {
         ParseTransactionResponse(xprotocol);
 
         if (isTicketFlagOn(xprotocol)) {
-            addMessage(request.ticketRequest(TicketCommand.Merchant));
             lastTicket = TicketCommand.Merchant;
+            addMessage(request.ticketRequest(lastTicket));
         } else {
             addMessage(HandleOperations.Exit);
+        }
+
+        // To jesteli se ma kontrolovat podpis na listku se neposila v odpovedi
+        // na listek, ale v odpovedi na transakci
+        // Takze si to musim zapamatovat, a vyvolat to az po samotnem
+        // vytisknuti.
+        checkSignFlag = isSignFlagOn(xprotocol);
+        if (checkSignFlag) {
+            if (!isTicketFlagOn(xprotocol)) {
+                addMessage(HandleOperations.CheckSign, request);
+            }
         }
     }
 
@@ -575,7 +590,7 @@ public class MessageThread extends Thread {
         return checkBit(xprotocol.getFlag(), 1);
     }
 
-    private boolean isSingFlagOn(XProtocol xprotocol) {
+    private boolean isSignFlagOn(XProtocol xprotocol) {
         return checkBit(xprotocol.getFlag(), 0);
     }
 
@@ -644,10 +659,10 @@ public class MessageThread extends Thread {
             transactionOutputData.setRemainPayment(Long.valueOf(xprotocol
                     .getTagMap().get(XProtocolTag.RemainPayment).toString()));
         }
-        
+
         if (xprotocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
-            transactionOutputData.setAmount(Long.valueOf(xprotocol
-                    .getTagMap().get(XProtocolTag.Amount1).toString()));
+            transactionOutputData.setAmount(Long.valueOf(xprotocol.getTagMap()
+                    .get(XProtocolTag.Amount1).toString()));
         }
     }
 
