@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.util.Log;
+import cz.monetplus.blueterm.Balancing;
+import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.util.MonetUtils;
 
 public class XProtocolFactory {
@@ -23,6 +25,80 @@ public class XProtocolFactory {
     private static final byte GS = 0x1d;
 
     private static final String TAG = "XProtocolFactory";
+
+    private static boolean checkBit(int value, int i) {
+        return (value & (1L << i)) == (1L << i);
+    }
+
+    private static boolean isTicketFlagOn(XProtocol xprotocol) {
+        return checkBit(xprotocol.getFlag(), 1);
+    }
+
+    private static boolean isSignFlagOn(XProtocol xprotocol) {
+        return checkBit(xprotocol.getFlag(), 0);
+    }
+
+    public static TransactionOut parse(XProtocol protocol) {
+        TransactionOut tran = new TransactionOut();
+
+        try {
+            tran.setResultCode(Integer.valueOf(
+                    protocol.getTagMap().get(XProtocolTag.ResponseCode)));
+        } catch (Exception e) {
+            Log.w(TAG, "Missing ResponseCode TAG");
+        }
+        tran.setMessage(protocol.getTagMap().get(XProtocolTag.ServerMessage));
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
+            tran.setAuthCode(protocol.getTagMap().get(XProtocolTag.AuthCode));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.SequenceId)) {
+            tran.setSeqId(Integer.valueOf(
+                    protocol.getTagMap().get(XProtocolTag.SequenceId)));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
+            tran.setBalancing(new Balancing(
+                    protocol.getTagMap().get(XProtocolTag.TotalsBatch1)));
+        }
+
+        if (protocol.getCustomerTagMap()
+                .containsKey(XProtocolCustomerTag.CardToken)) {
+            tran.setCardToken(protocol.getCustomerTagMap()
+                    .get(XProtocolCustomerTag.CardToken));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.PAN)) {
+            tran.setCardNumber(protocol.getTagMap().get(XProtocolTag.PAN));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.PAN)
+                && !protocol.getCustomerTagMap()
+                        .containsKey(XProtocolCustomerTag.CardToken)) {
+            tran.setCardToken(
+                    "000000000000000000000000000000000000000000000000");
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.CardType)) {
+            tran.setCardType(protocol.getTagMap().get(XProtocolTag.CardType));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.RemainPayment)) {
+            tran.setRemainPayment(Long.valueOf(protocol.getTagMap()
+                    .get(XProtocolTag.RemainPayment).toString()));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
+            tran.setAmount(Long.valueOf(
+                    protocol.getTagMap().get(XProtocolTag.Amount1).toString()));
+        }
+
+        tran.setTicketRequired(isTicketFlagOn(protocol));
+        tran.setSignRequired(isSignFlagOn(protocol));
+
+        return tran;
+    }
 
     public static byte[] serialize(XProtocol bprotocol) {
         Log.i(TAG, bprotocol.toString());
@@ -37,12 +113,12 @@ public class XProtocolFactory {
                     .putShort((short) (optionalData.length & 0xFFFF)).array()));
 
             bout.write(STX);
-            bout.write(fixString(
-                    bprotocol.getProtocolType().getTag().toString(), 1)
-                    .getBytes());
+            bout.write(
+                    fixString(bprotocol.getProtocolType().getTag().toString(),
+                            1).getBytes());
             bout.write(fixString(
                     bprotocol.getMessageNumber().getNumber().toString(), 1)
-                    .getBytes());
+                            .getBytes());
             bout.write(fixString(bprotocol.getProtocolVersion(), 2).getBytes());
             bout.write(fixString(bprotocol.getPosId(), 8).getBytes());
             bout.write(fixString(bprotocol.getTransactionDateTime(), 12)
@@ -51,8 +127,8 @@ public class XProtocolFactory {
                     .getBytes());
             bout.write(fixString(bprotocol.getOptionalDataLen(), 4, '0')
                     .getBytes());
-            bout.write(fixString(bprotocol.getStandardCRC16(), 4, '0')
-                    .getBytes());
+            bout.write(
+                    fixString(bprotocol.getStandardCRC16(), 4, '0').getBytes());
             bout.write(optionalData);
             bout.write(ETX);
         } catch (IOException e) {
@@ -73,22 +149,21 @@ public class XProtocolFactory {
         try {
             String tmp = new String(Arrays.copyOfRange(buffer, 1, 2), "UTF8");
             bprotocol.setProtocolType(ProtocolType.tagOf(tmp.charAt(0)));
-            bprotocol.setMessageNumber(MessageNumber.numberOf(Integer
-                    .valueOf(new String(Arrays.copyOfRange(buffer, 2, 3),
-                            "UTF8"))));
-            bprotocol.setProtocolVersion(new String(Arrays.copyOfRange(buffer,
-                    3, 5), "UTF8"));
-            bprotocol.setPosId(new String(Arrays.copyOfRange(buffer, 5, 13),
-                    "UTF8"));
-            bprotocol.setTransactionDateTime(new String(Arrays.copyOfRange(
-                    buffer, 13, 25), "UTF8"));
+            bprotocol.setMessageNumber(MessageNumber.numberOf(Integer.valueOf(
+                    new String(Arrays.copyOfRange(buffer, 2, 3), "UTF8"))));
+            bprotocol.setProtocolVersion(
+                    new String(Arrays.copyOfRange(buffer, 3, 5), "UTF8"));
+            bprotocol.setPosId(
+                    new String(Arrays.copyOfRange(buffer, 5, 13), "UTF8"));
+            bprotocol.setTransactionDateTime(
+                    new String(Arrays.copyOfRange(buffer, 13, 25), "UTF8"));
 
-            bprotocol.setFlag(Integer.valueOf(new String(Arrays.copyOfRange(
-                    buffer, 25, 29), "UTF8")));
-            bprotocol.setOptionalDataLen(new String(Arrays.copyOfRange(buffer,
-                    29, 33), "UTF8"));
-            bprotocol.setStandardCRC16(new String(Arrays.copyOfRange(buffer,
-                    33, 37), "UTF8"));
+            bprotocol.setFlag(Integer.valueOf(
+                    new String(Arrays.copyOfRange(buffer, 25, 29), "UTF8")));
+            bprotocol.setOptionalDataLen(
+                    new String(Arrays.copyOfRange(buffer, 29, 33), "UTF8"));
+            bprotocol.setStandardCRC16(
+                    new String(Arrays.copyOfRange(buffer, 33, 37), "UTF8"));
 
             String[] split = splitTags(
                     Arrays.copyOfRange(buffer, 37, buffer.length - 1),
@@ -115,9 +190,8 @@ public class XProtocolFactory {
 
     private static void deserializeCustomer(XProtocol xprotocol, String element)
             throws UnsupportedEncodingException {
-        String[] customerTags = splitTags(Arrays.copyOfRange(
-                element.getBytes(), 1, element.getBytes().length), "UTF-8",
-                "[\\x1d]");
+        String[] customerTags = splitTags(Arrays.copyOfRange(element.getBytes(),
+                1, element.getBytes().length), "UTF-8", "[\\x1d]");
         for (String customerElement : customerTags) {
             if (customerElement != null && customerElement.length() > 0) {
                 XProtocolCustomerTag tagOf = XProtocolCustomerTag
@@ -145,7 +219,7 @@ public class XProtocolFactory {
 
     private static byte[] compileTags(HashMap<XProtocolTag, String> tagMap,
             HashMap<XProtocolCustomerTag, String> customerTagMap)
-            throws IOException {
+                    throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         Iterator<?> it = tagMap.entrySet().iterator();
@@ -205,7 +279,8 @@ public class XProtocolFactory {
      * @return z bufferu vycteny string
      */
     @SuppressWarnings("unused")
-    private static String getFixedTrimedString(byte[] buffer, int pos, int size) {
+    private static String getFixedTrimedString(byte[] buffer, int pos,
+            int size) {
         return new String(Arrays.copyOfRange(buffer, pos, pos + size)).trim();
     }
 
