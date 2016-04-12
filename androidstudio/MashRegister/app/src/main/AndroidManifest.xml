@@ -80,7 +80,7 @@ package="cz.monetplus.mashregister">
     <activity
         android:name="cz.monetplus.mashregister.ingenico.DeviceListActivity"
         android:configChanges="orientation|keyboardHidden"
-        android:label="@string/select_device"
+        android:label="@string/textSelectDevice"
         android:theme="@android:style/Theme.Dialog" />
     <activity
         android:name="cz.monetplus.mashregister.ingenico.TicketListActivity"

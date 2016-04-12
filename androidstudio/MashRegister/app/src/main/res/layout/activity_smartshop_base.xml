@@ -73,7 +73,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/select_device" />
+                    android:text="@string/textSelectDevice" />
             </LinearLayout>
 
             <!--
@@ -201,12 +201,12 @@
                 android:layout_height="wrap_content" >
 
                 <TextView
-                    android:id="@+id/tvCardType"
+                    android:id="@+id/tvRestriction"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:minWidth="150dp"
-                    android:text="@string/textCardType"
+                    android:text="@string/textRestriction"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <EditText

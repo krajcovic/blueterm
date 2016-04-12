@@ -39,7 +39,7 @@
     <string name="CompanyName">Monet+ a.s.</string>
     <string name="TextBTAddr">BT:</string>
     <string name="testedBTHWAddress"></string>
-    <string name="select_device">Select device</string>
+    <string name="textSelectDevice">Select device</string>
     <string name="text_currency">Currency:</string>
     <string name="text_invoice">Invoice:</string>
     <string name="text_invoice_default_value">1234567890</string>
@@ -76,6 +76,6 @@
     <string name="dotransactionrecharging">Recharging</string>
     <string name="maitenanceupdate">MaitenanceUpdate</string>
     <string name="textPartialPayment">Partial payment:</string>
-    <string name="textCardType">Card type:</string>
+    <string name="textRestriction">Restriction:</string>
 
 </resources>
