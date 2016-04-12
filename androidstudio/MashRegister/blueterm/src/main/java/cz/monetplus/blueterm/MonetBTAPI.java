@@ -5,6 +5,8 @@ import cz.monetplus.blueterm.worker.MessageThread;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.Locale;
+
 /**
  * Exported class for control from pos-system.
  * 
@@ -56,7 +58,7 @@ public class MonetBTAPI {
     }
 
     public static String getPin(String terminalName) {
-        return String.format("%06d", getDynamicPin(terminalName));
+        return String.format(Locale.getDefault(), "%06d", getDynamicPin(terminalName));
     }
 
     private static long getDynamicPin(String terminalName) {

@@ -202,7 +202,7 @@ public class DeviceListActivity extends Activity {
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
                     .equals(action)) {
                 setProgressBarIndeterminateVisibility(false);
-                setTitle(R.string.select_device);
+                setTitle(R.string.textSelectDevice);
                 if (mNewDevicesArrayAdapter.getCount() == 0) {
                     String noDevices = getResources().getText(
                             R.string.none_found).toString();

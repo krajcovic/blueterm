@@ -386,8 +386,8 @@ public class MvtaBaseActivity extends AdActivity {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(BT_ADDRESS, blueHwAddress.getText().toString());
-		editor.commit();
-
+//		editor.commit();
+		editor.apply();
 		// EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
 
