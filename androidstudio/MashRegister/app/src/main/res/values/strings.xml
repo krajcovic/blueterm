@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">MashRegister</string>
+
+    <!-- DeviceListActivity -->
+    <string name="scanning">Scanning for devices</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <!-- Options Menu -->
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
+    <string name="button_pay">Pay</string>
+    <string name="button_handshake">Handshake</string>
+    <string name="onoff_log">On/Off log</string>
+    <string name="preferences">Preferences</string>
+
+    <!-- Preferences -->
+    <string name="preferences_log">pref_log</string>
+    <string name="preferences_blue_addr">blue_addr</string>
+    <string name="preferences_tcp_ip">tcp_ip</string>
+    <string name="preferences_tcp_port">tcp_port</string>
+    <string name="title_amount">Amount:</string>
+    <string name="title_currency">Currency:</string>
+    <string name="invoice_invoice">Invoice:</string>
+    <string name="button_clear">Clear</string>
+    <string name="button_stop">Stop</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="textPrice">Price:</string>
+    <string name="defaultPriceValue">5</string>
+    <string name="defaultValueMerchantId">12345678</string>
+    <string name="merchantId">Merchant ID:</string>
+    <string name="payButtonText">Pay with intent</string>
+    <string name="CompanyName">Monet+ a.s.</string>
+    <string name="TextBTAddr">BT:</string>
+    <string name="testedBTHWAddress"></string>
+    <string name="select_device">Select device</string>
+    <string name="text_currency">Currency:</string>
+    <string name="text_invoice">Invoice:</string>
+    <string name="text_invoice_default_value">1234567890</string>
+    <string name="text_tranid_default_value">1234567890</string>
+    <string name="text_card_type_default_value"></string>
+    <string name="dotransactionhandshake">Handshake</string>
+    <string name="dotransactionbalancing">Balancing</string>
+    <string name="dotransactionpay">Pay</string>
+    <string name="terminal_result">Result from terminal</string>
+    <string name="infoButtonText">Terminal info</string>
+    <string name="doRecharging">EMV dobití</string>
+    <string name="text_invoice_tranid">Inv/Tran:</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="host">Host</string>
+    <string name="mbca">MBCA</string>
+    <string name="mvta">MVTA</string>
+    <string name="servis">Servis</string>
+    <string name="smartShop">Smart Shop</string>
+    <string name="smartshopParametersCall">Parameters</string>
+    <string name="doreturn">Návrat</string>
+    <string name="docardstate">Stav karty</string>
+    <string name="button_close">Close</string>
+    <string name="title_printer">Printer</string>
+    <string name="default_select_device">00:00:00:00:00:00</string>
+    <string name="default_terminal_name">POP-3E-5A-82</string>
+    <string name="hint_terminal_name">Terminal name</string>
+    <string name="button_getpin">GetPin</string>
+    <string name="title_bt_enabled">BT enabled</string>
+    <string name="title_tcp_enabled">TCP enabled</string>
+    <string name="lasttran">LastTran</string>
+    <string name="text_invoice_ticket">Inv/Ticket</string>
+    <string name="text_ticket_number_default_value"></string>
+    <string name="dotransactionrecharging">Recharging</string>
+    <string name="maitenanceupdate">MaitenanceUpdate</string>
+    <string name="textPartialPayment">Partial payment:</string>
+    <string name="textCardType">Card type:</string>
+
+</resources>

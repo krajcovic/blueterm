@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="currency_array" translatable="false">
+        <item>203</item>
+        <item>978</item>
+        <item>840</item>
+    </string-array>
+
+</resources>
