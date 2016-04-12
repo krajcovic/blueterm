@@ -93,6 +93,11 @@ public enum HandleOperations {
     /**
      * 
      */
+    CallMbcaPrintTicket,
+      
+    /**
+     * 
+     */
     CallMvtaHandshake,
     
     /**
@@ -109,6 +114,11 @@ public enum HandleOperations {
      * 
      */
     CallMvtaRecharging,
+    
+    /**
+     * 
+     */
+    CallMvtaPrintTicket,
     
     
     /**
@@ -160,6 +170,11 @@ public enum HandleOperations {
      * 
      */
     CallSmartShopHandshake,
+    
+    /**
+     * 
+     */
+    CallSmartShopPrintTicket,
     
     /**
      * 

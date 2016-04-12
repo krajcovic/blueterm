@@ -56,6 +56,15 @@ public class TransactionOut {
      */
     private Long remainPayment;
     
+    /**
+     * Vyzadovan tisk na pokladnim systemu.
+     */
+    private Boolean ticketRequired;
+    
+    /**
+     * Vyzadovana kontrola podpisu.
+     */
+    private Boolean signRequired;    
     
 
     public Integer getResultCode() {
@@ -105,44 +114,16 @@ public class TransactionOut {
     public void setCardType(String cardType) {
         this.cardType = cardType;
     }
-
+    
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("TransactionOut [\n");
-        if (resultCode != null) {
-            builder.append("resultCode=").append(resultCode).append("\n ");
-        }
-        if (message != null) {
-            builder.append("message=").append(message).append("\n ");
-        }
-        if (authCode != null) {
-            builder.append("authCode=").append(authCode).append("\n ");
-        }
-        if (seqId != null) {
-            builder.append("seqId=").append(seqId).append("\n ");
-        }
-        if (cardNumber != null) {
-            builder.append("cardNumber=").append(cardNumber).append("\n ");
-        }
-        if (cardType != null) {
-            builder.append("cardType=").append(cardType).append("\n ");
-        }
-        if (cardToken != null) {
-            builder.append("cardToken=").append(cardToken).append("\n ");
-        }
-        if (balancing != null) {
-            builder.append(balancing.toString()).append("\n ");
-        }
-        if (remainPayment != null) {
-            builder.append("remainPayment=").append(remainPayment.toString()).append("\n ");
-        }
-        if (amount != null) {
-            builder.append("amount=").append(amount.toString()).append("\n ");
-        }
-        
-        builder.append("]");
-        return builder.toString();
+        return "TransactionOut [resultCode=" + resultCode + ", message="
+                + message + ", authCode=" + authCode + ", seqId=" + seqId
+                + ", cardNumber=" + cardNumber + ", cardToken=" + cardToken
+                + ", cardType=" + cardType + ", balancing=" + balancing
+                + ", amount=" + amount + ", remainPayment=" + remainPayment
+                + ", ticketRequired=" + ticketRequired + ", signRequired="
+                + signRequired + "]";
     }
 
     public Balancing getBalancing() {
@@ -175,6 +156,22 @@ public class TransactionOut {
 
     public void setAmount(Long amount) {
         this.amount = amount;
+    }
+
+    public Boolean getTicketRequired() {
+        return ticketRequired;
+    }
+
+    public void setTicketRequired(Boolean ticketRequired) {
+        this.ticketRequired = ticketRequired;
+    }
+
+    public Boolean getSignRequired() {
+        return signRequired;
+    }
+
+    public void setSignRequired(Boolean signRequired) {
+        this.signRequired = signRequired;
     }
 
 }

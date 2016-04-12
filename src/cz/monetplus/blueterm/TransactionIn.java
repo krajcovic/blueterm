@@ -1,6 +1,8 @@
 package cz.monetplus.blueterm;
 
 import cz.monetplus.blueterm.vprotocol.RechargingType;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
+import cz.monetplus.blueterm.xprotocol.TicketType;
 
 /**
  * @author krajcovic
@@ -66,6 +68,11 @@ public class TransactionIn {
      * Metody pro komunikaci s pokladnou
      */
     private PosCallbacks posCallbacks;
+    
+    /**
+     * Which ticket print.
+     */
+    private TicketType ticketType;
 
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
@@ -168,5 +175,13 @@ public class TransactionIn {
 
     public void setCardType(Integer cardType) {
         this.cardType = cardType;
+    }
+
+    public TicketType getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(TicketType ticketType) {
+        this.ticketType = ticketType;
     }
  }

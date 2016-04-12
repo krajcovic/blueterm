@@ -31,8 +31,6 @@ public class MonetBTAPI {
      */
     public static final TransactionOut doTransaction(final Context context,
             final TransactionIn in) throws Exception {
-
-        // messageThread = new MessageThread(context, in);
         messageThread = MessageThread.getInstance(context, in);
         messageThread.start();
 
@@ -42,7 +40,7 @@ public class MonetBTAPI {
             Log.e(TAG, e.getMessage());
         }
 
-        return messageThread.getValue();
+        return messageThread.getResult();
     }
 
     /**

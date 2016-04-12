@@ -3,6 +3,7 @@ package cz.monetplus.blueterm.worker;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -12,6 +13,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 import cz.monetplus.blueterm.Balancing;
+import cz.monetplus.blueterm.TransactionCommand;
 import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.frames.SLIPFrame;
@@ -95,14 +97,14 @@ public class MessageThread extends Thread {
     /**
      * Type of ticket command.
      */
-    private TicketCommand lastTicket;
+    // private TicketCommand lastTicket;
 
     /**
      * Check sign after merchant ticket. To jesteli se ma kontrolovat podpis na
      * listku se neposila v odpovedi na listek, ale v odpovedi na transakci
      * Takze si to musim zapamatovat, a vyvolat to az po samotnem vytisknuti.
      */
-    private Boolean checkSignFlag = false;
+    // private Boolean checkSignFlag = false;
 
     /**
      * Terminal to muze posilat po castech.
@@ -161,7 +163,7 @@ public class MessageThread extends Thread {
      * 
      * @return TransactionOut result Data.
      */
-    public TransactionOut getValue() {
+    public TransactionOut getResult() {
         return transactionOutputData;
     }
 
@@ -250,6 +252,12 @@ public class MessageThread extends Thread {
             addMessage(MbcaRequests.reversal(transactionInputData));
             break;
         }
+
+        case CallMbcaPrintTicket: {
+            addMessage(new MbcaRequests().ticketRequest(TicketCommand
+                    .valueOf(transactionInputData.getTicketType())));
+        }
+
         case CallMvtaHandshake: {
             addMessage(MvtaRequests.handshakeMvta());
             break;
@@ -268,7 +276,12 @@ public class MessageThread extends Thread {
             addMessage(MvtaRequests.recharge(transactionInputData));
             break;
         }
-
+        
+        case CallMvtaPrintTicket: {
+            addMessage(new MvtaRequests().ticketRequest(TicketCommand
+                    .valueOf(transactionInputData.getTicketType())));
+        }
+        
         case CallSmartShopActivate: {
             addMessage(SmartShopRequests.activate());
             break;
@@ -318,6 +331,11 @@ public class MessageThread extends Thread {
             this.addMessage(SmartShopRequests.handshake());
             break;
         }
+        
+        case CallSmartShopPrintTicket: {
+            addMessage(new MbcaRequests().ticketRequest(TicketCommand
+                    .valueOf(transactionInputData.getTicketType())));
+        }
 
         case CallMaintenanceUpdate: {
             addMessage(MaintenanceRequests.getMaintenanceUpdate());
@@ -345,9 +363,9 @@ public class MessageThread extends Thread {
 
             break;
 
-        case CheckSign:
-            checkSign(msg.getRequest());
-            break;
+        // case CheckSign:
+        // checkSign(msg.getRequest());
+        // break;
 
         case Exit:
             this.stopThread();
@@ -362,16 +380,17 @@ public class MessageThread extends Thread {
         }
     }
 
-    private void checkSign(Requests request) {
-        if (!checkSignFlag || transactionInputData.getPosCallbacks().isSignOk()) {
-            // Sign is OK
-            lastTicket = TicketCommand.Customer;
-            addMessage(request.ticketRequest(lastTicket));
-        } else {
-            // Sign is Bad
-            addMessage(HandleOperations.Exit);
-        }
-    }
+    // private void checkSign(Requests request) {
+    // if (!checkSignFlag || transactionInputData.getPosCallbacks().isSignOk())
+    // {
+    // // Sign is OK
+    // lastTicket = TicketCommand.Customer;
+    // addMessage(request.ticketRequest(lastTicket));
+    // } else {
+    // // Sign is Bad
+    // addMessage(HandleOperations.Exit);
+    // }
+    // }
 
     /**
      * Get the BluetoothDevice object.
@@ -532,7 +551,8 @@ public class MessageThread extends Thread {
     }
 
     private void ticketResponse(Requests request, XProtocol xprotocol) {
-        ParseTicketResponse(xprotocol);
+        printTicket(xprotocol.getTicketList());
+
         addMessage(request.ack());
 
         if (xprotocol.getCustomerTagMap()
@@ -547,11 +567,13 @@ public class MessageThread extends Thread {
                 break;
             case End:
                 transactionInputData.getPosCallbacks().ticketFinish();
-                if (lastTicket == TicketCommand.Merchant) {
-                    addMessage(HandleOperations.CheckSign, request);
-                } else {
-                    addMessage(HandleOperations.Exit);
-                }
+                addMessage(HandleOperations.Exit);
+
+                // if (lastTicket == TicketCommand.Merchant) {
+                // addMessage(HandleOperations.CheckSign, request);
+                // } else {
+                // addMessage(HandleOperations.Exit);
+                // }
                 break;
             default:
                 break;
@@ -561,37 +583,26 @@ public class MessageThread extends Thread {
     }
 
     private void transactionResponse(Requests request, XProtocol xprotocol) {
-        ParseTransactionResponse(xprotocol);
+        // ParseTransactionResponse(xprotocol);
+        this.transactionOutputData = XProtocolFactory.parse(xprotocol);
 
-        if (isTicketFlagOn(xprotocol)) {
-            lastTicket = TicketCommand.Merchant;
-            addMessage(request.ticketRequest(lastTicket));
-        } else {
-            addMessage(HandleOperations.Exit);
-        }
+        // if (isTicketFlagOn(xprotocol)) {
+        // lastTicket = TicketCommand.Merchant;
+        // addMessage(request.ticketRequest(lastTicket));
+        // } else {
+        // addMessage(HandleOperations.Exit);
+        // }
 
         // To jesteli se ma kontrolovat podpis na listku se neposila v odpovedi
         // na listek, ale v odpovedi na transakci
         // Takze si to musim zapamatovat, a vyvolat to az po samotnem
         // vytisknuti.
-        checkSignFlag = isSignFlagOn(xprotocol);
-        if (checkSignFlag) {
-            if (!isTicketFlagOn(xprotocol)) {
-                addMessage(HandleOperations.CheckSign, request);
-            }
-        }
-    }
-
-    private boolean checkBit(int value, int i) {
-        return (value & (1L << i)) == (1L << i);
-    }
-
-    private boolean isTicketFlagOn(XProtocol xprotocol) {
-        return checkBit(xprotocol.getFlag(), 1);
-    }
-
-    private boolean isSignFlagOn(XProtocol xprotocol) {
-        return checkBit(xprotocol.getFlag(), 0);
+        // checkSignFlag = isSignFlagOn(xprotocol);
+        // if (checkSignFlag) {
+        // if (!isTicketFlagOn(xprotocol)) {
+        // addMessage(HandleOperations.CheckSign, request);
+        // }
+        // }
     }
 
     /**
@@ -605,71 +616,79 @@ public class MessageThread extends Thread {
         return termFrame;
     }
 
-    private void ParseTransactionResponse(XProtocol xprotocol) {
-        // transactionOutputData = new TransactionOut();
-        try {
-            transactionOutputData.setResultCode(Integer.valueOf(
-                    xprotocol.getTagMap().get(XProtocolTag.ResponseCode)));
-        } catch (Exception e) {
-            // transactionOutputData.setResultCode(-1);
-            Log.w(TAG, "Missing ResponseCode TAG");
-        }
-        transactionOutputData.setMessage(
-                xprotocol.getTagMap().get(XProtocolTag.ServerMessage));
+    // private void ParseTransactionResponse(XProtocol xprotocol) {
+    // try {
+    // transactionOutputData.setResultCode(Integer.valueOf(
+    // xprotocol.getTagMap().get(XProtocolTag.ResponseCode)));
+    // } catch (Exception e) {
+    // // transactionOutputData.setResultCode(-1);
+    // Log.w(TAG, "Missing ResponseCode TAG");
+    // }
+    // transactionOutputData.setMessage(
+    // xprotocol.getTagMap().get(XProtocolTag.ServerMessage));
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
+    // transactionOutputData.setAuthCode(
+    // xprotocol.getTagMap().get(XProtocolTag.AuthCode));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.SequenceId)) {
+    // transactionOutputData.setSeqId(Integer.valueOf(
+    // xprotocol.getTagMap().get(XProtocolTag.SequenceId)));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
+    // transactionOutputData.setBalancing(new Balancing(
+    // xprotocol.getTagMap().get(XProtocolTag.TotalsBatch1)));
+    // }
+    //
+    // if (xprotocol.getCustomerTagMap()
+    // .containsKey(XProtocolCustomerTag.CardToken)) {
+    // transactionOutputData.setCardToken(xprotocol.getCustomerTagMap()
+    // .get(XProtocolCustomerTag.CardToken));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)) {
+    // transactionOutputData
+    // .setCardNumber(xprotocol.getTagMap().get(XProtocolTag.PAN));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)
+    // && !xprotocol.getCustomerTagMap()
+    // .containsKey(XProtocolCustomerTag.CardToken)) {
+    // transactionOutputData.setCardToken(
+    // "000000000000000000000000000000000000000000000000");
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.CardType)) {
+    // transactionOutputData.setCardType(
+    // xprotocol.getTagMap().get(XProtocolTag.CardType));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.RemainPayment)) {
+    // transactionOutputData.setRemainPayment(Long.valueOf(xprotocol
+    // .getTagMap().get(XProtocolTag.RemainPayment).toString()));
+    // }
+    //
+    // if (xprotocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
+    // transactionOutputData.setAmount(Long.valueOf(xprotocol.getTagMap()
+    // .get(XProtocolTag.Amount1).toString()));
+    // }
+    //
+    // transactionOutputData.setTicketRequired(isTicketFlagOn(xprotocol));
+    // transactionOutputData.setSignRequired(isSignFlagOn(xprotocol));
+    // }
 
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
-            transactionOutputData.setAuthCode(
-                    xprotocol.getTagMap().get(XProtocolTag.AuthCode));
+    private Boolean printTicket(List<String> list) {
+        for (String string : list) {
+            Boolean ticketLine = transactionInputData.getPosCallbacks()
+                    .ticketLine(string);
+            if (ticketLine == Boolean.FALSE) {
+                return Boolean.FALSE;
+            }
         }
 
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.SequenceId)) {
-            transactionOutputData.setSeqId(Integer.valueOf(
-                    xprotocol.getTagMap().get(XProtocolTag.SequenceId)));
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.TotalsBatch1)) {
-            transactionOutputData.setBalancing(new Balancing(
-                    xprotocol.getTagMap().get(XProtocolTag.TotalsBatch1)));
-        }
-
-        if (xprotocol.getCustomerTagMap()
-                .containsKey(XProtocolCustomerTag.CardToken)) {
-            transactionOutputData.setCardToken(xprotocol.getCustomerTagMap()
-                    .get(XProtocolCustomerTag.CardToken));
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)) {
-            transactionOutputData
-                    .setCardNumber(xprotocol.getTagMap().get(XProtocolTag.PAN));
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.PAN)
-                && !xprotocol.getCustomerTagMap()
-                        .containsKey(XProtocolCustomerTag.CardToken)) {
-            transactionOutputData.setCardToken(
-                    "000000000000000000000000000000000000000000000000");
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.CardType)) {
-            transactionOutputData.setCardType(
-                    xprotocol.getTagMap().get(XProtocolTag.CardType));
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.RemainPayment)) {
-            transactionOutputData.setRemainPayment(Long.valueOf(xprotocol
-                    .getTagMap().get(XProtocolTag.RemainPayment).toString()));
-        }
-
-        if (xprotocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
-            transactionOutputData.setAmount(Long.valueOf(xprotocol.getTagMap()
-                    .get(XProtocolTag.Amount1).toString()));
-        }
-    }
-
-    private void ParseTicketResponse(XProtocol xprotocol) {
-        for (String string : xprotocol.getTicketList()) {
-            transactionInputData.getPosCallbacks().ticketLine(string);
-        }
+        return Boolean.TRUE;
     }
 
     /**
