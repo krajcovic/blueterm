@@ -44,7 +44,7 @@ public class MonetBTAPI {
             Log.e(TAG, e.getMessage());
         }
 
-        return messageThread.getValue();
+        return messageThread.getResult();
     }
 
     /**
