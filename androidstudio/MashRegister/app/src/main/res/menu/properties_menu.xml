@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:id="@+id/groupConnectionType" android:visible="true" android:enabled="true" android:checkableBehavior="single">
+        <item android:id="@+id/bt_enabled" android:actionLayout="@layout/activity_mbca_base" android:checkable="true" android:title="@string/title_bt_enabled" android:checked="true"></item>
+        <item android:id="@+id/tcp_enabled" android:actionLayout="@layout/activity_mbca_base" android:checkable="true" android:title="@string/title_tcp_enabled"></item>
+    </group>
+    
+
+</menu>
