@@ -209,6 +209,37 @@
                     style="?android:attr/buttonBarButtonStyle" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp" >
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonLastTranMvta"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:text="@string/buktTextLastTran" />
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonParametersMvta"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:text="@string/textParameters" />
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonFFUmvta"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:text="@string/butTextFFU"
+                    android:enabled="true"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/textAnswer"
                 android:layout_width="match_parent"

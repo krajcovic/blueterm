@@ -83,5 +83,16 @@ public class MvtaRequests implements Requests {
                                 .getPortApplicationNumber(), VProtocolMessages
                                 .getAck()).createFrame())));
     }
+
+    /**
+     * Create and send call mbca parameters.
+     */
+    public static HandleMessage parameters(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MVTA
+                                .getPortApplicationNumber(), VProtocolMessages
+                        .getParametersCall()).createFrame())));
+    }
     
 }

@@ -97,7 +97,7 @@ public class MessageThread extends Thread {
     /**
      * Type of ticket command.
      */
-    // private TicketCommand lastTicket;
+    private TicketCommand lastTicket;
 
     /**
      * Check sign after merchant ticket. To jesteli se ma kontrolovat podpis na
@@ -281,6 +281,11 @@ public class MessageThread extends Thread {
                         .valueOf(transactionInputData.getTicketType())));
             }
 
+            case CallMvtaParameters: {
+                addMessage(MvtaRequests.parameters(transactionInputData));
+                break;
+            }
+
             case CallSmartShopActivate: {
                 addMessage(SmartShopRequests.activate());
                 break;
@@ -367,9 +372,9 @@ public class MessageThread extends Thread {
 
                 break;
 
-            // case CheckSign:
-            // checkSign(msg.getRequest());
-            // break;
+             case CheckSign:
+                checkSign(msg.getRequest());
+             break;
 
             case Exit:
                 this.stopThread();
@@ -384,17 +389,17 @@ public class MessageThread extends Thread {
         }
     }
 
-    // private void checkSign(Requests request) {
-    // if (!checkSignFlag || transactionInputData.getPosCallbacks().isSignOk())
-    // {
-    // // Sign is OK
-    // lastTicket = TicketCommand.Customer;
-    // addMessage(request.ticketRequest(lastTicket));
-    // } else {
-    // // Sign is Bad
-    // addMessage(HandleOperations.Exit);
-    // }
-    // }
+     private void checkSign(Requests request) {
+     if (!transactionOutputData.getSignRequired() || transactionInputData.getPosCallbacks().isSignOk())
+     {
+        // Sign is OK
+         lastTicket = TicketCommand.Customer;
+           addMessage(request.ticketRequest(lastTicket));
+     } else {
+        // Sign is Bad
+        addMessage(HandleOperations.Exit);
+        }
+     }
 
     /**
      * Get the BluetoothDevice object.
@@ -568,11 +573,12 @@ public class MessageThread extends Thread {
                     transactionInputData.getPosCallbacks().ticketFinish();
                     addMessage(HandleOperations.Exit);
 
-                    // if (lastTicket == TicketCommand.Merchant) {
-                    // addMessage(HandleOperations.CheckSign, request);
-                    // } else {
-                    // addMessage(HandleOperations.Exit);
-                    // }
+                     if (lastTicket == TicketCommand.Merchant) {
+                        addMessage(HandleOperations.CheckSign, request);
+                     } else {
+                        addMessage(HandleOperations.Exit);
+                     }
+
                     break;
                 default:
                     break;
@@ -585,23 +591,23 @@ public class MessageThread extends Thread {
         // ParseTransactionResponse(xprotocol);
         this.transactionOutputData = XProtocolFactory.parse(xprotocol);
 
-        // if (isTicketFlagOn(xprotocol)) {
-        // lastTicket = TicketCommand.Merchant;
-        // addMessage(request.ticketRequest(lastTicket));
-        // } else {
-        // addMessage(HandleOperations.Exit);
-        // }
+        if (this.transactionOutputData.getTicketRequired()) {
+            lastTicket = TicketCommand.Merchant;
+            addMessage(request.ticketRequest(lastTicket));
+        } else {
+            addMessage(HandleOperations.Exit);
+        }
 
         // To jesteli se ma kontrolovat podpis na listku se neposila v odpovedi
         // na listek, ale v odpovedi na transakci
         // Takze si to musim zapamatovat, a vyvolat to az po samotnem
         // vytisknuti.
-        // checkSignFlag = isSignFlagOn(xprotocol);
-        // if (checkSignFlag) {
-        // if (!isTicketFlagOn(xprotocol)) {
-        // addMessage(HandleOperations.CheckSign, request);
-        // }
-        // }
+        //checkSignFlag = isSignFlagOn(xprotocol);
+//        if (this.transactionOutputData.getSignRequired()) {
+//            if (!this.transactionOutputData.getTicketRequired()) {
+//                addMessage(HandleOperations.CheckSign, request);
+//            }
+//        }
     }
 
     /**

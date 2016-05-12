@@ -24,6 +24,8 @@ public enum TransactionCommand {
     MVTA_INFO(HandleOperations.CallMvtaInfo),
     
     MVTA_LAST_TRAN(HandleOperations.CallMvtaGetLastTran),
+
+    MVTA_PARAMETERS(HandleOperations.CallMvtaParameters),
     
     MVTA_RECHARGE(HandleOperations.CallMvtaRecharging),
     

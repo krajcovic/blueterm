@@ -215,6 +215,24 @@ public class MvtaBaseActivity extends AdActivity {
 				doTransaction(TransactionCommand.MVTA_HANDSHAKE);
 			}
 		});
+
+		temp = (Button) findViewById(R.id.buttonLastTran);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doTransaction(TransactionCommand.MVTA_LAST_TRAN);
+			}
+		});
+
+		temp = (Button) findViewById(R.id.buttonParameters);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doTransaction(TransactionCommand.MVTA_PARAMETERS);
+			}
+		});
 	}
 
 	@Override
@@ -305,6 +323,10 @@ public class MvtaBaseActivity extends AdActivity {
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonRechargingTransactionMvta);
 		button.setEnabled(enabled);
+        button = (Button) findViewById(R.id.buttonLastTran);
+        button.setEnabled(enabled);
+        button = (Button) findViewById(R.id.buttonParameters);
+        button.setEnabled(enabled);
 
 	}
 

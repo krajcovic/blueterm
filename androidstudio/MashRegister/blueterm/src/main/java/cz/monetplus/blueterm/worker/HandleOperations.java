@@ -119,6 +119,11 @@ public enum HandleOperations {
      * 
      */
     CallMvtaPrintTicket,
+
+    /**
+     *
+     */
+    CallMvtaParameters,
     
     
     /**

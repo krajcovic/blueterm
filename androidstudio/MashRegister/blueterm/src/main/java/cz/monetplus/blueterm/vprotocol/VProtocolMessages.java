@@ -21,11 +21,16 @@ public final class VProtocolMessages extends ProtocolMessages {
         super();
     }
 
-    public static byte[] getAppInfo() {
-
-        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
+    private static XProtocol getInstance() {
+        XProtocol xprotocol = new XProtocol(ProtocolType.VProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
+        return xprotocol;
+    }
+
+    public static byte[] getAppInfo() {
+
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "80");
 
@@ -35,9 +40,7 @@ public final class VProtocolMessages extends ProtocolMessages {
     public static byte[] getEmvRecharge(long amount, int currencyCode,
             String invoiceNumber, long ticketId, char rechargingType) {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "17");
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
@@ -54,9 +57,7 @@ public final class VProtocolMessages extends ProtocolMessages {
 
     public static byte[] getHanshake() {
 
-        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "95");
 
@@ -70,9 +71,7 @@ public final class VProtocolMessages extends ProtocolMessages {
     // }
 
     public static byte[] getLastTran() {
-        XProtocol bprotocol = new XProtocol(ProtocolType.VProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+        XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "82");
         return XProtocolFactory.serialize(bprotocol);
@@ -94,6 +93,13 @@ public final class VProtocolMessages extends ProtocolMessages {
                 MessageNumber.Ack, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
+        return XProtocolFactory.serialize(bprotocol);
+    }
+
+    public static byte[] getParametersCall() {
+
+        XProtocol bprotocol = getInstance();
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "90");
         return XProtocolFactory.serialize(bprotocol);
     }
 }
