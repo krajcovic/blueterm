@@ -266,6 +266,15 @@ public class MbcaBaseActivity extends AdActivity {
 				doTransaction(TransactionCommand.MBCA_PARAMETERS);
 			}
 		});
+
+		temp = (Button) findViewById(R.id.buttonTip);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doTransaction(TransactionCommand.SMART_SHOP_TIP);
+			}
+		});
 	}
 
 	@Override
@@ -358,6 +367,10 @@ public class MbcaBaseActivity extends AdActivity {
 		button = (Button) findViewById(R.id.buttonMbcaPay);
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonLastTran);
+		button.setEnabled(enabled);
+		button = (Button) findViewById(R.id.buttonParameters);
+		button.setEnabled(enabled);
+		button = (Button) findViewById(R.id.buttonTip);
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonReversalTransaction);
 		button.setEnabled(lastAuthcode == null ? false : enabled);

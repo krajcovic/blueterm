@@ -79,5 +79,9 @@
     <string name="textRestriction">Restriction:</string>
     <string name="textParameters">Parameters</string>
     <string name="textReversal">Reversal</string>
+    <string name="textTip">Tip?</string>
+    <string name="defaultTipValue">1</string>
+    <string name="buktTextLastTran">Last Tran</string>
+    <string name="butTextFFU">FFU</string>
 
 </resources>

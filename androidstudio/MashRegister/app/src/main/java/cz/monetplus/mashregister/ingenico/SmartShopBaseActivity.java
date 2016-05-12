@@ -1,15 +1,10 @@
 package cz.monetplus.mashregister.ingenico;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -86,7 +81,7 @@ public class SmartShopBaseActivity extends AdActivity {
 		mCardType = (EditText) findViewById(R.id.editCardType);
 		mCurrencySpinner = (Spinner) findViewById(R.id.spinnerCurrency);
 		mInvoiceIdEditText = (EditText) findViewById(R.id.editTextInvoice);
-		mTicketNumberEditText = (EditText) findViewById(R.id.editTicketNumber);
+		mTicketNumberEditText = (EditText) findViewById(R.id.editTicketId);
 		cbPartialPayment = (CheckBox) findViewById(R.id.cbPartial);
 
 		mAnswerTextView = (TextView) findViewById(R.id.textAnswer);
@@ -231,6 +226,15 @@ public class SmartShopBaseActivity extends AdActivity {
 			}
 		});
 
+		temp = (Button) findViewById(R.id.buttonTip);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doTransacation(TransactionCommand.SMART_SHOP_TIP);
+			}
+		});
+
 		temp = (Button) findViewById(R.id.buttonBalancing);
 		temp.setOnClickListener(new OnClickListener() {
 
@@ -331,6 +335,8 @@ public class SmartShopBaseActivity extends AdActivity {
 		button = (Button) findViewById(R.id.buttonReturn);
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonCardState);
+		button.setEnabled(enabled);
+		button = (Button) findViewById(R.id.buttonTip);
 		button.setEnabled(enabled);
 	}
 

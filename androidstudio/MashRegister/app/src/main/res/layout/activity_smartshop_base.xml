@@ -29,7 +29,6 @@
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/linearLayoutAds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -159,6 +158,7 @@
                     android:layout_width="0dp"
                     android:layout_height="41dp"
                     android:layout_weight="1" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -187,7 +187,7 @@
                 </EditText>
 
                 <EditText
-                    android:id="@+id/editTicketNumber"
+                    android:id="@+id/editTicketId"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -280,11 +280,19 @@
                     style="?android:attr/buttonBarButtonStyle" />
 
                 <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonTip"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/textTip" />
+
+                <Button
                     android:id="@+id/buttonRecharging"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:text="@string/dotransactionrecharging" />
 
             </LinearLayout>

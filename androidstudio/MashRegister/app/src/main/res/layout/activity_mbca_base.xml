@@ -29,7 +29,6 @@
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/linearLayoutAds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -165,7 +164,7 @@
                 </EditText>
 
                 <EditText
-                    android:id="@+id/editTicketNumber"
+                    android:id="@+id/editTicketId"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -227,17 +226,26 @@
 
                 <Button
                     android:id="@+id/buttonParameters"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
                     android:text="@string/textParameters" />
-                
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonTip"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:text="@string/textTip" />
+
                 <Button
                     android:id="@+id/buttonReversalTransaction"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:enabled="false"
                     android:text="@string/textReversal" />
 
