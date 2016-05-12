@@ -216,7 +216,7 @@ public class MvtaBaseActivity extends AdActivity {
 			}
 		});
 
-		temp = (Button) findViewById(R.id.buttonLastTran);
+		temp = (Button) findViewById(R.id.buttonLastTranMvta);
 		temp.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -225,7 +225,7 @@ public class MvtaBaseActivity extends AdActivity {
 			}
 		});
 
-		temp = (Button) findViewById(R.id.buttonParameters);
+		temp = (Button) findViewById(R.id.buttonParametersMvta);
 		temp.setOnClickListener(new OnClickListener() {
 
 			@Override
