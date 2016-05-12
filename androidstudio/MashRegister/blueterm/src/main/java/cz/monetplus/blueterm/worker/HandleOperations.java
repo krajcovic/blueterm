@@ -170,6 +170,11 @@ public enum HandleOperations {
      * 
      */
     CallSmartShopHandshake,
+
+    /**
+     *
+     */
+    CallSmartShopTip,
     
     /**
      * 

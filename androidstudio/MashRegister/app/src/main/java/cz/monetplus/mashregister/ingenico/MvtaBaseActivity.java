@@ -1,15 +1,10 @@
 package cz.monetplus.mashregister.ingenico;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,7 +72,7 @@ public class MvtaBaseActivity extends AdActivity {
 		mCurrencySpinner = (Spinner) findViewById(R.id.spinnerCurrency);
 		mRechargeTypeSpinner = (Spinner) findViewById(R.id.spinnerRechargeType);
 		mInvoiceIdEditText = (EditText) findViewById(R.id.editTextInvoice);
-		mTranIdEditText = (EditText) findViewById(R.id.editTicketNumber);
+		mTranIdEditText = (EditText) findViewById(R.id.editTicketId);
 
 		mAnswerTextView = (TextView) findViewById(R.id.textAnswer);
 

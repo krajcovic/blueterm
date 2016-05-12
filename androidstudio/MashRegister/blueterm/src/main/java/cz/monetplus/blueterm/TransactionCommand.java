@@ -46,6 +46,8 @@ public enum TransactionCommand {
     SMART_SHOP_PARAMETRS_CALL(HandleOperations.CallSmartShopParametersCall),
     
     SMART_SHOP_HANDSHAKE(HandleOperations.CallSmartShopHandshake),
+
+    SMART_SHOP_TIP(HandleOperations.CallSmartShopTip),
     
     MAINTENANCE_UPDATE(HandleOperations.CallMaintenanceUpdate),
     ;

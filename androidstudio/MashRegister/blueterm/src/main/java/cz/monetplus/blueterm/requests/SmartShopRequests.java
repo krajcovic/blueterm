@@ -126,6 +126,15 @@ public class SmartShopRequests implements Requests {
                         SProtocolMessages.getHanshake()).createFrame())));
     }
 
+    public static HandleMessage tip(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.SMARTSHOP
+                                .getPortApplicationNumber(),
+                        SProtocolMessages.getTip(transactionInputData.getAmount(),
+                                transactionInputData.getCurrency())).createFrame())));
+    }
+
     @Override
     public HandleMessage ticketRequest(TicketCommand command) {
         return (new HandleMessage(HandleOperations.TerminalWrite,

@@ -43,7 +43,7 @@ public final class SProtocolMessages extends ProtocolMessages {
 
         bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.InvoiceNumber,
                 invoiceNumber);
-        
+
         if(cardType != null) {
             bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.Restriction,
                     cardType.toString());
@@ -61,7 +61,7 @@ public final class SProtocolMessages extends ProtocolMessages {
 
         return XProtocolFactory.serialize(bprotocol);
     }
-    
+
     public static byte[] getRecharging(long amount, int currencyCode,
             String invoiceNumber) {
 
@@ -134,7 +134,7 @@ public final class SProtocolMessages extends ProtocolMessages {
                 MessageNumber.TransactionRequest, "01", "        ",
                 getCurrentDateTimeForHeader(), 0, "A5A5");
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "07");
-        
+
         return XProtocolFactory.serialize(bprotocol);
     }
 
@@ -181,6 +181,19 @@ public final class SProtocolMessages extends ProtocolMessages {
                 getCurrentDateTimeForHeader(), 0, "A5A5");
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "95");
+        return XProtocolFactory.serialize(bprotocol);
+    }
+
+    public static byte[] getTip(long amount, int currencyCode) {
+        XProtocol bprotocol = new XProtocol(ProtocolType.SProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), 0, "A5A5");
+
+        bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+        bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
+                String.valueOf(currencyCode));
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "70");
         return XProtocolFactory.serialize(bprotocol);
     }
 
