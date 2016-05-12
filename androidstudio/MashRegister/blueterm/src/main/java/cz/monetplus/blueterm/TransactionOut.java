@@ -2,7 +2,6 @@ package cz.monetplus.blueterm;
 
 /**
  * @author krajcovic
- *
  */
 public class TransactionOut {
 
@@ -45,27 +44,27 @@ public class TransactionOut {
      * Hodnoty uzaverky, popis v B protokolu.
      */
     private Balancing balancing;
-  
+
     /**
      * Skutecne zaplacena castka
      */
     private Long amount;
-    
+
     /**
      * Zbytek po platbe.
      */
     private Long remainPayment;
-    
+
     /**
      * Vyzadovan tisk na pokladnim systemu.
      */
     private Boolean ticketRequired;
-    
+
     /**
      * Vyzadovana kontrola podpisu.
      */
-    private Boolean signRequired;    
-    
+    private Boolean signRequired;
+
 
     public Integer getResultCode() {
         return resultCode;
@@ -113,17 +112,6 @@ public class TransactionOut {
 
     public void setCardType(String cardType) {
         this.cardType = cardType;
-    }
-    
-    @Override
-    public String toString() {
-        return "TransactionOut [resultCode=" + resultCode + ", message="
-                + message + ", authCode=" + authCode + ", seqId=" + seqId
-                + ", cardNumber=" + cardNumber + ", cardToken=" + cardToken
-                + ", cardType=" + cardType + ", balancing=" + balancing
-                + ", amount=" + amount + ", remainPayment=" + remainPayment
-                + ", ticketRequired=" + ticketRequired + ", signRequired="
-                + signRequired + "]";
     }
 
     public Balancing getBalancing() {
@@ -174,4 +162,22 @@ public class TransactionOut {
         this.signRequired = signRequired;
     }
 
+
+    @Override
+    public String toString() {
+        return "TransactionOut{" +
+                "resultCode=" + resultCode +
+                ", message='" + message + '\'' +
+                ", authCode='" + authCode + '\'' +
+                ", seqId=" + seqId +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", cardToken='" + cardToken + '\'' +
+                ", cardType='" + cardType + '\'' +
+                ", balancing=" + balancing +
+                ", amount=" + amount +
+                ", remainPayment=" + remainPayment +
+                ", ticketRequired=" + ticketRequired +
+                ", signRequired=" + signRequired +
+                '}';
+    }
 }

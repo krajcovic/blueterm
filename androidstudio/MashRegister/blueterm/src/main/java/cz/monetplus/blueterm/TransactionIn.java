@@ -184,4 +184,23 @@ public class TransactionIn {
     public void setTicketType(TicketType ticketType) {
         this.ticketType = ticketType;
     }
- }
+
+    @Override
+    public String toString() {
+        return "TransactionIn{" +
+                "blueHwAddress='" + blueHwAddress + '\'' +
+                ", command=" + command +
+                ", amount=" + amount +
+                ", partialPayment=" + partialPayment +
+                ", ticketNumber='" + ticketNumber + '\'' +
+                ", invoice='" + invoice + '\'' +
+                ", currency=" + currency +
+                ", tranId=" + tranId +
+                ", authCode='" + authCode + '\'' +
+                ", rechargingType=" + rechargingType +
+                ", cardType=" + cardType +
+                ", posCallbacks=" + posCallbacks +
+                ", ticketType=" + ticketType +
+                '}';
+    }
+}
