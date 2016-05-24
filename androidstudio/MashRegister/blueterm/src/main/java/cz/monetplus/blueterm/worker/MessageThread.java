@@ -234,7 +234,7 @@ public class MessageThread extends Thread {
             }
 
             case CallMbcaInfo: {
-                addMessage(MbcaRequests.appInfoMbca());
+                addMessage(MbcaRequests.appInfoMbca(transactionInputData));
                 break;
             }
 
@@ -555,7 +555,7 @@ public class MessageThread extends Thread {
     }
 
     private void ticketResponse(Requests request, XProtocol xprotocol) {
-        printTicket(xprotocol.getTicketList());
+        printTicket(xprotocol.getCustomerTagMap().get(XProtocolCustomerTag.TerminalTicketLine).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
 
         addMessage(request.ack());
 
@@ -685,6 +685,18 @@ public class MessageThread extends Thread {
     // }
 
     private Boolean printTicket(List<String> list) {
+        for (String string : list) {
+            Boolean ticketLine = transactionInputData.getPosCallbacks()
+                    .ticketLine(string);
+            if (ticketLine == Boolean.FALSE) {
+                return Boolean.FALSE;
+            }
+        }
+
+        return Boolean.TRUE;
+    }
+
+    private Boolean printTicket(String[] list) {
         for (String string : list) {
             Boolean ticketLine = transactionInputData.getPosCallbacks()
                     .ticketLine(string);

@@ -1,5 +1,8 @@
 package cz.monetplus.blueterm;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author krajcovic
  */
@@ -64,6 +67,11 @@ public class TransactionOut {
      * Vyzadovana kontrola podpisu.
      */
     private Boolean signRequired;
+
+    /**
+     * Nepovinne, pevna delka odpovedi 10 bytu. Format #:MERCHANTID
+     */
+    private List<String> merchantId;
 
 
     public Integer getResultCode() {
@@ -162,22 +170,30 @@ public class TransactionOut {
         this.signRequired = signRequired;
     }
 
+    public List<String> getMerchantId() {
+        return this.merchantId;
+    }
+
+    public void setMerchantId(String[] merchantId) {
+        this.merchantId = Arrays.asList(merchantId);
+    }
 
     @Override
     public String toString() {
         return "TransactionOut{" +
-                "resultCode=" + resultCode +
-                ", message='" + message + '\'' +
-                ", authCode='" + authCode + '\'' +
-                ", seqId=" + seqId +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", cardToken='" + cardToken + '\'' +
-                ", cardType='" + cardType + '\'' +
-                ", balancing=" + balancing +
-                ", amount=" + amount +
-                ", remainPayment=" + remainPayment +
-                ", ticketRequired=" + ticketRequired +
-                ", signRequired=" + signRequired +
+                (resultCode != null ? "resultCode=" + resultCode : "") +
+                (message != null ? ", message='" + message + '\'' : "") +
+                (authCode != null ? ", authCode='" + authCode + '\'' : "") +
+                (seqId != null ? ", seqId=" + seqId : "") +
+                (cardNumber != null ? ", cardNumber='" + cardNumber + '\'' : "") +
+                (cardToken != null ? ", cardToken='" + cardToken + '\'' : "") +
+                (cardType != null ? ", cardType='" + cardType + '\'' : "") +
+                (balancing != null ? ", balancing=" + balancing : "") +
+                (amount != null ? ", amount=" + amount : "") +
+                (remainPayment != null ? ", remainPayment=" + remainPayment : "") +
+                (ticketRequired != null ? ", ticketRequired=" + ticketRequired : "") +
+                (signRequired != null ? ", signRequired=" + signRequired : "") +
+                (merchantId != null ? ", merchantId='" + merchantId + '\'' : "") +
                 '}';
     }
 }

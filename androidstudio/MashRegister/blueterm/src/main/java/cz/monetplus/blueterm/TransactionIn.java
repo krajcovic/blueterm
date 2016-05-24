@@ -6,7 +6,6 @@ import cz.monetplus.blueterm.xprotocol.TicketType;
 
 /**
  * @author krajcovic
- *
  */
 public class TransactionIn {
     /**
@@ -23,12 +22,12 @@ public class TransactionIn {
      * Zasilana castka
      */
     private Long amount;
-    
+
     /**
      * Castecna platba.
      */
     private Boolean partialPayment;
-    
+
     /**
      * Cislo tiketu.
      */
@@ -48,7 +47,7 @@ public class TransactionIn {
      * ID transakce
      */
     private Long tranId;
-    
+
     /**
      * Autorizacni kod
      */
@@ -58,7 +57,7 @@ public class TransactionIn {
      * Typ dobijeni
      */
     private RechargingType rechargingType;
-    
+
     /**
      * Typy smartshop karet.
      */
@@ -68,17 +67,23 @@ public class TransactionIn {
      * Metody pro komunikaci s pokladnou
      */
     private PosCallbacks posCallbacks;
-    
+
     /**
      * Which ticket print.
      */
     private TicketType ticketType;
 
+    /**
+     * Alternate ID
+     * Pole obsahuje index alternativniho obchodnika(Merchant)/Terminal ID pouzitelne pro tuto transakci
+     */
+    private Character alternateId;
+
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
 
         this.blueHwAddress = blueHwAddress;
-        this.command = command;       
+        this.command = command;
         this.partialPayment = false;
         this.ticketNumber = "";
         this.posCallbacks = posCallbacks;
@@ -86,7 +91,7 @@ public class TransactionIn {
     }
 
     public void setPayment(Long amount, String invoice, Integer currency,
-            Long tranId) {
+                           Long tranId) {
         this.amount = amount;
         this.invoice = invoice;
         this.currency = currency;
@@ -185,22 +190,31 @@ public class TransactionIn {
         this.ticketType = ticketType;
     }
 
+    public Character getAlternateId() {
+        return alternateId;
+    }
+
+    public void setAlternateId(Character alternateId) {
+        this.alternateId = alternateId;
+    }
+
     @Override
     public String toString() {
         return "TransactionIn{" +
-                "blueHwAddress='" + blueHwAddress + '\'' +
-                ", command=" + command +
-                ", amount=" + amount +
-                ", partialPayment=" + partialPayment +
-                ", ticketNumber='" + ticketNumber + '\'' +
-                ", invoice='" + invoice + '\'' +
-                ", currency=" + currency +
-                ", tranId=" + tranId +
-                ", authCode='" + authCode + '\'' +
-                ", rechargingType=" + rechargingType +
-                ", cardType=" + cardType +
-                ", posCallbacks=" + posCallbacks +
-                ", ticketType=" + ticketType +
+                (blueHwAddress != null ? "blueHwAddress='" + blueHwAddress + '\'' : "") +
+                (command != null ? ", command=" + command : "") +
+                (amount != null ? ", amount=" + amount : "") +
+                (partialPayment != null ? ", partialPayment=" + partialPayment : "") +
+                (ticketNumber != null ? ", ticketNumber='" + ticketNumber + '\'' : "") +
+                (invoice != null ? ", invoice='" + invoice + '\'' : "") +
+                (currency != null ? ", currency=" + currency : "") +
+                (tranId != null ? ", tranId=" + tranId : "") +
+                (authCode != null ? ", authCode='" + authCode + '\'' : "") +
+                (rechargingType != null ? ", rechargingType=" + rechargingType : "") +
+                (cardType != null ? ", cardType=" + cardType : "") +
+                (posCallbacks != null ? ", posCallbacks=" + posCallbacks : "") +
+                (ticketType != null ? ", ticketType=" + ticketType : "") +
+                (alternateId != null ? ", alternateId=" + alternateId : "") +
                 '}';
     }
 }

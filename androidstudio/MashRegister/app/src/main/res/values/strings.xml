@@ -83,5 +83,6 @@
     <string name="defaultTipValue">1</string>
     <string name="buktTextLastTran">Last Tran</string>
     <string name="butTextFFU">FFU</string>
+    <string name="title_alternateId">Alternate ID</string>
 
 </resources>

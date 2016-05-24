@@ -40,7 +40,7 @@ public final class BProtocolMessages extends ProtocolMessages {
     }
 
     public static byte[] getSale(long amount, int currencyCode,
-            String invoiceNumber) {
+                                 String invoiceNumber, Character alternateId) {
 
         XProtocol bprotocol = getInstance();
 
@@ -50,13 +50,17 @@ public final class BProtocolMessages extends ProtocolMessages {
                 String.valueOf(currencyCode));
         bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
 
+        if(alternateId != null) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        }
+
         // XProtocolFactory factory = new XProtocolFactory();
 
         return XProtocolFactory.serialize(bprotocol);
     }
 
     public static byte[] getReturn(int amount, int currencyCode,
-            String invoiceNumber) {
+            String invoiceNumber, Character alternateId) {
 
         XProtocol bprotocol = getInstance();
 
@@ -66,17 +70,23 @@ public final class BProtocolMessages extends ProtocolMessages {
                 String.valueOf(currencyCode));
         bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
 
-        // XProtocolFactory factory = new XProtocolFactory();
+        if(alternateId != null) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        }
 
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    public static byte[] getReversal(String authCode) {
+    public static byte[] getReversal(String authCode, Character alternateId) {
 
         XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "10");
         bprotocol.getTagMap().put(XProtocolTag.AuthCode, authCode);
+
+        if(alternateId != null) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        }
 
         return XProtocolFactory.serialize(bprotocol);
     }

@@ -39,10 +39,6 @@ import cz.monetplus.mashregister.util.SystemUiHider;
  * @see SystemUiHider
  */
 public class MbcaBaseActivity extends AdActivity {
-	private static final int ACTIVITY_INTENT_ID = 33333;
-
-	// Intent request codes
-	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 33334;
 
 	private static final String TAG = "MbcaBaseActivity";
 
@@ -134,10 +130,7 @@ public class MbcaBaseActivity extends AdActivity {
 	private void doTransaction(TransactionCommand command) {
 		try {
 			mAnswerTextView.setText("Calling " + command);
-//<<<<<<< HEAD
-//			TransactionIn transIn = new TransactionIn(blueHwAddress.getText().toString(), command, posCallbackee);
-//			transIn.setAmount(Long.valueOf((long) (Double.valueOf(mAmountIdEditText.getText().toString()) * 100)));
-//=======
+
 			posCallbackee.getTicket().clear();
 			TransactionIn transIn = new TransactionIn(blueHwAddress.getText()
 					.toString(), command, posCallbackee);
@@ -145,6 +138,8 @@ public class MbcaBaseActivity extends AdActivity {
 					.valueOf(mAmountIdEditText.getText().toString()) * 100)));
 			transIn.setCurrency(Integer.valueOf(currentCurrency));
 			transIn.setInvoice(mInvoiceIdEditText.getText().toString());
+
+            transIn.setAlternateId(alternateId);
 
 			if (transactionTask != null) {
 				transactionTask.cancel(true);
@@ -195,7 +190,7 @@ public class MbcaBaseActivity extends AdActivity {
 			public void onClick(View v) {
 				// Launch the DeviceListActivity to see devices and do scan
 				Intent serverIntent = new Intent(getApplicationContext(), DeviceListActivity.class);
-				startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+				startActivityForResult(serverIntent, INTENT_RC_CONNECT_DEVICE_INSECURE);
 
 			}
 		});
@@ -285,23 +280,6 @@ public class MbcaBaseActivity extends AdActivity {
 		return true;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		switch (item.getItemId()) {
-		case R.id.bt_enabled:
-			item.setChecked(true);
-			propertiesMenu.findItem(R.id.tcp_enabled).setChecked(false);
-			break;
-		case R.id.tcp_enabled:
-			item.setChecked(true);
-			propertiesMenu.findItem(R.id.bt_enabled).setChecked(false);
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
 	private void ShowTransactionOut(TransactionOut out) {
 		if (out != null) {
 			final String result = out.toString();
@@ -335,7 +313,7 @@ public class MbcaBaseActivity extends AdActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
-		case REQUEST_CONNECT_DEVICE_INSECURE:
+		case INTENT_RC_CONNECT_DEVICE_INSECURE:
 			if (resultCode == Activity.RESULT_OK) {
 				if (data.hasExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS)) {
 					blueHwAddress.setText(data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS));
@@ -344,13 +322,6 @@ public class MbcaBaseActivity extends AdActivity {
 						setButtons(true);
 
 					}
-				}
-			}
-			break;
-		case ACTIVITY_INTENT_ID:
-			if (resultCode == Activity.RESULT_OK) {
-				if (data != null) {
-					mAnswerTextView.setText(data.toString());
 				}
 			}
 			break;
@@ -466,6 +437,9 @@ public class MbcaBaseActivity extends AdActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+	}
+
+	public void onMenuAlternateIdItemClick(MenuItem item) {
 	}
 
 }

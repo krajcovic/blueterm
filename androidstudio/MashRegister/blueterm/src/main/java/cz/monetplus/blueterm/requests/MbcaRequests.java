@@ -23,7 +23,7 @@ public class MbcaRequests implements Requests {
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getSale(transactionInputData.getAmount(),
                                         transactionInputData.getCurrency(),
-                                        transactionInputData.getInvoice()))
+                                        transactionInputData.getInvoice(), transactionInputData.getAlternateId()))
                         .createFrame())));
     }
     
@@ -37,7 +37,7 @@ public class MbcaRequests implements Requests {
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.MBCA
                                 .getPortApplicationNumber(), BProtocolMessages
-                                .getReversal(transactionInputData.getAuthCode()))
+                                .getReversal(transactionInputData.getAuthCode(), transactionInputData.getAlternateId()))
                         .createFrame())));
     }
 
@@ -88,7 +88,7 @@ public class MbcaRequests implements Requests {
      /**
      * Create and send app info request to terminal.
      */
-    public static HandleMessage appInfoMbca() {
+    public static HandleMessage appInfoMbca(TransactionIn transactionInputData) {
         return (new HandleMessage(HandleOperations.TerminalWrite,
                 SLIPFrame.createFrame(new TerminalFrame(
                         TerminalPortApplications.MBCA

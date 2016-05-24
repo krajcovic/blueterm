@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.util.Log;
+
 import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.TransactionOut;
 import cz.monetplus.blueterm.util.MonetUtils;
@@ -25,6 +26,8 @@ public class XProtocolFactory {
     private static final byte GS = 0x1d;
 
     private static final String TAG = "XProtocolFactory";
+    public static final String MULTI_FID_SEPARATOR = "|";
+    public static final String REGULAR_MULTI_FID_SEPARATOR = "\\|";
 
     private static boolean checkBit(int value, int i) {
         return (value & (1L << i)) == (1L << i);
@@ -75,7 +78,7 @@ public class XProtocolFactory {
 
         if (protocol.getTagMap().containsKey(XProtocolTag.PAN)
                 && !protocol.getCustomerTagMap()
-                        .containsKey(XProtocolCustomerTag.CardToken)) {
+                .containsKey(XProtocolCustomerTag.CardToken)) {
             tran.setCardToken(
                     "000000000000000000000000000000000000000000000000");
         }
@@ -92,6 +95,10 @@ public class XProtocolFactory {
         if (protocol.getTagMap().containsKey(XProtocolTag.Amount1)) {
             tran.setAmount(Long.valueOf(
                     protocol.getTagMap().get(XProtocolTag.Amount1).toString()));
+        }
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.AlternateId)) {
+            tran.setMerchantId(protocol.getTagMap().get(XProtocolTag.AlternateId).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
         }
 
         tran.setTicketRequired(isTicketFlagOn(protocol));
@@ -118,7 +125,7 @@ public class XProtocolFactory {
                             1).getBytes());
             bout.write(fixString(
                     bprotocol.getMessageNumber().getNumber().toString(), 1)
-                            .getBytes());
+                    .getBytes());
             bout.write(fixString(bprotocol.getProtocolVersion(), 2).getBytes());
             bout.write(fixString(bprotocol.getPosId(), 8).getBytes());
             bout.write(fixString(bprotocol.getTransactionDateTime(), 12)
@@ -175,7 +182,16 @@ public class XProtocolFactory {
                     if (tagOf.equals(XProtocolTag.CustomerFid)) {
                         deserializeCustomer(bprotocol, element);
                     } else {
-                        bprotocol.getTagMap().put(tagOf, element.substring(1));
+                        if(bprotocol.getTagMap().containsKey(tagOf)) {
+                            // Uz je v mape
+                            String value = bprotocol.getTagMap().get(tagOf);
+                            value += MULTI_FID_SEPARATOR + element.substring(1);
+                            bprotocol.getTagMap().put(tagOf, value);
+                        }else {
+                            // Jeste neni v mape.
+                            bprotocol.getTagMap().put(tagOf, element.substring(1));
+                        }
+
                     }
                 }
             }
@@ -196,30 +212,35 @@ public class XProtocolFactory {
             if (customerElement != null && customerElement.length() > 0) {
                 XProtocolCustomerTag tagOf = XProtocolCustomerTag
                         .tagOf(customerElement.charAt(0));
-                if (tagOf.equals(XProtocolCustomerTag.TerminalTicketLine)) {
-                    // String temp = new
-                    // String(customerElement.substring(1).getBytes(),
-                    // "ISO-8859-2");
 
-                    xprotocol.getTicketList().add(customerElement.substring(1));
+                if(xprotocol.getCustomerTagMap().containsKey(tagOf)) {
+                    String value = xprotocol.getTagMap().get(tagOf);
+                    value += MULTI_FID_SEPARATOR + element.substring(1);
+                    xprotocol.getCustomerTagMap().put(tagOf, value);
                 } else {
                     xprotocol.getCustomerTagMap().put(tagOf,
                             customerElement.substring(1));
                 }
+//                if (tagOf.equals(XProtocolCustomerTag.TerminalTicketLine)) {
+//                    xprotocol.getTicketList().add(customerElement.substring(1));
+//                } else {
+//                    xprotocol.getCustomerTagMap().put(tagOf,
+//                            customerElement.substring(1));
+//                }
             }
         }
     }
 
     private static String[] splitTags(byte[] buffer, String codepage,
-            String regex) throws UnsupportedEncodingException {
+                                      String regex) throws UnsupportedEncodingException {
         String dp = new String(buffer, codepage);
         String[] split = dp.split(regex);
         return split;
     }
 
     private static byte[] compileTags(HashMap<XProtocolTag, String> tagMap,
-            HashMap<XProtocolCustomerTag, String> customerTagMap)
-                    throws IOException {
+                                      HashMap<XProtocolCustomerTag, String> customerTagMap)
+            throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         Iterator<?> it = tagMap.entrySet().iterator();
@@ -269,18 +290,15 @@ public class XProtocolFactory {
 
     /**
      * Vyparsovani stringu s fixni delkou z bufferu.
-     * 
-     * @param buffer
-     *            buffer s daty
-     * @param pos
-     *            pozice pocatku stringu
-     * @param size
-     *            velikost vycitaneho stringu
+     *
+     * @param buffer buffer s daty
+     * @param pos    pozice pocatku stringu
+     * @param size   velikost vycitaneho stringu
      * @return z bufferu vycteny string
      */
     @SuppressWarnings("unused")
     private static String getFixedTrimedString(byte[] buffer, int pos,
-            int size) {
+                                               int size) {
         return new String(Arrays.copyOfRange(buffer, pos, pos + size)).trim();
     }
 
@@ -290,16 +308,13 @@ public class XProtocolFactory {
 
     /**
      * Zafixovani stringu na danou delku.
-     * 
-     * @param inputStr
-     *            vstupni retezec
-     * @param size
-     *            velikost vycitaneho stringu
-     * @param fill
-     *            Fill free space with char.
+     *
+     * @param inputStr vstupni retezec
+     * @param size     velikost vycitaneho stringu
+     * @param fill     Fill free space with char.
      * @return pokud je vetsi je navracena pouze retezec pozadovane velikosti
-     *         nebo je vstupni retezec zarovnan na pozadovanou delku pripojenim
-     *         mezer.
+     * nebo je vstupni retezec zarovnan na pozadovanou delku pripojenim
+     * mezer.
      */
     private static String fixString(String inputStr, int size, char fill) {
         String str = inputStr;
@@ -323,14 +338,12 @@ public class XProtocolFactory {
 
     /**
      * Zafixovani ciselneho retezce na danou delku.
-     * 
-     * @param inputStr
-     *            vstupni retezec
-     * @param size
-     *            velikost vycitaneho stringu
+     *
+     * @param inputStr vstupni retezec
+     * @param size     velikost vycitaneho stringu
      * @return pokud je vetsi je navracena pouze retezec pozadovane velikosti
-     *         nebo je vstupni retezec zarovnan na pozadovanou delku prefixem z
-     *         nul.
+     * nebo je vstupni retezec zarovnan na pozadovanou delku prefixem z
+     * nul.
      */
 
     @SuppressWarnings("unused")

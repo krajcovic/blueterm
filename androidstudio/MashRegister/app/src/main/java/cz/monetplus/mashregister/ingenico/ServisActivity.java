@@ -34,10 +34,6 @@ import cz.monetplus.mashregister.util.SystemUiHider;
  * @see SystemUiHider
  */
 public class ServisActivity extends AdActivity {
-	private static final int ACTIVITY_INTENT_ID = 33333;
-
-	// Intent request codes
-	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 33334;
 
 	private static final String TAG = "ServisActivity";
 
@@ -70,7 +66,7 @@ public class ServisActivity extends AdActivity {
 			public void onClick(View v) {
 				// Launch the DeviceListActivity to see devices and do scan
 				Intent serverIntent = new Intent(getApplicationContext(), DeviceListActivity.class);
-				startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+				startActivityForResult(serverIntent, INTENT_RC_CONNECT_DEVICE_INSECURE);
 
 			}
 		});
@@ -188,22 +184,30 @@ public class ServisActivity extends AdActivity {
 		return true;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		switch (item.getItemId()) {
-		case R.id.bt_enabled:
-			item.setChecked(true);
-			propertiesMenu.findItem(R.id.tcp_enabled).setChecked(false);
-			break;
-		case R.id.tcp_enabled:
-			item.setChecked(true);
-			propertiesMenu.findItem(R.id.bt_enabled).setChecked(false);
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
+//	@Override
+//	public boolean onOptionsItemSelected(MenuItem item) {
+//
+//		switch (item.getItemId()) {
+////		case R.id.bt_enabled:
+////			item.setChecked(true);
+////			propertiesMenu.findItem(R.id.tcp_enabled).setChecked(false);
+////			break;
+////		case R.id.tcp_enabled:
+////			item.setChecked(true);
+////			propertiesMenu.findItem(R.id.bt_enabled).setChecked(false);
+////			break;
+//			case R.id.menuHwAddress:
+//				Intent serverIntent = new Intent(getApplicationContext(),
+//						DeviceListActivity.class);
+//				startActivityForResult(serverIntent,
+//						REQUEST_CONNECT_DEVICE_INSECURE);
+//				break;
+//			case R.id.alternateId:
+//				break;
+//		}
+//
+//		return super.onOptionsItemSelected(item);
+//	}
 
 	private void ShowTransactionOut(TransactionOut out) {
 		if (out != null) {
@@ -233,7 +237,7 @@ public class ServisActivity extends AdActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
-		case REQUEST_CONNECT_DEVICE_INSECURE:
+		case INTENT_RC_CONNECT_DEVICE_INSECURE:
 			if (resultCode == Activity.RESULT_OK) {
 				if (data.hasExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS)) {
 					blueHwAddress.setText(data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS));
@@ -242,13 +246,6 @@ public class ServisActivity extends AdActivity {
 						setButtons(true);
 						updateTerminalName();
 					}
-				}
-			}
-			break;
-		case ACTIVITY_INTENT_ID:
-			if (resultCode == Activity.RESULT_OK) {
-				if (data != null) {
-					mAnswerTextView.setText(data.toString());
 				}
 			}
 			break;

@@ -59,17 +59,17 @@ public class XProtocol implements Serializable {
     /**
      * Tag map.
      */
-    private HashMap<XProtocolTag, String> tagMap = new HashMap<XProtocolTag, String>();
+    private HashMap<XProtocolTag, String> tags = new HashMap<XProtocolTag, String>();
 
     /**
      * Tag map.
      */
-    private HashMap<XProtocolCustomerTag, String> customerTagMap = new HashMap<XProtocolCustomerTag, String>();
+    private HashMap<XProtocolCustomerTag, String> customerTags = new HashMap<XProtocolCustomerTag, String>();
     
     /**
      * Rows for printing.
      */
-    private List<String> ticketList = new ArrayList<String>();
+//    private List<String> ticketList = new ArrayList<String>();
 
     /**
      * 
@@ -162,12 +162,8 @@ public class XProtocol implements Serializable {
     }
 
     public HashMap<XProtocolTag, String> getTagMap() {
-        return tagMap;
+        return tags;
     }
-
-//    public void setTagMap(HashMap<XProtocolTag, String> tagMap) {
-//        this.tagMap = tagMap;
-//    }
 
     public MessageNumber getMessageNumber() {
         return messageNumber;
@@ -204,16 +200,16 @@ public class XProtocol implements Serializable {
         if (standardCRC16 != null) {
             builder.append("crc=").append(standardCRC16).append(", ");
         }
-        if (tagMap != null) {
-            builder.append("FID's=").append(tagMap).append(", ");
+        if (tags != null) {
+            builder.append("FID's=").append(tags).append(", ");
         }
-        if (customerTagMap != null) {
-            builder.append("SubFID's 9=").append(customerTagMap)
+        if (customerTags != null) {
+            builder.append("SubFID's 9=").append(customerTags)
                     .append(", ");
         }
-        if (ticketList != null) {
-            builder.append("ticketList=").append(ticketList);
-        }
+//        if (ticketList != null) {
+//            builder.append("ticketList=").append(ticketList);
+//        }
         builder.append("]");
         return builder.toString();
     }
@@ -223,20 +219,15 @@ public class XProtocol implements Serializable {
     }
 
     public HashMap<XProtocolCustomerTag, String> getCustomerTagMap() {
-        return customerTagMap;
+        return customerTags;
     }
 
-    public List<String> getTicketList() {
-        return ticketList;
-    }
+//    public List<String> getTicketList() {
+//        return ticketList;
+//    }
 
-    public void setTicketList(List<String> ticketList) {
-        this.ticketList = ticketList;
-    }
-
-//    public void setCustomerTagMap(
-//            HashMap<XProtocolCustomerTag, String> customerTagMap) {
-//        this.customerTagMap = customerTagMap;
+//    public void setTicketList(List<String> ticketList) {
+//        this.ticketList = ticketList;
 //    }
 
 }

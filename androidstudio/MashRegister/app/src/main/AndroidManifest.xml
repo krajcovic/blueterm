@@ -87,6 +87,15 @@ package="cz.monetplus.mashregister">
         android:configChanges="orientation|keyboardHidden"
         android:label="@string/title_printer"
         android:theme="@android:style/Theme.Dialog" />
+
+    <activity
+        android:name="cz.monetplus.mashregister.ingenico.AlternateIdActivity"
+        android:configChanges="keyboardHidden"
+        android:label="@string/title_alternateId"
+        android:windowSoftInputMode="stateHidden"
+        android:theme="@android:style/Theme.Dialog"
+    />
+
     <activity
         android:name="cz.monetplus.mashregister.ingenico.AdActivity"
         android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
