@@ -182,12 +182,12 @@ public class XProtocolFactory {
                     if (tagOf.equals(XProtocolTag.CustomerFid)) {
                         deserializeCustomer(bprotocol, element);
                     } else {
-                        if(bprotocol.getTagMap().containsKey(tagOf)) {
+                        if (bprotocol.getTagMap().containsKey(tagOf)) {
                             // Uz je v mape
                             String value = bprotocol.getTagMap().get(tagOf);
                             value += MULTI_FID_SEPARATOR + element.substring(1);
                             bprotocol.getTagMap().put(tagOf, value);
-                        }else {
+                        } else {
                             // Jeste neni v mape.
                             bprotocol.getTagMap().put(tagOf, element.substring(1));
                         }
@@ -213,20 +213,14 @@ public class XProtocolFactory {
                 XProtocolCustomerTag tagOf = XProtocolCustomerTag
                         .tagOf(customerElement.charAt(0));
 
-                if(xprotocol.getCustomerTagMap().containsKey(tagOf)) {
-                    String value = xprotocol.getTagMap().get(tagOf);
-                    value += MULTI_FID_SEPARATOR + element.substring(1);
-                    xprotocol.getCustomerTagMap().put(tagOf, value);
+                if (xprotocol.getCustomerTagMap().containsKey(tagOf)) {
+                    String oldValue = xprotocol.getCustomerTagMap().get(tagOf);
+                    oldValue += MULTI_FID_SEPARATOR + customerElement.substring(1);
+                    xprotocol.getCustomerTagMap().put(tagOf, oldValue);
                 } else {
                     xprotocol.getCustomerTagMap().put(tagOf,
                             customerElement.substring(1));
                 }
-//                if (tagOf.equals(XProtocolCustomerTag.TerminalTicketLine)) {
-//                    xprotocol.getTicketList().add(customerElement.substring(1));
-//                } else {
-//                    xprotocol.getCustomerTagMap().put(tagOf,
-//                            customerElement.substring(1));
-//                }
             }
         }
     }

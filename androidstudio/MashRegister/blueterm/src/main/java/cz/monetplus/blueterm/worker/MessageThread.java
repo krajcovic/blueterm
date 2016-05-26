@@ -2,6 +2,7 @@ package cz.monetplus.blueterm.worker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -372,9 +373,9 @@ public class MessageThread extends Thread {
 
                 break;
 
-             case CheckSign:
+            case CheckSign:
                 checkSign(msg.getRequest());
-             break;
+                break;
 
             case Exit:
                 this.stopThread();
@@ -389,17 +390,16 @@ public class MessageThread extends Thread {
         }
     }
 
-     private void checkSign(Requests request) {
-     if (!transactionOutputData.getSignRequired() || transactionInputData.getPosCallbacks().isSignOk())
-     {
-        // Sign is OK
-         lastTicket = TicketCommand.Customer;
-           addMessage(request.ticketRequest(lastTicket));
-     } else {
-        // Sign is Bad
-        addMessage(HandleOperations.Exit);
+    private void checkSign(Requests request) {
+        if (!transactionOutputData.getSignRequired() || transactionInputData.getPosCallbacks().isSignOk()) {
+            // Sign is OK
+            lastTicket = TicketCommand.Customer;
+            addMessage(request.ticketRequest(lastTicket));
+        } else {
+            // Sign is Bad
+            addMessage(HandleOperations.Exit);
         }
-     }
+    }
 
     /**
      * Get the BluetoothDevice object.
@@ -573,11 +573,11 @@ public class MessageThread extends Thread {
                     transactionInputData.getPosCallbacks().ticketFinish();
                     addMessage(HandleOperations.Exit);
 
-                     if (lastTicket == TicketCommand.Merchant) {
+                    if (lastTicket == TicketCommand.Merchant) {
                         addMessage(HandleOperations.CheckSign, request);
-                     } else {
+                    } else {
                         addMessage(HandleOperations.Exit);
-                     }
+                    }
 
                     break;
                 default:
@@ -698,11 +698,11 @@ public class MessageThread extends Thread {
 
     private Boolean printTicket(String[] list) {
         for (String string : list) {
-            Boolean ticketLine = transactionInputData.getPosCallbacks()
-                    .ticketLine(string);
-            if (ticketLine == Boolean.FALSE) {
-                return Boolean.FALSE;
-            }
+                Boolean ticketLine = transactionInputData.getPosCallbacks()
+                        .ticketLine(string);
+                if (ticketLine == Boolean.FALSE) {
+                    return Boolean.FALSE;
+                }
         }
 
         return Boolean.TRUE;
