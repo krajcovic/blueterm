@@ -8,8 +8,8 @@ android {
         applicationId "cz.monetplus.mashregisterplus.ingenico"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 33
-        versionName "33.0"
+        versionCode 34
+        versionName "34.0"
     }
     buildTypes {
         release {
