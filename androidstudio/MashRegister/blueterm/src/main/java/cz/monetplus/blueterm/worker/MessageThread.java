@@ -571,8 +571,6 @@ public class MessageThread extends Thread {
                     break;
                 case End:
                     transactionInputData.getPosCallbacks().ticketFinish();
-                    addMessage(HandleOperations.Exit);
-
                     if (lastTicket == TicketCommand.Merchant) {
                         addMessage(HandleOperations.CheckSign, request);
                     } else {
