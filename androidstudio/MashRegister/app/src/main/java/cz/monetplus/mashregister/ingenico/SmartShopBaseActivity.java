@@ -269,7 +269,7 @@ public class SmartShopBaseActivity extends AdActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_RC_ALTERNATE_ID:
+            case INTENT_RC_CONNECT_DEVICE_INSECURE:
                 if (resultCode == Activity.RESULT_OK) {
                     if (data.hasExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS)) {
                         blueHwAddress.setText(data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS));

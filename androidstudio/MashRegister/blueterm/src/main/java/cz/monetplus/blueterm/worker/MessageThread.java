@@ -114,7 +114,6 @@ public class MessageThread extends Thread {
 
     /**
      * @param context
-     * @param terminalPort
      * @param transactionInputData
      */
     private MessageThread(final Context context,
@@ -555,7 +554,10 @@ public class MessageThread extends Thread {
     }
 
     private void ticketResponse(Requests request, XProtocol xprotocol) {
-        printTicket(xprotocol.getCustomerTagMap().get(XProtocolCustomerTag.TerminalTicketLine).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
+        String ticketLine = xprotocol.getCustomerTagMap().get(XProtocolCustomerTag.TerminalTicketLine);
+        if(ticketLine != null) {
+            printTicket(ticketLine.split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
+        }
 
         addMessage(request.ack());
 
