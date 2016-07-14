@@ -238,6 +238,11 @@ public class MessageThread extends Thread {
                 break;
             }
 
+            case CallMbcaAccountInfo: {
+                addMessage(MbcaRequests.appAccountInfo(transactionInputData));
+                break;
+            }
+
             case CallMbcaGetLastTran: {
                 addMessage(MbcaRequests.getLastTran());
                 break;

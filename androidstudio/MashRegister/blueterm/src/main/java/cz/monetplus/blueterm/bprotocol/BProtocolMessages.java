@@ -142,4 +142,16 @@ public final class BProtocolMessages extends ProtocolMessages {
 
         return XProtocolFactory.serialize(bprotocol);
     }
+
+    public static byte[] getAccountInfo(Character alternateId) {
+        XProtocol bprotocol = getInstance();
+
+        bprotocol.getTagMap().put(XProtocolTag.TransactionType, "84");
+
+        if(alternateId != null && alternateId != 0) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        }
+
+        return XProtocolFactory.serialize(bprotocol);
+    }
 }

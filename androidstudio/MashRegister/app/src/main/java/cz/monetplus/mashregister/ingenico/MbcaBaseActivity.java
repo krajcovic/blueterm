@@ -270,6 +270,15 @@ public class MbcaBaseActivity extends AdActivity {
 				doTransaction(TransactionCommand.SMART_SHOP_TIP);
 			}
 		});
+
+		temp = (Button) findViewById(R.id.butAccountInfo);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doTransaction(TransactionCommand.MBCA_ACCOUNT_INFO);
+			}
+		});
 	}
 
 	@Override

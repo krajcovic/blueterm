@@ -1,6 +1,11 @@
 package cz.monetplus.blueterm.xprotocol;
 
 public enum XProtocolCustomerTag {
+
+    /**
+     * Account/Virtual merchan id information.
+     */
+    AccountInfo('i'),
     
     /**
      * Restriction / cardType

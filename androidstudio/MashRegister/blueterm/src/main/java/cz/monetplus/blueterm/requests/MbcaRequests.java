@@ -96,6 +96,14 @@ public class MbcaRequests implements Requests {
                                 .getAppInfo()).createFrame())));
     }
 
+    public static HandleMessage appAccountInfo(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                        .getAccountInfo(transactionInputData.getAlternateId())).createFrame())));
+    }
+
     @Override
     public HandleMessage ticketRequest(TicketCommand command) {
         return (new HandleMessage(HandleOperations.TerminalWrite,

@@ -84,5 +84,6 @@
     <string name="buktTextLastTran">Last Tran</string>
     <string name="butTextFFU">FFU</string>
     <string name="title_alternateId">Alternate ID</string>
+    <string name="accountInfoButtonText">Account info</string>
 
 </resources>

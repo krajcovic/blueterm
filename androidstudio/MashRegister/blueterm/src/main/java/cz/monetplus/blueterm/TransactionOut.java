@@ -1,7 +1,12 @@
 package cz.monetplus.blueterm;
 
+import android.util.ArrayMap;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author krajcovic
@@ -72,6 +77,14 @@ public class TransactionOut {
      * Nepovinne, pevna delka odpovedi 10 bytu. Format #:MERCHANTID
      */
     private List<String> merchantId;
+
+    /**
+     * {9i}* - jednotlive informace, prvni znak - index, dalsi data
+     0-pozice menu dcery (int-1..)
+     1-jmeno menu dcery (text[20])
+     2-parametry invoice (text[24])
+     */
+    private Map<Character, String> accountInfo;
 
 
     public Integer getResultCode() {
@@ -178,6 +191,17 @@ public class TransactionOut {
         this.merchantId = Arrays.asList(merchantId);
     }
 
+    public Map<Character, String> getAccountInfo() {
+        return accountInfo;
+    }
+
+    public void setAccountInfo(String[] accountInfo) {
+        this.accountInfo = new HashMap<>();
+        for (String ai:accountInfo) {
+            this.accountInfo.put(ai.charAt(0), ai.substring(1));
+        }
+    }
+
     @Override
     public String toString() {
         return "TransactionOut{" +
@@ -194,6 +218,7 @@ public class TransactionOut {
                 (ticketRequired != null ? ", ticketRequired=" + ticketRequired : "") +
                 (signRequired != null ? ", signRequired=" + signRequired : "") +
                 (merchantId != null ? ", merchantId='" + merchantId + '\'' : "") +
+                (accountInfo != null ? ", accountInfo='" + accountInfo + '\'' : "") +
                 '}';
     }
 }

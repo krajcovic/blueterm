@@ -251,6 +251,19 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp" >
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/butAccountInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/accountInfoButtonText" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/textAnswer"
                 android:layout_width="match_parent"

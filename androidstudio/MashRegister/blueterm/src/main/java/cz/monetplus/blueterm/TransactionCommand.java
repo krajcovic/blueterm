@@ -19,6 +19,8 @@ public enum TransactionCommand {
 
     MBCA_INFO(HandleOperations.CallMbcaInfo),
 
+    MBCA_ACCOUNT_INFO(HandleOperations.CallMbcaAccountInfo),
+
     MVTA_HANDSHAKE(HandleOperations.CallMvtaHandshake),
     
     MVTA_INFO(HandleOperations.CallMvtaInfo),

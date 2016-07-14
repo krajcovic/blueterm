@@ -101,6 +101,10 @@ public class XProtocolFactory {
             tran.setMerchantId(protocol.getTagMap().get(XProtocolTag.AlternateId).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
         }
 
+        if(protocol.getCustomerTagMap().containsKey(XProtocolCustomerTag.AccountInfo)) {
+            tran.setAccountInfo(protocol.getCustomerTagMap().get(XProtocolCustomerTag.AccountInfo).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
+        }
+
         tran.setTicketRequired(isTicketFlagOn(protocol));
         tran.setSignRequired(isSignFlagOn(protocol));
 
