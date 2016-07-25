@@ -262,6 +262,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/accountInfoButtonText" />
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonAccountInfoTest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/accountInfoTestButtonText" />
+
             </LinearLayout>
 
             <TextView

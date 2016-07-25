@@ -52,7 +52,7 @@ public class SmartShopBaseActivity extends AdActivity {
     private String currentCurrency;
     private TextView blueHwAddress;
 
-    DoTransactionTask transactionTask = null;
+//    DoTransactionTask transactionTask = null;
 
     private Menu propertiesMenu;
 
@@ -140,13 +140,12 @@ public class SmartShopBaseActivity extends AdActivity {
             transIn.setPartialPayment(cbPartialPayment.isChecked());
             transIn.setTicketNumber(mTicketNumberEditText.getText().toString());
 
-            if (transactionTask != null) {
-                transactionTask.cancel(true);
-                transactionTask = null;
-            }
+//            if (transactionTask != null) {
+//                transactionTask.cancel(true);
+//                transactionTask = null;
+//            }
 
-            transactionTask = new DoTransactionTask();
-            transactionTask.execute(transIn);
+            new DoTransactionTask().executeOnExecutor (AsyncTask.SERIAL_EXECUTOR, transIn);
 
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -313,7 +312,7 @@ public class SmartShopBaseActivity extends AdActivity {
                 SmartShopBaseActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "Another thread work with blueterm.", Toast.LENGTH_LONG)
+                        Toast.makeText(getApplicationContext(), "Another thread work with blueterm.", Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });
@@ -332,7 +331,7 @@ public class SmartShopBaseActivity extends AdActivity {
             if (result != null) {
                 ShowTransactionOut(result);
             }
-            transactionTask = null;
+//            transactionTask = null;
         }
     }
 

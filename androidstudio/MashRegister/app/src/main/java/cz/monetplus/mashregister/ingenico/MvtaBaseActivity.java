@@ -50,7 +50,7 @@ public class MvtaBaseActivity extends AdActivity {
 	private RechargingType rechargingType;
 	private TextView blueHwAddress;
 
-	DoTransactionTask transactionTask = null;
+//	DoTransactionTask transactionTask = null;
 
 	private Menu propertiesMenu;
 
@@ -154,13 +154,12 @@ public class MvtaBaseActivity extends AdActivity {
 					.valueOf(mTranIdEditText.getText().toString()));
 			transIn.setRechargingType(rechargingType);
 
-			if (transactionTask != null) {
-				transactionTask.cancel(true);
-				transactionTask = null;
-			}
+//			if (transactionTask != null) {
+//				transactionTask.cancel(true);
+//				transactionTask = null;
+//			}
 
-			transactionTask = new DoTransactionTask();
-			transactionTask.execute(transIn);
+			new DoTransactionTask().executeOnExecutor (AsyncTask.SERIAL_EXECUTOR, transIn);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.getMessage(),
@@ -341,7 +340,7 @@ public class MvtaBaseActivity extends AdActivity {
 					public void run() {
 						Toast.makeText(getApplicationContext(),
 								"Another thread work with blueterm.",
-								Toast.LENGTH_LONG).show();
+								Toast.LENGTH_SHORT).show();
 					}
 				});
 			}
@@ -359,7 +358,7 @@ public class MvtaBaseActivity extends AdActivity {
 			if (result != null) {
 				ShowTransactionOut(result);
 			}
-			transactionTask = null;
+//			transactionTask = null;
 		}
 	}
 

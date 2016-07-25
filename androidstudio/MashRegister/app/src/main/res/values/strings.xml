@@ -85,5 +85,6 @@
     <string name="butTextFFU">FFU</string>
     <string name="title_alternateId">Alternate ID</string>
     <string name="accountInfoButtonText">Account info</string>
+    <string name="accountInfoTestButtonText">Account Info Test</string>
 
 </resources>

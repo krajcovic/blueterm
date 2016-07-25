@@ -1,6 +1,7 @@
 package cz.monetplus.mashregister.ingenico;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -54,7 +55,7 @@ public class MbcaBaseActivity extends AdActivity {
 	private String currentCurrency;
 	private TextView blueHwAddress;
 
-	DoTransactionTask transactionTask = null;
+//	private DoTransactionTask transactionTask = null;
 
 	private Menu propertiesMenu;
 
@@ -141,13 +142,17 @@ public class MbcaBaseActivity extends AdActivity {
 
             transIn.setAlternateId(alternateId);
 
-			if (transactionTask != null) {
-				transactionTask.cancel(true);
-				transactionTask = null;
-			}
+//			if (transactionTask != null) {
+//				transactionTask.cancel(true);
+//				transactionTask = null;
+//			}
 
-			transactionTask = new DoTransactionTask();
-			transactionTask.execute(transIn);
+			new DoTransactionTask(new TaskDelegate() {
+				@Override
+				public void taskCompletionResult(TransactionOut transactionOut) {
+					ShowTransactionOut(transactionOut);
+				}
+			}).executeOnExecutor (AsyncTask.SERIAL_EXECUTOR, transIn);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.getMessage(),
@@ -168,13 +173,17 @@ public class MbcaBaseActivity extends AdActivity {
 				transIn.setAuthCode(authCode);
 			}
 
-			if (transactionTask != null) {
-				transactionTask.cancel(true);
-				transactionTask = null;
-			}
+//			if (transactionTask != null) {
+//				transactionTask.cancel(true);
+//				transactionTask = null;
+//			}
 
-			transactionTask = new DoTransactionTask();
-			transactionTask.execute(transIn);
+			new DoTransactionTask(new TaskDelegate() {
+				@Override
+				public void taskCompletionResult(TransactionOut transactionOut) {
+					ShowTransactionOut(transactionOut);
+				}
+			}).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, transIn);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -279,6 +288,20 @@ public class MbcaBaseActivity extends AdActivity {
 				doTransaction(TransactionCommand.MBCA_ACCOUNT_INFO);
 			}
 		});
+
+
+		temp = (Button) findViewById(R.id.buttonAccountInfoTest);
+		temp.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				for(int i=0; i<=9; i++) {
+//					alternateId = Character.valueOf((char) ('0' + i));
+//					alternateId = Character.valueOf((char) ('1'));
+					doTransaction(TransactionCommand.MBCA_ACCOUNT_INFO);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -298,18 +321,7 @@ public class MbcaBaseActivity extends AdActivity {
 				@Override
 				public void run() {
 					mAnswerTextView.setText(result);
-
-					Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
-
-//					if (!posCallbackee.getTicket().isEmpty()) {
-//						Intent intent = new Intent(getApplicationContext(), TicketListActivity.class);
-//						Bundle b = new Bundle();
-//						b.putStringArrayList("ticket", (ArrayList<String>) posCallbackee.getTicket());
-//						intent.putExtras(b);
-//
-//						startActivity(intent);
-//					}
-					
+					Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
 					setButtons(true);
 
 				}
@@ -356,7 +368,17 @@ public class MbcaBaseActivity extends AdActivity {
 		button.setEnabled(lastAuthcode == null ? false : enabled);
 	}
 
+	public interface TaskDelegate {
+		public void taskCompletionResult(TransactionOut transactionOut);
+	}
+
 	class DoTransactionTask extends AsyncTask<TransactionIn, Void, TransactionOut> {
+
+		private TaskDelegate delegate;
+
+		public DoTransactionTask(TaskDelegate delegate) {
+			this.delegate = delegate;
+		}
 
 		@Override
 		protected TransactionOut doInBackground(TransactionIn... params) {
@@ -380,12 +402,16 @@ public class MbcaBaseActivity extends AdActivity {
 		}
 
 		@Override
-		protected void onPostExecute(TransactionOut result) {
+		protected void onPostExecute(TransactionOut transactionOut) {
 			// do the analysis of the returned data of the function
-			if (result != null) {
-				ShowTransactionOut(result);
+			if (transactionOut != null) {
+				this.delegate.taskCompletionResult(transactionOut);
 			}
-			transactionTask = null;
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e) {
+//				Log.i(TAG, e.getMessage());
+//			}
 		}
 	}
 

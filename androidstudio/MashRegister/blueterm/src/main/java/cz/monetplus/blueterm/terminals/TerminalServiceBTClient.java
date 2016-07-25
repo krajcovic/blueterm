@@ -113,11 +113,7 @@ public class TerminalServiceBTClient {
 
     /**
      * Start the ConnectedThread to begin managing a Bluetooth connection.
-     * 
-     * @param socket
-     *            The BluetoothSocket on which the connection was made.
-     * @param device
-     *            The BluetoothDevice that has been connected.
+     *
      */
     public synchronized void connected() {
         if (D) {
@@ -221,6 +217,7 @@ public class TerminalServiceBTClient {
                     mmSocket = device
                             .createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
                 }
+
             } catch (IOException e) {
                 Log.e(TAG, "create() failed", e);
             }
@@ -238,13 +235,27 @@ public class TerminalServiceBTClient {
             // Always cancel discovery because it will slow down a connection
             getAdapter().cancelDiscovery();
 
-            // Make a connection to the BluetoothSocket
-            try {
-                // This is a blocking call and will only return on a
-                // successful connection or an exception
-                mmSocket.connect();
-            } catch (IOException e) {
-                // Close the socket
+            for(int i = 3; i > 0; i--)
+            {
+                try {
+                    // This is a blocking call and will only return on a
+                    // successful connection or an exception
+                    mmSocket.connect();
+                    if(mmSocket.isConnected()) {
+                        break;
+                    }
+                } catch (IOException e) {
+                    Log.w(TAG, "Try: " + String.valueOf(i) + ". " + e.getMessage());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        Log.i(TAG, e1.getMessage());
+                    }
+                }
+            }
+
+            if(!mmSocket.isConnected()) {
+                Log.e(TAG, "Cannot connect to serial port. 3x");
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
@@ -254,6 +265,23 @@ public class TerminalServiceBTClient {
                 connectionFailed();
                 return;
             }
+
+            // Make a connection to the BluetoothSocket
+//            try {
+//                // This is a blocking call and will only return on a
+//                // successful connection or an exception
+//                mmSocket.connect();
+//            } catch (IOException e) {
+//                // Close the socket
+//                try {
+//                    mmSocket.close();
+//                } catch (IOException e2) {
+//                    Log.e(TAG, "unable to close() "
+//                            + " socket during connection failure", e2);
+//                }
+//                connectionFailed();
+//                return;
+//            }
 
             // Reset the ConnectThread because we're done
             synchronized (TerminalServiceBTClient.this) {
