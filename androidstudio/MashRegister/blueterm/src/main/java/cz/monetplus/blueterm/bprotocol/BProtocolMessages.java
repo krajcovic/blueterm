@@ -46,9 +46,13 @@ public final class BProtocolMessages extends ProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "00");
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+
+        if(invoiceNumber != null && !invoiceNumber.isEmpty()) {
+            bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        }
 
         if(alternateId != null) {
             bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
@@ -68,7 +72,9 @@ public final class BProtocolMessages extends ProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
-        bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        if(invoiceNumber != null && !invoiceNumber.isEmpty()) {
+            bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
+        }
 
         if(alternateId != null) {
             bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
