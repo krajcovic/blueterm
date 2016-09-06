@@ -16,6 +16,13 @@ import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
 public final class BProtocolMessages extends ProtocolMessages {
 
+
+    /**
+     * bit 1 = pokladna musi tisknout listecek
+     * bit 15 je pozadovane potvrzeni prijeti zpravy
+     */
+    private static final Integer FLAG = 32770;
+
     /**
      * Private protocols.
      */
@@ -35,7 +42,7 @@ public final class BProtocolMessages extends ProtocolMessages {
     private static XProtocol getInstance() {
         XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
                 MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), 0, "A5A5");
+                getCurrentDateTimeForHeader(), FLAG, "A5A5");
         return bprotocol;
     }
 
