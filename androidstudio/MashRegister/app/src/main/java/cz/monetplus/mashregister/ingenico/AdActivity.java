@@ -28,7 +28,7 @@ public class AdActivity extends Activity {
     protected static final String PREFS_NAME = "MashRegister.properties";
     protected static final String BT_ADDRESS = "lastUsedBtAddress";
 
-    protected Character alternateId = null;
+    protected Integer alternateId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +90,7 @@ public class AdActivity extends Activity {
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
                         if (data.hasExtra(AlternateIdActivity.EXTRA_ALTERNATE_ID)) {
-                            alternateId = data.getStringExtra(AlternateIdActivity.EXTRA_ALTERNATE_ID).charAt(0);
+                            alternateId = Integer.valueOf(data.getStringExtra(AlternateIdActivity.EXTRA_ALTERNATE_ID));
                         }
                     }
                 }

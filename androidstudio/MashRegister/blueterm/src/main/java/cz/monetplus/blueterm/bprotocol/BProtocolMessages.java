@@ -47,7 +47,7 @@ public final class BProtocolMessages extends ProtocolMessages {
     }
 
     public static byte[] getSale(long amount, int currencyCode,
-                                 String invoiceNumber, Character alternateId) {
+                                 String invoiceNumber, Integer alternateId) {
 
         XProtocol bprotocol = getInstance();
 
@@ -90,7 +90,7 @@ public final class BProtocolMessages extends ProtocolMessages {
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    public static byte[] getReversal(String authCode, Character alternateId) {
+    public static byte[] getReversal(String authCode, Integer alternateId) {
 
         XProtocol bprotocol = getInstance();
 
@@ -156,13 +156,14 @@ public final class BProtocolMessages extends ProtocolMessages {
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    public static byte[] getAccountInfo(Character alternateId) {
+    public static byte[] getAccountInfo(Integer alternateId) {
         XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "84");
 
-        if(alternateId != null && alternateId != 0) {
-            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        if((alternateId != null) && (alternateId % 10 != 0)) {
+//            String hexa = Integer.toString(alternateId, 16).toUpperCase();
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId % 10));
         }
 
         return XProtocolFactory.serialize(bprotocol);

@@ -56,7 +56,7 @@ public class AlternateIdActivity extends Activity implements NumberPicker.OnValu
         Button b1 = (Button) d.findViewById(R.id.button1);
         Button b2 = (Button) d.findViewById(R.id.button2);
         final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-        np.setMaxValue(10); // max value 100
+        np.setMaxValue(9); // max value 100
         np.setMinValue(0);   // min value 0
         np.setWrapSelectorWheel(false);
         np.setOnValueChangedListener(this);

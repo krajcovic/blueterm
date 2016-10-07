@@ -77,7 +77,7 @@ public class TransactionIn {
      * Alternate ID
      * Pole obsahuje index alternativniho obchodnika(Merchant)/Terminal ID pouzitelne pro tuto transakci
      */
-    private Character alternateId;
+    private Integer alternateId;
 
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
@@ -190,11 +190,11 @@ public class TransactionIn {
         this.ticketType = ticketType;
     }
 
-    public Character getAlternateId() {
+    public Integer getAlternateId() {
         return alternateId;
     }
 
-    public void setAlternateId(Character alternateId) {
+    public void setAlternateId(Integer alternateId) {
         this.alternateId = alternateId;
     }
 
