@@ -21,7 +21,7 @@ public final class BProtocolMessages extends ProtocolMessages {
      * bit 1 = pokladna musi tisknout listecek
      * bit 15 je pozadovane potvrzeni prijeti zpravy
      */
-    private static final Integer FLAG = 32770;
+    private static final Integer FLAG = 0x8000;
 
     /**
      * Private protocols.

@@ -119,9 +119,10 @@ public class XProtocolFactory {
 
             byte[] optionalData = compileTags(bprotocol.getTagMap(),
                     bprotocol.getCustomerTagMap());
-            bprotocol.setOptionalDataLen(MonetUtils.bytesToHex(ByteBuffer
-                    .allocate(2)
-                    .putShort((short) (optionalData.length & 0xFFFF)).array()));
+
+//            bprotocol.setOptionalDataLen(MonetUtils.bytesToHex(ByteBuffer
+//                    .allocate(2)
+//                    .putShort((short) (optionalData.length & 0xFFFF)).array()));
 
             bout.write(STX);
             bout.write(
@@ -134,10 +135,11 @@ public class XProtocolFactory {
             bout.write(fixString(bprotocol.getPosId(), 8).getBytes());
             bout.write(fixString(bprotocol.getTransactionDateTime(), 12)
                     .getBytes());
-            bout.write(fixString(bprotocol.getFlag().toString(), 4, '0')
+            bout.write(fixString(Integer.toString(bprotocol.getFlag(), 16), 4, '0')
                     .getBytes());
-            bout.write(fixString(bprotocol.getOptionalDataLen(), 4, '0')
-                    .getBytes());
+//            bout.write(fixString(bprotocol.getOptionalDataLen(), 4, '0')
+//                    .getBytes());
+            bout.write(fixString(Integer.toString(optionalData.length, 16), 4, '0').getBytes());
             bout.write(
                     fixString(bprotocol.getStandardCRC16(), 4, '0').getBytes());
             bout.write(optionalData);
