@@ -61,8 +61,8 @@ public final class BProtocolMessages extends ProtocolMessages {
             bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
         }
 
-        if(alternateId != null) {
-            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        if(alternateId != null && (alternateId != 0)) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
         }
 
         // XProtocolFactory factory = new XProtocolFactory();
@@ -83,8 +83,8 @@ public final class BProtocolMessages extends ProtocolMessages {
             bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
         }
 
-        if(alternateId != null) {
-            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        if(alternateId != null && (alternateId != 0)) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
         }
 
         return XProtocolFactory.serialize(bprotocol);
@@ -97,8 +97,8 @@ public final class BProtocolMessages extends ProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "10");
         bprotocol.getTagMap().put(XProtocolTag.AuthCode, authCode);
 
-        if(alternateId != null) {
-            bprotocol.getTagMap().put(XProtocolTag.AlternateId, alternateId.toString());
+        if(alternateId != null && (alternateId != 0)) {
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
         }
 
         return XProtocolFactory.serialize(bprotocol);
@@ -161,9 +161,9 @@ public final class BProtocolMessages extends ProtocolMessages {
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "84");
 
-        if((alternateId != null) && (alternateId % 10 != 0)) {
+        if((alternateId != null) && (alternateId != 0)) {
 //            String hexa = Integer.toString(alternateId, 16).toUpperCase();
-            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId % 10));
+            bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
         }
 
         return XProtocolFactory.serialize(bprotocol);

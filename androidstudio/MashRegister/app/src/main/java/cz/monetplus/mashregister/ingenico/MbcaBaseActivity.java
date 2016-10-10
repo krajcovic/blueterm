@@ -295,7 +295,7 @@ public class MbcaBaseActivity extends AdActivity {
 
 			@Override
 			public void onClick(View v) {
-				for(Integer i=1; i<=9; i++) {
+				for(Integer i=1; i<=10; i++) {
 					alternateId = i;
 					doTransaction(TransactionCommand.MBCA_ACCOUNT_INFO);
 				}
