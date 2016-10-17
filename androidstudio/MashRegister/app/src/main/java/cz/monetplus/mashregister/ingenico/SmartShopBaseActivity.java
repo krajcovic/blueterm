@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -239,6 +238,15 @@ public class SmartShopBaseActivity extends AdActivity {
                 doTransacation(TransactionCommand.SMART_SHOP_PARAMETRS_CALL);
             }
         });
+
+        temp = (Button) findViewById(R.id.buttonSmartShopGetLastTransaction);
+        temp.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                doTransacation(TransactionCommand.SMART_SHOP_GET_LAST_TRAN);
+            }
+        });
     }
 
     @Override
@@ -299,6 +307,8 @@ public class SmartShopBaseActivity extends AdActivity {
         button = (Button) findViewById(R.id.buttonCardState);
         button.setEnabled(enabled);
         button = (Button) findViewById(R.id.buttonTip);
+        button.setEnabled(enabled);
+        button = (Button) findViewById(R.id.buttonSmartShopGetLastTransaction);
         button.setEnabled(enabled);
     }
 

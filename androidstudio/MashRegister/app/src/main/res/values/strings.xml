@@ -86,5 +86,6 @@
     <string name="title_alternateId">Alternate ID</string>
     <string name="accountInfoButtonText">Account info</string>
     <string name="accountInfoTestButtonText">Account Info Test</string>
+    <string name="textRecharging">Recharging</string>
 
 </resources>

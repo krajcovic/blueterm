@@ -203,7 +203,7 @@
                     android:text="@string/dotransactionpay" />
 
                 <Button
-                    android:id="@+id/buttonLastTran"
+                    android:id="@+id/buttonMbcaLastTran"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"

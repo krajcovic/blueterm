@@ -1,16 +1,10 @@
 package cz.monetplus.mashregister.ingenico;
 
-import java.util.ArrayList;
-import java.util.concurrent.Executor;
-
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +19,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import cz.monetplus.blueterm.Balancing;
+
 import cz.monetplus.blueterm.MonetBTAPI;
 import cz.monetplus.blueterm.TransactionCommand;
 import cz.monetplus.blueterm.TransactionIn;
@@ -223,7 +217,7 @@ public class MbcaBaseActivity extends AdActivity {
 
 		});
 
-		temp = (Button) findViewById(R.id.buttonLastTran);
+		temp = (Button) findViewById(R.id.buttonMbcaLastTran);
 		temp.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -357,7 +351,7 @@ public class MbcaBaseActivity extends AdActivity {
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonMbcaPay);
 		button.setEnabled(enabled);
-		button = (Button) findViewById(R.id.buttonLastTran);
+		button = (Button) findViewById(R.id.buttonMbcaLastTran);
 		button.setEnabled(enabled);
 		button = (Button) findViewById(R.id.buttonParameters);
 		button.setEnabled(enabled);

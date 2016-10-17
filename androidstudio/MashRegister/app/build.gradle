@@ -8,8 +8,8 @@ android {
         applicationId "cz.monetplus.mashregisterplus.ingenico"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 44
-        versionName "44.0"
+        versionCode 45
+        versionName "45.0"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {

@@ -283,20 +283,34 @@
                     style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/buttonTip"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="fill_parent"
                     android:layout_weight="1"
                     android:text="@string/textTip" />
 
                 <Button
-                    android:id="@+id/buttonRecharging"
                     style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonRecharging"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:text="@string/textRecharging"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/buttonSmartShopGetLastTransaction"
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
-                    android:text="@string/dotransactionrecharging" />
-
+                    android:text="@string/lasttran" />
             </LinearLayout>
-            
 
             <TextView
                 android:id="@+id/textAnswer"
