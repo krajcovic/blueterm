@@ -87,5 +87,8 @@
     <string name="accountInfoButtonText">Account info</string>
     <string name="accountInfoTestButtonText">Account Info Test</string>
     <string name="textRecharging">Recharging</string>
+    <string name="textGastroSupport">Gastro:</string>
+    <string name="defaultFoodPriceValue">0</string>
+    <string name="defaultSocialPriceValue">0</string>
 
 </resources>

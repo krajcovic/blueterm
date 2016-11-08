@@ -140,6 +140,46 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textGastroSupport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:minWidth="150dp"
+                    android:text="@string/textGastroSupport"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <Spinner
+                    android:id="@+id/spinnerGastroType"
+                    android:layout_width="0dp"
+                    android:layout_height="41dp"
+                    android:layout_weight="2" />
+
+                <EditText
+                    android:id="@+id/editFoodPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:ems="10"
+                    android:inputType="numberDecimal"
+                    android:text="@string/defaultFoodPriceValue" />
+
+                <EditText
+                    android:id="@+id/editSocialPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:ems="10"
+                    android:inputType="numberDecimal"
+                    android:text="@string/defaultSocialPriceValue" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
 
                 <TextView
@@ -173,6 +213,8 @@
                     android:maxLength="10"
                     android:text="@string/text_tranid_default_value" />
             </LinearLayout>
+
+
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="gastro_type_array" translatable="false">
+        <item>Disabled</item>
+        <item>Full</item>
+        <item>Partial</item>
+    </string-array>
+
+</resources>

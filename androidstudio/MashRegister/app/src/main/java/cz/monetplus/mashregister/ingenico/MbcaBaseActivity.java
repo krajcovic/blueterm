@@ -40,13 +40,17 @@ public class MbcaBaseActivity extends AdActivity {
 	// private final ReentrantLock lock = new ReentrantLock();
 
 	private EditText mAmountIdEditText;
+	private EditText mFoodAmountIdEditText;
+	private EditText mSocialAmountIdEditText;
 	private Spinner mCurrencySpinner;
+	private Spinner mGastroTypeSpinner;
 	private EditText mInvoiceIdEditText;
 	// private EditText mTranIdEditText;
 
 	private TextView mAnswerTextView;
 
 	private String currentCurrency;
+	private GastroType gastroType;
 	private TextView blueHwAddress;
 
 //	private DoTransactionTask transactionTask = null;
@@ -74,9 +78,16 @@ public class MbcaBaseActivity extends AdActivity {
 		super.adAddView();
 
 		mAmountIdEditText = (EditText) findViewById(R.id.editPrice);
+
+		mFoodAmountIdEditText = (EditText) findViewById(R.id.editFoodPrice);
+		mSocialAmountIdEditText = (EditText) findViewById(R.id.editSocialPrice);
+
 		mCurrencySpinner = (Spinner) findViewById(R.id.spinnerCurrency);
+		mGastroTypeSpinner = (Spinner) findViewById(R.id.spinnerGastroType);
 		mInvoiceIdEditText = (EditText) findViewById(R.id.editTextInvoice);
 		// mTranIdEditText = (EditText) findViewById(R.id.editTextTranId);
+
+
 
 		mAnswerTextView = (TextView) findViewById(R.id.textAnswer);
 
@@ -96,6 +107,27 @@ public class MbcaBaseActivity extends AdActivity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
 				currentCurrency = parent.getItemAtPosition(pos).toString();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+
+			}
+		});
+
+		// Create an ArrayAdapter using the string array and a default spinner
+		// layout
+		adapter = ArrayAdapter.createFromResource(this, R.array.gastro_type_array,
+				android.R.layout.simple_spinner_item);
+		// Specify the layout to use when the list of choices appears
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Apply the adapter to the spinner
+		mGastroTypeSpinner.setAdapter(adapter);
+		mGastroTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
+				gastroType = GastroType.valueOf(pos - 1);
 			}
 
 			@Override
@@ -136,6 +168,10 @@ public class MbcaBaseActivity extends AdActivity {
 
             transIn.setAlternateId(alternateId);
 
+            if(!gastroType.equals(GastroType.Disabled)) {
+                transIn.setGastroData(getGastroData());
+            }
+
 //			if (transactionTask != null) {
 //				transactionTask.cancel(true);
 //				transactionTask = null;
@@ -154,7 +190,11 @@ public class MbcaBaseActivity extends AdActivity {
 		}
 	}
 
-	/**
+    private String getGastroData() {
+        return String.format("%d,%d,%d", gastroType.getId(), Integer.valueOf(mFoodAmountIdEditText.getText().toString()), Integer.valueOf(mSocialAmountIdEditText.getText().toString()));
+    }
+
+    /**
 	 * @param command
 	 */
 	private void doReversal(TransactionCommand command, String authCode) {
