@@ -8,3 +8,5 @@ ktere pouze demonstruje moznosti komunikace. Spravne reseni je, ze si ten BProto
 a napisete si to spravne a sami.
 
 Testy se provadi na jednom az dvou zarizeni, takze se nedivte ze zrovna na tom vasem androidu 6 a vyse to proste nejede. Ja takovy android jeste ani nevidel.
+
+Jsem znacne flexibilni, a jestli vam tu neco chybi ke stesti, tak mi proste napiste na dusan.krajcovic@gmail.com a urcite se nejak domluvime.
