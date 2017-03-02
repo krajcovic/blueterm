@@ -79,6 +79,12 @@ public class TransactionIn {
      */
     private Integer alternateId;
 
+
+    /**
+     * x,<foodprice>,<socialprice>
+     */
+    private String gastroData;
+
     public TransactionIn(String blueHwAddress, TransactionCommand command, PosCallbacks posCallbacks) {
         super();
 
@@ -215,6 +221,15 @@ public class TransactionIn {
                 (posCallbacks != null ? ", posCallbacks=" + posCallbacks : "") +
                 (ticketType != null ? ", ticketType=" + ticketType : "") +
                 (alternateId != null ? ", alternateId=" + alternateId : "") +
+                (gastroData != null ? ", gastroData=" + gastroData : "") +
                 '}';
+    }
+
+    public String getGastroData() {
+        return gastroData;
+    }
+
+    public void setGastroData(String gastroData) {
+        this.gastroData = gastroData;
     }
 }

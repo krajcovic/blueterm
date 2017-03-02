@@ -12,6 +12,8 @@ public enum TransactionCommand {
     MBCA_PARAMETERS(HandleOperations.CallMbcaParameters),
 
     MBCA_PAY(HandleOperations.CallMbcaPay),
+
+//    MBCA_REFUND(HandleOperations.CallMbcaRefund),
     
     MBCA_LAST_TRAN(HandleOperations.CallMbcaGetLastTran),
     

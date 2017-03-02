@@ -252,6 +252,12 @@ public class MessageThread extends Thread {
                 addMessage(MbcaRequests.pay(transactionInputData));
                 break;
             }
+
+            case CallMbcaRefund: {
+                addMessage(MbcaRequests.refund(transactionInputData));
+                break;
+            }
+
             case CallMbcaReversal: {
                 addMessage(MbcaRequests.reversal(transactionInputData));
                 break;

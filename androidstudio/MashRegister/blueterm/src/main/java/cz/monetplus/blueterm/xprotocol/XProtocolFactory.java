@@ -105,6 +105,10 @@ public class XProtocolFactory {
             tran.setAccountInfo(protocol.getCustomerTagMap().get(XProtocolCustomerTag.AccountInfo).split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
         }
 
+        if(protocol.getCustomerTagMap().containsKey(XProtocolCustomerTag.GastroData)) {
+            tran.setGastroData(protocol.getCustomerTagMap().get(XProtocolCustomerTag.GastroData).toString());
+        }
+
         tran.setTicketRequired(isTicketFlagOn(protocol));
         tran.setSignRequired(isSignFlagOn(protocol));
 

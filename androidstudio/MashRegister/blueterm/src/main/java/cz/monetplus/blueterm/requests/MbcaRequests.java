@@ -5,7 +5,6 @@ import cz.monetplus.blueterm.bprotocol.BProtocolMessages;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.terminals.TerminalPortApplications;
-import cz.monetplus.blueterm.vprotocol.VProtocolMessages;
 import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.worker.HandleOperations;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
@@ -23,7 +22,23 @@ public class MbcaRequests implements Requests {
                                 .getPortApplicationNumber(), BProtocolMessages
                                 .getSale(transactionInputData.getAmount(),
                                         transactionInputData.getCurrency(),
-                                        transactionInputData.getInvoice(), transactionInputData.getAlternateId()))
+                                        transactionInputData.getInvoice(), transactionInputData.getAlternateId(), transactionInputData.getGastroData()))
+                        .createFrame())));
+    }
+
+    /**
+     * Create and send pay request to terminal.
+     * @param transactionInputData
+     * @return
+     */
+    public static HandleMessage refund(TransactionIn transactionInputData) {
+        return (new HandleMessage(HandleOperations.TerminalWrite,
+                SLIPFrame.createFrame(new TerminalFrame(
+                        TerminalPortApplications.MBCA
+                                .getPortApplicationNumber(), BProtocolMessages
+                        .getRefund(transactionInputData.getAmount(),
+                                transactionInputData.getCurrency(),
+                                transactionInputData.getInvoice(), transactionInputData.getAlternateId(), transactionInputData.getGastroData()))
                         .createFrame())));
     }
     

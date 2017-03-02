@@ -47,7 +47,7 @@ public final class BProtocolMessages extends ProtocolMessages {
     }
 
     public static byte[] getSale(long amount, int currencyCode,
-                                 String invoiceNumber, Integer alternateId) {
+                                 String invoiceNumber, Integer alternateId, String gastroData) {
 
         XProtocol bprotocol = getInstance();
 
@@ -65,26 +65,36 @@ public final class BProtocolMessages extends ProtocolMessages {
             bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
         }
 
+        if(gastroData != null && !gastroData.isEmpty()) {
+            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.GastroData, gastroData);
+        }
+
         // XProtocolFactory factory = new XProtocolFactory();
 
         return XProtocolFactory.serialize(bprotocol);
     }
 
-    public static byte[] getReturn(int amount, int currencyCode,
-            String invoiceNumber, Character alternateId) {
+    public static byte[] getRefund(long amount, int currencyCode,
+                                   String invoiceNumber, Integer alternateId, String gastroData) {
 
         XProtocol bprotocol = getInstance();
 
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "04");
         bprotocol.getTagMap().put(XProtocolTag.Amount1, String.valueOf(amount));
+
         bprotocol.getTagMap().put(XProtocolTag.CurrencyCode2,
                 String.valueOf(currencyCode));
+
         if(invoiceNumber != null && !invoiceNumber.isEmpty()) {
             bprotocol.getTagMap().put(XProtocolTag.InvoiceNumber, invoiceNumber);
         }
 
         if(alternateId != null && (alternateId != 0)) {
             bprotocol.getTagMap().put(XProtocolTag.AlternateId, Integer.toString(alternateId));
+        }
+
+        if(gastroData != null && !gastroData.isEmpty()) {
+            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.GastroData, gastroData);
         }
 
         return XProtocolFactory.serialize(bprotocol);

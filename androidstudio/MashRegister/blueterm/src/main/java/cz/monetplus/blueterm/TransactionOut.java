@@ -79,6 +79,11 @@ public class TransactionOut {
     private List<String> merchantId;
 
     /**
+     * Odpoved gastro data.
+     */
+    private String gastroData;
+
+    /**
      * {9i}* - jednotlive informace, prvni znak - index, dalsi data
      0-pozice menu dcery (int-1..)
      1-jmeno menu dcery (text[20])
@@ -202,6 +207,14 @@ public class TransactionOut {
         }
     }
 
+    public String getGastroData() {
+        return gastroData;
+    }
+
+    public void setGastroData(String gastroData) {
+        this.gastroData = gastroData;
+    }
+
     @Override
     public String toString() {
         return "TransactionOut{" +
@@ -219,6 +232,7 @@ public class TransactionOut {
                 (signRequired != null ? ", signRequired=" + signRequired : "") +
                 (merchantId != null ? ", merchantId='" + merchantId + '\'' : "") +
                 (accountInfo != null ? ", accountInfo='" + accountInfo + '\'' : "") +
+                (gastroData != null ? ", gastroData='" + gastroData + '\'' : "") +
                 '}';
     }
 }

@@ -18,6 +18,11 @@ public enum XProtocolCustomerTag {
     TerminalTicketInformation('t'),
 
     /**
+     * Gastro data.
+     */
+    GastroData('G'),
+
+    /**
      * 
      */
     TerminalTicketLine('T'),
@@ -40,7 +45,9 @@ public enum XProtocolCustomerTag {
     /**
      * Token generovany na zaklade pan karty.
      */
-    CardToken('Z'),;
+    CardToken('Z'),
+
+    ;
 
     /**
      * Character tag.
