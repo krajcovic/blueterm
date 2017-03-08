@@ -2,19 +2,15 @@ package cz.monetplus.mashregister.ingenico;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract.CommonDataKinds.Callable;
 import android.util.Log;
 import android.widget.Toast;
 import cz.monetplus.blueterm.PosCallbacks;
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
 
 public class PosCallbackee implements PosCallbacks {
 
@@ -54,9 +50,9 @@ public class PosCallbackee implements PosCallbacks {
 	}
 
 	@Override
-	public void ticketFinish() {
+	public void ticketFinish(Character lastTicket) {
 		// Ukonci listek
-		getTicket().add("*** Ticket finish ***");
+		getTicket().add("*** Ticket "+ lastTicket+" finish ***");
 
 		Intent intent = new Intent(context, TicketListActivity.class);
 		Bundle b = new Bundle();
