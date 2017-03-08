@@ -583,7 +583,7 @@ public class MessageThread extends Thread {
                     addMessage(request.ticketRequest(TicketCommand.Next));
                     break;
                 case End:
-                    transactionInputData.getPosCallbacks().ticketFinish();
+                    transactionInputData.getPosCallbacks().ticketFinish(lastTicket.getTag());
                     if (lastTicket == TicketCommand.Merchant) {
                         addMessage(HandleOperations.CheckSign, request);
                     } else {

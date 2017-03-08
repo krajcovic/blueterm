@@ -1,5 +1,7 @@
 package cz.monetplus.blueterm;
 
+import cz.monetplus.blueterm.xprotocol.TicketCommand;
+
 public interface PosCallbacks {
 
     /**
@@ -13,8 +15,9 @@ public interface PosCallbacks {
     /**
      * Ukonceni tisku nejakeho listku. 
      * Slouzi pro oddelni listku.
+     * @param lastTicket
      */
-    public void ticketFinish();
+    public void ticketFinish(Character lastTicket);
     
     /**
      * Debug information from blueterm.
