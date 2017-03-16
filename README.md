@@ -12,3 +12,7 @@ Testy se provadi na jednom az dvou zarizeni, takze se nedivte ze zrovna na tom v
 Jsem znacne flexibilni, a jestli vam tu neco chybi ke stesti, tak mi proste napiste na dusan.krajcovic@gmail.com a urcite se nejak domluvime.
 
 Pouzivejte master branch! Release's jsou delany vzdy pouze pro konkretni pripad a platici firmu.
+
+Rozdeleni v master:
+	androidstudio - udrzovana verze knihovny a mashregistr pro terminaly ingenico
+	eclipse - neudrzovana verze knihovny a mashregistru pro terminaly ingenico a pwm. NEPOUZIVAT, pouze jste si li vedomi toho co delate.
