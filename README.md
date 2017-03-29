@@ -14,8 +14,8 @@ Jsem znacne flexibilni, a jestli vam tu neco chybi ke stesti, tak mi proste napi
 Pouzivejte master branch! Release's jsou delany vzdy pouze pro konkretni pripad a platici firmu.
 
 Rozdeleni v master:
-	androidstudio - udrzovana verze knihovny a mashregistr pro terminaly ingenico
-	eclipse - neudrzovana verze knihovny a mashregistru pro terminaly ingenico a pwm. NEPOUZIVAT, pouze jste si li vedomi toho co delate.
+	* androidstudio - udrzovana verze knihovny a mashregistr pro terminaly ingenico
+	* eclipse - neudrzovana verze knihovny a mashregistru pro terminaly ingenico a pwm. NEPOUZIVAT, pouze jste si li vedomi toho co delate.
 
 Dokumentace:
-	https://docs.google.com/document/d/1b1X7OGIZ-mi_vsj_4OGxuZ6c2ClK9wh2Db6hd_UASG0/edit?usp=sharing
+	[BlueTerm_GDrive]https://docs.google.com/document/d/1b1X7OGIZ-mi_vsj_4OGxuZ6c2ClK9wh2Db6hd_UASG0/edit?usp=sharing
