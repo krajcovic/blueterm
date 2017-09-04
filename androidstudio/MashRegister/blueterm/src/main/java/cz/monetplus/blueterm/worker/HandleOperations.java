@@ -31,8 +31,7 @@ public enum HandleOperations {
      * 
      */
     TerminalReady,
-    //TerminalDisconnected,
-    
+
     /**
      * 
      */
@@ -47,8 +46,7 @@ public enum HandleOperations {
      * 
      */
     ShowMessage,
-    // Connected,
-    
+
     
     /**
      * 

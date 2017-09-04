@@ -55,7 +55,7 @@ public final class SProtocolMessages extends ProtocolMessages {
         }
 
         if (ticketNumber != null && ticketNumber.length() > 0) {
-            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.TicketNumber,
+            bprotocol.getCustomerTagMap().put(XProtocolCustomerTag.TerminalTicketLine,
                     ticketNumber);
         }
 

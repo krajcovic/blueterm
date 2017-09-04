@@ -1,6 +1,6 @@
 package cz.monetplus.blueterm.requests;
 
-import cz.monetplus.blueterm.TransactionIn;
+import cz.monetplus.blueterm.v1.TransactionIn;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.sprotocol.SProtocolMessages;

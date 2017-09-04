@@ -40,7 +40,7 @@ public enum XProtocolCustomerTag {
     /**
      * Platba ticketem.
      */
-    TicketNumber('T'),
+//    TicketNumber('T'),
 
     /**
      * Token generovany na zaklade pan karty.

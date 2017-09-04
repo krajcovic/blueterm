@@ -1,23 +1,20 @@
 package cz.monetplus.blueterm.worker;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import cz.monetplus.blueterm.Balancing;
-import cz.monetplus.blueterm.TransactionCommand;
-import cz.monetplus.blueterm.TransactionIn;
-import cz.monetplus.blueterm.TransactionOut;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import cz.monetplus.blueterm.v1.TransactionIn;
+import cz.monetplus.blueterm.v1.TransactionOut;
 import cz.monetplus.blueterm.frames.SLIPFrame;
 import cz.monetplus.blueterm.frames.TerminalFrame;
 import cz.monetplus.blueterm.requests.MaintenanceRequests;
@@ -34,7 +31,6 @@ import cz.monetplus.blueterm.xprotocol.TicketCommand;
 import cz.monetplus.blueterm.xprotocol.XProtocol;
 import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
 import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
-import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
 /**
  * Thread for handling all messages.
@@ -266,6 +262,7 @@ public class MessageThread extends Thread {
             case CallMbcaPrintTicket: {
                 addMessage(new MbcaRequests().ticketRequest(TicketCommand
                         .valueOf(transactionInputData.getTicketType())));
+                break;
             }
 
             case CallMvtaHandshake: {
@@ -290,6 +287,7 @@ public class MessageThread extends Thread {
             case CallMvtaPrintTicket: {
                 addMessage(new MvtaRequests().ticketRequest(TicketCommand
                         .valueOf(transactionInputData.getTicketType())));
+                break;
             }
 
             case CallMvtaParameters: {
@@ -355,6 +353,7 @@ public class MessageThread extends Thread {
             case CallSmartShopPrintTicket: {
                 addMessage(new MbcaRequests().ticketRequest(TicketCommand
                         .valueOf(transactionInputData.getTicketType())));
+                break;
             }
 
             case CallMaintenanceUpdate: {
@@ -525,7 +524,9 @@ public class MessageThread extends Thread {
                         }
                         case MAINTENANCE: {
                             TTResponse(new MaintenanceRequests(), termFrame);
+                            break;
                         }
+
 
                         default:
                             Log.w(TAG, "Unsupported application port number: "
@@ -566,7 +567,7 @@ public class MessageThread extends Thread {
 
     private void ticketResponse(Requests request, XProtocol xprotocol) {
         String ticketLine = xprotocol.getCustomerTagMap().get(XProtocolCustomerTag.TerminalTicketLine);
-        if(ticketLine != null) {
+        if (ticketLine != null) {
             printTicket(ticketLine.split(XProtocolFactory.REGULAR_MULTI_FID_SEPARATOR));
         }
 
@@ -709,11 +710,11 @@ public class MessageThread extends Thread {
 
     private Boolean printTicket(String[] list) {
         for (String string : list) {
-                Boolean ticketLine = transactionInputData.getPosCallbacks()
-                        .ticketLine(string);
-                if (ticketLine == Boolean.FALSE) {
-                    return Boolean.FALSE;
-                }
+            Boolean ticketLine = transactionInputData.getPosCallbacks()
+                    .ticketLine(string);
+            if (ticketLine == Boolean.FALSE) {
+                return Boolean.FALSE;
+            }
         }
 
         return Boolean.TRUE;

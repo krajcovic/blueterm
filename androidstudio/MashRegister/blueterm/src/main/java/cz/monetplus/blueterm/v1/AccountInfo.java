@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.v1;
 
 /**
  * Created by krajcovic on 7/14/16.

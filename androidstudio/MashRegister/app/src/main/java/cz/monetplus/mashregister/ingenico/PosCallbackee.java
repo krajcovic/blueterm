@@ -9,8 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-import cz.monetplus.blueterm.PosCallbacks;
-import cz.monetplus.blueterm.xprotocol.TicketCommand;
+import cz.monetplus.blueterm.v1.PosCallbacks;
 
 public class PosCallbackee implements PosCallbacks {
 

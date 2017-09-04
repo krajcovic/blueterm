@@ -18,6 +18,10 @@ public enum MessageNumber {
         return number;
     }
 
+    public Character getHexCharacter() {
+        return Integer.toHexString(number).charAt(0);
+    }
+
     private void setNumber(Integer number) {
         this.number = number;
     }

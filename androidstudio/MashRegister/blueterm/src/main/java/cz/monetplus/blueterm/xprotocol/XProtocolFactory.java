@@ -1,20 +1,18 @@
 package cz.monetplus.blueterm.xprotocol;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import android.util.Log;
-
-import cz.monetplus.blueterm.Balancing;
-import cz.monetplus.blueterm.TransactionOut;
-import cz.monetplus.blueterm.util.MonetUtils;
+import cz.monetplus.blueterm.v1.Balancing;
+import cz.monetplus.blueterm.v1.TransactionOut;
 
 public class XProtocolFactory {
     private static final byte STX = 0x02;
@@ -133,7 +131,7 @@ public class XProtocolFactory {
                     fixString(bprotocol.getProtocolType().getTag().toString(),
                             1).getBytes());
             bout.write(fixString(
-                    bprotocol.getMessageNumber().getNumber().toString(), 1)
+                    bprotocol.getMessageNumber().getHexCharacter().toString(), 1)
                     .getBytes());
             bout.write(fixString(bprotocol.getProtocolVersion(), 2).getBytes());
             bout.write(fixString(bprotocol.getPosId(), 8).getBytes());

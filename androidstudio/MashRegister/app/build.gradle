@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "cz.monetplus.mashregisterplus.ingenico"
@@ -21,11 +21,20 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
-    compile 'com.auth0.android:lock:2.0.0-beta.3'
     compile project(path: ':blueterm')
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:design:23.3.0'
+    compile 'com.google.android.gms:play-services-ads:11.0.2'
+    compile 'com.auth0.android:lock:2.0.0-beta.3'
+
+    testCompile 'junit:junit:4.12'
+
+    /*androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'*/
+    /*androidTestCompile 'com.android.support.test:runner:0.5'*/
+
+    /*testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"*/
+
 }

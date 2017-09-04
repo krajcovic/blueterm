@@ -1,4 +1,4 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.v1;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

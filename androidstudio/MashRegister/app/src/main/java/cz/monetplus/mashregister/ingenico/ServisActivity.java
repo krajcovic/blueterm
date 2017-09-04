@@ -1,7 +1,6 @@
 package cz.monetplus.mashregister.ingenico;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -13,17 +12,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import cz.monetplus.blueterm.MonetBTAPI;
-import cz.monetplus.blueterm.TransactionCommand;
-import cz.monetplus.blueterm.TransactionIn;
-import cz.monetplus.blueterm.TransactionOut;
+import cz.monetplus.blueterm.v1.MonetBTAPI;
+import cz.monetplus.blueterm.v1.TransactionCommand;
+import cz.monetplus.blueterm.v1.TransactionIn;
+import cz.monetplus.blueterm.v1.TransactionOut;
 import cz.monetplus.mashregister.R;
 import cz.monetplus.mashregister.util.SystemUiHider;
 

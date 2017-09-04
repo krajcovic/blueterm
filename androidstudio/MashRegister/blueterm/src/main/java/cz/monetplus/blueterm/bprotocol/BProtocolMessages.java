@@ -1,10 +1,5 @@
 package cz.monetplus.blueterm.bprotocol;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-import cz.monetplus.blueterm.Balancing;
 import cz.monetplus.blueterm.xprotocol.MessageNumber;
 import cz.monetplus.blueterm.xprotocol.ProtocolMessages;
 import cz.monetplus.blueterm.xprotocol.ProtocolType;
@@ -30,6 +25,14 @@ public final class BProtocolMessages extends ProtocolMessages {
         super();
     }
 
+    private static XProtocol getInstance() {
+        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
+                MessageNumber.TransactionRequest, "01", "        ",
+                getCurrentDateTimeForHeader(), FLAG, "A5A5");
+
+        return bprotocol;
+    }
+
     public static byte[] getAppInfo() {
 
         XProtocol bprotocol = getInstance();
@@ -37,13 +40,6 @@ public final class BProtocolMessages extends ProtocolMessages {
         bprotocol.getTagMap().put(XProtocolTag.TransactionType, "80");
 
         return XProtocolFactory.serialize(bprotocol);
-    }
-
-    private static XProtocol getInstance() {
-        XProtocol bprotocol = new XProtocol(ProtocolType.BProtocol,
-                MessageNumber.TransactionRequest, "01", "        ",
-                getCurrentDateTimeForHeader(), FLAG, "A5A5");
-        return bprotocol;
     }
 
     public static byte[] getSale(long amount, int currencyCode,

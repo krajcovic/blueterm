@@ -1,6 +1,5 @@
 package cz.monetplus.blueterm.requests;
 
-import cz.monetplus.blueterm.TransactionIn;
 import cz.monetplus.blueterm.worker.HandleMessage;
 import cz.monetplus.blueterm.xprotocol.TicketCommand;
 

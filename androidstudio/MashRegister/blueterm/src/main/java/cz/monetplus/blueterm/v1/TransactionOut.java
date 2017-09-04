@@ -1,8 +1,5 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.v1;
 
-import android.util.ArrayMap;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

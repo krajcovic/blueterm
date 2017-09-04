@@ -1,11 +1,12 @@
-package cz.monetplus.blueterm;
+package cz.monetplus.blueterm.v1;
 
-import cz.monetplus.blueterm.worker.HandleOperations;
-import cz.monetplus.blueterm.worker.MessageThread;
 import android.content.Context;
 import android.util.Log;
 
 import java.util.Locale;
+
+import cz.monetplus.blueterm.worker.HandleOperations;
+import cz.monetplus.blueterm.worker.MessageThread;
 
 /**
  * Exported class for control from pos-system.

@@ -20,10 +20,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cz.monetplus.blueterm.MonetBTAPI;
-import cz.monetplus.blueterm.TransactionCommand;
-import cz.monetplus.blueterm.TransactionIn;
-import cz.monetplus.blueterm.TransactionOut;
+import cz.monetplus.blueterm.v1.MonetBTAPI;
+import cz.monetplus.blueterm.v1.TransactionCommand;
+import cz.monetplus.blueterm.v1.TransactionIn;
+import cz.monetplus.blueterm.v1.TransactionOut;
 import cz.monetplus.mashregister.R;
 import cz.monetplus.mashregister.util.SystemUiHider;
 
