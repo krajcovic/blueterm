@@ -137,13 +137,13 @@ public class XProtocolFactory {
             bout.write(fixString(bprotocol.getPosId(), 8).getBytes());
             bout.write(fixString(bprotocol.getTransactionDateTime(), 12)
                     .getBytes());
-            bout.write(fixString(Integer.toString(bprotocol.getFlag(), 16), 4, '0')
+            bout.write(fixNumber(Integer.toString(bprotocol.getFlag(), 16), 4)
                     .getBytes());
 //            bout.write(fixString(bprotocol.getOptionalDataLen(), 4, '0')
 //                    .getBytes());
-            bout.write(fixString(Integer.toString(optionalData.length, 16), 4, '0').getBytes());
+            bout.write(fixNumber(Integer.toString(optionalData.length, 16), 4).getBytes());
             bout.write(
-                    fixString(bprotocol.getStandardCRC16(), 4, '0').getBytes());
+                    fixNumber(bprotocol.getStandardCRC16(), 4).getBytes());
             bout.write(optionalData);
             bout.write(ETX);
         } catch (IOException e) {
