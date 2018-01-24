@@ -48,7 +48,10 @@ public class XProtocolFactory {
         } catch (Exception e) {
             Log.w(TAG, "Missing ResponseCode TAG");
         }
-        tran.setMessage(protocol.getTagMap().get(XProtocolTag.ServerMessage));
+
+        if (protocol.getTagMap().containsKey(XProtocolTag.ServerMessage)) {
+            tran.setMessage(protocol.getTagMap().get(XProtocolTag.ServerMessage));
+        }
 
         if (protocol.getTagMap().containsKey(XProtocolTag.AuthCode)) {
             tran.setAuthCode(protocol.getTagMap().get(XProtocolTag.AuthCode));

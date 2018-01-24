@@ -31,6 +31,7 @@ import cz.monetplus.blueterm.xprotocol.TicketCommand;
 import cz.monetplus.blueterm.xprotocol.XProtocol;
 import cz.monetplus.blueterm.xprotocol.XProtocolCustomerTag;
 import cz.monetplus.blueterm.xprotocol.XProtocolFactory;
+import cz.monetplus.blueterm.xprotocol.XProtocolTag;
 
 /**
  * Thread for handling all messages.
@@ -504,29 +505,27 @@ public class MessageThread extends Thread {
 
                 if (termFrame != null) {
                     switch (termFrame.getPortApplication()) {
-                        case SERVER: {
+                        case SERVER:
                             // messages for server
                             handleServerMessage(termFrame);
                             break;
-                        }
 
-                        case MBCA: {
+
+                        case MBCA:
                             TTResponse(new MbcaRequests(), termFrame);
                             break;
-                        }
-                        case MVTA: {
+
+                        case MVTA:
                             TTResponse(new MvtaRequests(), termFrame);
                             break;
-                        }
-                        case SMARTSHOP: {
+
+                        case SMARTSHOP:
                             TTResponse(new SmartShopRequests(), termFrame);
                             break;
-                        }
-                        case MAINTENANCE: {
+
+                        case MAINTENANCE:
                             TTResponse(new MaintenanceRequests(), termFrame);
                             break;
-                        }
-
 
                         default:
                             Log.w(TAG, "Unsupported application port number: "
@@ -549,13 +548,22 @@ public class MessageThread extends Thread {
 
         switch (xprotocol.getMessageNumber()) {
             case Ack:
+                // Anomalie pro restart, B0 neobsahuje data, ale pokud ano, a zaroven je response code -99
+                // tak to znamena ze se restartuje terminal, normalne by se cekalo na dalsi B0 po restartu,
+                // ale tady se rozpadne spojeni, takze pokladna musi nove navazat spojeni.
+                if(xprotocol.getTagMap().containsKey(XProtocolTag.ResponseCode)) {
+                    Integer responseCode = Integer.valueOf(xprotocol.getTagMap().get(XProtocolTag.ResponseCode));
+                    if(responseCode == -99) {
+                        this.transactionOutputData.setTicketRequired(false);
+                        transactionResponse(request, xprotocol);
+                    }
+                }
                 break;
             case TransactionResponse:
                 transactionResponse(request, xprotocol);
                 break;
             case TicketResponse:
                 ticketResponse(request, xprotocol);
-
                 break;
             default:
                 Log.w(TAG, "Unexpected messageNumber: "
