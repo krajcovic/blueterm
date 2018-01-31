@@ -42,7 +42,7 @@ public class MonetBTAPI {
         try {
             messageThread.join();
         } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "doTransaction interrupted.", e);
         }
 
         return messageThread.getResult();
