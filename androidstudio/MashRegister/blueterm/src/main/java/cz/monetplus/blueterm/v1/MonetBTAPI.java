@@ -34,6 +34,7 @@ public class MonetBTAPI {
      */
     public static final TransactionOut doTransaction(final Context context,
             final TransactionIn in) throws Exception {
+        Log.i(TAG, "MonetBTAPI.doTransaction. START");
 
         // messageThread = new MessageThread(context, in);
         messageThread = MessageThread.getInstance(context, in);
@@ -45,6 +46,7 @@ public class MonetBTAPI {
             Log.e(TAG, "doTransaction interrupted.", e);
         }
 
+        Log.i(TAG, "MonetBTAPI.doTransaction. STOP");
         return messageThread.getResult();
     }
 
