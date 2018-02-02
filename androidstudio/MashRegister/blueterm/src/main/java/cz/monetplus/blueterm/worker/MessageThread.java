@@ -130,11 +130,13 @@ public class MessageThread extends Thread {
     public static MessageThread getInstance(final Context context,
                                             TransactionIn transactionInputData) throws Exception {
         if (instance == null) {
+            Log.i(TAG, "synchronized (MessageThread.class) START");
             synchronized (MessageThread.class) {
                 if (instance == null) {
                     instance = new MessageThread(context, transactionInputData);
                 }
             }
+            Log.i(TAG, "synchronized (MessageThread.class) STOP");
         } else {
             throw new Exception("Another thread communicate with blueterm");
         }
